@@ -8,9 +8,10 @@ public class CsvManager : MonoBehaviour
     public List<Lesion> lesiones { get;  private set; }
     public List<Familia> familias { get; private set; }
     public List<Etiologia> etiologias { get; private set; }
-
+    private Dictionary<string, Sprite> imagenes;
     private void Awake()
     {
+        
         if (Instance == null)
         {
             Instance = this;
@@ -20,11 +21,16 @@ public class CsvManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
 
         patologias = new List<Patologia>();
         lesiones = new List<Lesion>();
         familias = new List<Familia>();
         etiologias = new List<Etiologia>();
+        imagenes = new Dictionary<string, Sprite>();
+
+        CargarTodos();
+        CargarImagenes();
     }
 
     private void CargarTodos()
@@ -33,6 +39,25 @@ public class CsvManager : MonoBehaviour
         CargarLesiones();
         CargarFamilias();
         CargarEtiologias();
+    }
+
+    private void CargarImagenes()
+    {
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Imagenes");
+        foreach(Sprite s in sprites)
+        {
+            if(!imagenes.ContainsKey(s.name))
+            {
+                Debug.Log("Sprite cargado: " + s.name);
+                imagenes.Add(s.name, s);
+            }
+            else
+            {
+                Debug.LogWarning("Imagen duplicada: " + s.name);
+            }
+        }
+
+        Debug.Log("Se cargaron" +  imagenes.Count + " imágenes.");
     }
 
     private void CargarPatologias()
@@ -46,11 +71,11 @@ public class CsvManager : MonoBehaviour
             string[] datos = lineas[i].Split(',');
             Patologia p = new Patologia();
             p.id = int.Parse(datos[0]);
-            p.nombre = datos[1];
+            p.nombre = datos[1].Trim();
             p.lesionID = int.Parse(datos[2]);
             p.familiaID = int.Parse(datos[3]);
             p.etiologiaID = int.Parse(datos[4]);
-            p.codigoImagen = datos[5];
+            p.codigoImagen = datos[5].Trim();
             patologias.Add(p);
         }
     }
@@ -66,7 +91,7 @@ public class CsvManager : MonoBehaviour
             string[] datos = lineas[i].Split(',');
             Lesion l = new Lesion();
             l.id = int.Parse(datos[0]);
-            l.nombre = datos[1];
+            l.nombre = datos[1].Trim();
 
             lesiones.Add(l);
         }
@@ -82,7 +107,7 @@ public class CsvManager : MonoBehaviour
             string[] datos = lineas[i].Split(',');
             Familia f = new Familia();
             f.id = int.Parse(datos[0]);
-            f.nombre = datos[1];
+            f.nombre = datos[1].Trim();
 
             familias.Add(f);
         }
@@ -98,7 +123,7 @@ public class CsvManager : MonoBehaviour
             string[] datos = lineas[i].Split(',');
             Etiologia e = new Etiologia();
             e.id = int.Parse(datos[0]);
-            e.nombre = datos[1];
+            e.nombre = datos[1].Trim();
 
             etiologias.Add(e);
         }
@@ -119,5 +144,18 @@ public class CsvManager : MonoBehaviour
     public Etiologia ObtenerEtiologiaPorId(int id)
     {
         return etiologias.Find(e => e.id == id);
+    }
+
+    public Sprite spritePorCodigo(string codigo)
+    {
+        if(imagenes.TryGetValue(codigo, out Sprite sprite))
+        {
+            return sprite;
+        }
+        else
+        {
+            Debug.LogError("No se encontró la imagen con el código: " + codigo);
+            return null;
+        }
     }
 }

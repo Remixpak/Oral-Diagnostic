@@ -20,6 +20,10 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     {
         botonesAlternativas = new List<Button>(GetComponentsInChildren<Button>());//revisar esto despues
         alternativas = new List<string>();
+        ObtnerLesion();
+        ObtenerImagen();
+        RellenarRespuestas();
+
         foreach (Button boton in botonesAlternativas)
         {
             boton.onClick.AddListener(() => SeleccionarAlternativa(boton));
@@ -43,12 +47,8 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     public void ObtenerImagen()
     {
         Patologia patologia = CsvManager.Instance.ObtenerPatologiaPorId(int.Parse(idPatologia));
-        Sprite sprite = Resources.Load<Sprite>($"Imagenes/" + patologia.codigoImagen);
-        if(sprite == null)
-        {
-            Debug.LogError("No se pudo cargar la imagen: " + patologia.codigoImagen);
-        }
-        imagen.sprite = sprite;
+        Debug.Log("Buscando imagn: " + patologia.codigoImagen + " Largo: " + patologia.codigoImagen.Length);
+        imagen.sprite = CsvManager.Instance.spritePorCodigo(patologia.codigoImagen);
        
     }
     //obtiene la lesion segun la patologia
@@ -71,15 +71,18 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     }
     public void SeleccionarAlternativa(Button boton)
     {
-        respuesta = boton.GetComponentInChildren<Text>().text;
+        respuesta = boton.GetComponentInChildren<TMP_Text>().text;
         if (ComprobarRespuesta(respuesta, respuestaCorrecta))
         {
+            boton.GetComponent<Image>().color = Color.green;
             Debug.Log("Respuesta Correcta");
         }
         else
         {
+            boton.GetComponent<Image>().color = Color.red;
             Debug.Log("Respuesta Incorrecta");
         }
+        finished = true;
     }
     
     public void RellenarRespuestas()
@@ -87,13 +90,13 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         alternativas.Clear();
 
         alternativas.Add(respuestaCorrecta);
-        List<Lesion> lesiones = CsvManager.Instance.lesiones;
-        lesiones.RemoveAll(l => l.nombre == respuestaCorrecta);
+        List<Lesion> l = new List<Lesion>(CsvManager.Instance.lesiones);
+        l.RemoveAll(l => l.nombre == respuestaCorrecta);
         while(alternativas.Count < botonesAlternativas.Count)
         {
-            int indice = Random.Range(0, lesiones.Count);
-            alternativas.Add(lesiones[indice].nombre);
-            lesiones.RemoveAt(indice);
+            int indice = Random.Range(0, l.Count);
+            alternativas.Add(l[indice].nombre);
+            l.RemoveAt(indice);
         }
         for(int i = 0; i < alternativas.Count; i++)
         {
@@ -102,7 +105,7 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         }
         for(int i = 0; i < botonesAlternativas.Count; i++)
         {
-            botonesAlternativas[i].GetComponentInChildren<Text>().text = alternativas[i];
+            botonesAlternativas[i].GetComponentInChildren<TMP_Text>().text = alternativas[i];
         }
     }
 
