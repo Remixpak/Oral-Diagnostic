@@ -1,0 +1,54 @@
+id,nombre,lesion_id,familia_id,etiologia_id,codigo_foto
+1,Queratosis friccional,22,9,15,1.0
+2,Fibroma irritativo,21,9,15,2.0
+3,Epulis fisurado,26,9,15,3.0
+4,Granuloma piogenico,18,9,3,4.0
+5,Mucocele,18,9,14,5.0
+6,Queilitis Actinica,13,9,10,6.0
+7,Herpes labial recurrente,29,5,18,7.0
+8,GEHP,30,5,18,8.0
+9,Herpangina,28,5,17,9.0
+10,Mano pie boca,14,5,17,10.0
+11,Varicela,30,5,19,11.0
+12,Herpes zoster,30,5,19,12.0
+13,Papiloma oral,21,5,20,13.0
+14,Candidiasis pseudomembranosa,22,4,4,14.0
+15,Candidiasis eritematosa,7,4,4,15.0
+16,Candidiasis hiperplasica,22,4,4,16.0
+17,Estomatitis subprotesica,8,4,4,17.0
+18,Queilitis angular,10,4,4,18.0
+19,Glosotis romboidal media,5,4,4,19.0
+20,Impetigo,29,3,11,20.0
+21,Tuberculosis oral,31,3,8,21.0
+22,Sifilis primaria,3,3,16,22.0
+23,Sifilis secundaria,25,3,16,23.0
+24,Sifilis terciaria,12,3,16,24.0
+25,Liquen plano reticular,4,6,5,25.0
+26,Liquen plano en placa,22,6,5,26.0
+27,Liquen plano erosivo,10,6,5,27.0
+28,Liquen plano mixto,23,6,5,28.0
+29,Afta,31,6,5,29.0
+30,Lupus,31,6,2,30.0
+31,Pénfigo,2,6,2,31.0
+32,Penfigoide,2,6,2,32.0
+33,Alergia,9,6,6,33.0
+34,Angioedema,6,6,6,34.0
+35,Reacción liquenoide,22,6,6,35.0
+36,Leucoplasia,22,11,13,36.0
+37,Eritroplasia,22,11,13,37.0
+38,Nevus,17,7,9,38.0
+39,Lipoma,21,7,9,39.0
+40,Hemangioma,21,7,9,40.0
+41,Carcinoma espinocelular,24,8,9,41.0
+42,Melanoma,16,8,9,42.0
+43,Sarcoma de Kaposi,16,8,9,43.0
+44,Granulos de Fordyce,20,2,7,44.0
+45,Lengua fisurada,11,2,7,45.0
+46,Labio doble,27,2,7,46.0
+47,Melanosis,15,2,7,47.0
+48,Varicosidades linguales,21,2,7,48.0
+49,Malformaciones vasculares,21,2,7,49.0
+50,Torus,19,2,7,50.0
+51,Exostosis,21,2,7,51.0
+52,Lengua geográfica,22,10,12,52.0
+
