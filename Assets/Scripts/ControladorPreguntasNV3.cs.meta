@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 33825a6f05348a8429fc88762102c315
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - containerEspacios: {instanceID: 0}
+  - containerTeclado: {instanceID: 0}
+  - prefabBotonLetra: {fileID: 4629883868892508376, guid: 09b0c71a52c1c314194eb0541631aef0, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
