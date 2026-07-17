@@ -9,6 +9,8 @@ public abstract class ControladorPreguntas : MonoBehaviour
     private int TotalFallos;
     private int TotalIntentos;
     private int TotalReinicios;
+    //quiza haya que llevar estas variables al gameManager mejor
+    private bool finished {get; set;}
 
     public void RegistrarMetricas()
     {
@@ -23,7 +25,7 @@ public abstract class ControladorPreguntas : MonoBehaviour
 
     void Start()
     {
-        
+        finished = false;
     }
 
     void Update()
