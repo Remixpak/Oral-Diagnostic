@@ -19,6 +19,21 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     [SerializeField] private Transform containerTeclado;
     [SerializeField] private GameObject prefabBotonLetra;
 
+    [Header("Pistas clinicas")]
+    [SerializeField] private Image uiImagePista;
+    [SerializeField] private TextMeshProUGUI uiTextoLesion;
+    [SerializeField] private TextMeshProUGUI uiTextoFamilia;
+    [SerializeField] private TextMeshProUGUI uiTextoEtiopatogenia;
+
+    [Header("Datos de la pista")]
+    [SerializeField] private Sprite imagenPistaSprite;
+    [SerializeField] private string NombreLesion = "Lesion Primaria";
+    [SerializeField] private string NombreFamilia = "Dermatologica";
+    [SerializeField] private string DescripcionEtiopatogenia = "Perdida continuidad de la piel";
+
+
+
+
     private List<string> letrasTeclado = new List<string>();
     private string[] progresoUsuario; //variable que guarda las letras que el usuario va ingresando
 
@@ -30,6 +45,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     void Start()
     {
         progresoUsuario = new string[palabraCorrecta.Length];
+        ConfigurarPanelPistas();
         GenerarLetrasTeclado();
         CrearEspaciosPalabra();
         CrearTeclado();
@@ -37,6 +53,14 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     void Update()
     {
         
+    }
+
+    private void ConfigurarPanelPistas()
+    {
+        if (uiImagePista != null && imagenPistaSprite != null) uiImagePista.sprite = imagenPistaSprite;
+        if (uiTextoLesion != null) uiTextoLesion.text = "Lesión: " + NombreLesion;
+        if (uiTextoFamilia != null) uiTextoFamilia.text = "Familia: " + NombreFamilia;
+        if (uiTextoEtiopatogenia != null) uiTextoEtiopatogenia.text = "Etiopatogenia: " + DescripcionEtiopatogenia;
     }
 
     //metodo para generarr las teclas en pantalla
@@ -138,6 +162,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
             //limpiamos visualmente la casilla 
             botonesEspaciosUI[indiceEspacio].GetComponentInChildren<TextMeshProUGUI>().text = "";
             botonesEspaciosUI[indiceEspacio].name = "Espacio";
+            botonesEspaciosUI[indiceEspacio].GetComponent<Image>().color = Color.white; //restablece el color del espacio a blanco
         }
     }
 
@@ -147,17 +172,25 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         string palabraFormada = "";
         for (int i = 0; i < progresoUsuario.Length; i++)
         {
-            if (string.IsNullOrEmpty(progresoUsuario[i])) return; //faltan letras
+            if (string.IsNullOrEmpty(progresoUsuario[i])) return;//si hay un espacio vacio no se puede comprobar el resultado
             palabraFormada += progresoUsuario[i];
         }
 
         if (palabraFormada == palabraCorrecta)
         {
             Debug.Log("<color=green>¡Correcto! Has descubierto el diagnóstico clínico.</color>");
+            foreach (Button btn in botonesEspaciosUI)
+            {
+                btn.GetComponent<Image>().color = Color.green;
+            }
         }
         else
         {
             Debug.Log("<color=red>Palabra incorrecta. Sigue intentando.</color>");
+            foreach (Button btn in botonesEspaciosUI)
+            {
+                btn.GetComponent<Image>().color = Color.red;
+            }
         }
     }
 
