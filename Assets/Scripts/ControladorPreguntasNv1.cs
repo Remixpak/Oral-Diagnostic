@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using TMPro;
 public class ControladorPreguntasNv1 : ControladorPreguntas
 {
+    
     [Header("Atributos")]
     [SerializeField] private string pregunta;
     [SerializeField] private string respuestaCorrecta;
     [SerializeField] private string respuesta;
     [SerializeField] private List<string> alternativas;
-
+    
+    private int idPatologiaNumerica;
     private string idPatologia;
     [SerializeField] private Image imagen;
     [Header("Botones")]
@@ -18,16 +20,7 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        botonesAlternativas = new List<Button>(GetComponentsInChildren<Button>());//revisar esto despues
-        alternativas = new List<string>();
-        ObtnerLesion();
-        ObtenerImagen();
-        RellenarRespuestas();
-
-        foreach (Button boton in botonesAlternativas)
-        {
-            boton.onClick.AddListener(() => SeleccionarAlternativa(boton));
-        }
+        
     }
 
     // Update is called once per frame
@@ -54,16 +47,10 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     //obtiene la lesion segun la patologia
     public void ObtnerLesion()
     {
-        int indice = Random.Range(0, CsvManager.Instance.patologias.Count);
-        Patologia patologia = CsvManager.Instance.patologias[indice];
-        idPatologia = patologia.id.ToString();
-
-        Lesion lesion = CsvManager.Instance.ObtenerLesionPorId(patologia.lesionID);
-        respuestaCorrecta = lesion.nombre;
+        Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologiaNumerica);
+        Lesion l = CsvManager.Instance.ObtenerLesionPorId(p.lesionID);
+        respuestaCorrecta = l.nombre;
         alternativas.Add(respuestaCorrecta);
-
-        Debug.Log("Patologia: {patologia.nombre}, Lesion: {lesion.nombre}");
-        Debug.Log("Respuesta Correcta: {respuestaCorrecta}");
     }
     public bool ComprobarRespuesta(string respuesta, string respuestaCorrecta)
     {
@@ -113,4 +100,24 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     {
         throw new System.NotImplementedException();
     }
+
+    public override void InicializarPregunta(int indPatologiaAsignada)
+    {
+        idPatologiaNumerica = indPatologiaAsignada;
+        idPatologia = idPatologiaNumerica.ToString();
+        botonesAlternativas = new List<Button>(GetComponentsInChildren<Button>());//revisar esto despues
+        alternativas = new List<string>();
+        ObtnerLesion();
+        ObtenerImagen();
+        RellenarRespuestas();
+
+        foreach (Button boton in botonesAlternativas)
+        {
+            boton.onClick.AddListener(() => SeleccionarAlternativa(boton));
+        }
+
+
+    }
+
+    
 }
