@@ -5,11 +5,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class ControladorPreguntasNV3 : ControladorPreguntas
 {
 
     [Header("Configuración del Juego")]
 
+    [SerializeField] private int patologiaIDTarget = 1; //ID de la patologia que se quiere mostrar
     [SerializeField] private string palabraCorrecta = "ULCERA"; //Objetivo a formar
     [SerializeField] private int cantidadLetrasTeclado = 12;// letras totaless
 
@@ -44,6 +46,9 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
 
     void Start()
     {
+        ObtenerPatologiaAleatoria();
+        CargarDatosDesdeCSV();
+
         progresoUsuario = new string[palabraCorrecta.Length];
         ConfigurarPanelPistas();
         GenerarLetrasTeclado();
@@ -55,6 +60,54 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         
     }
 
+    //metodo para obtener una patologia aleatoria del CSV a traves del ID de la patologia
+    private void ObtenerPatologiaAleatoria()
+    {
+        if (CsvManager.Instance != null && CsvManager.Instance.patologias != null && CsvManager.Instance.patologias.Count > 0)
+        {
+            int indice = Random.Range(0, CsvManager.Instance.patologias.Count);
+            Patologia patologia = CsvManager.Instance.patologias[indice];
+            patologiaIDTarget = patologia.id;
+        }
+    }
+
+    //metodo para cargar los datos de la patologia desde el CSV
+    private void CargarDatosDesdeCSV()
+    {
+        if (CsvManager.Instance == null) return;
+
+        Patologia patologiaActual = CsvManager.Instance.ObtenerPatologiaPorId(patologiaIDTarget);//
+        if (patologiaActual != null)
+        {
+            palabraCorrecta = patologiaActual.nombre.ToUpper().Trim();
+
+            Lesion lesion = CsvManager.Instance.ObtenerLesionPorId(patologiaActual.lesionID);
+            if (lesion != null) NombreLesion = lesion.nombre;
+
+            Familia familia = CsvManager.Instance.ObtenerFamiliaPorId(patologiaActual.familiaID);
+            if (familia != null) NombreFamilia = familia.nombre;
+
+            Etiologia etiologia = CsvManager.Instance.ObtenerEtiologiaPorId(patologiaActual.etiologiaID);
+            if (etiologia != null) DescripcionEtiopatogenia = etiologia.nombre;
+
+            if (!string.IsNullOrEmpty(patologiaActual.codigoImagen))
+            {
+                string nombreImagenLimpio = patologiaActual.codigoImagen.Trim().Replace("\r", "").Replace("\n", "");
+
+                Sprite spriteCargado = CsvManager.Instance.spritePorCodigo(nombreImagenLimpio);
+                if (spriteCargado != null)
+                {
+                    imagenPistaSprite = spriteCargado;
+                }
+                else
+                {
+                    Debug.LogError("No se encontró la imagen en: Assets/Resources/Imagenes/" + nombreImagenLimpio);
+                }
+            }
+        }
+    }
+
+    //metodo para configurar el panel de pistas con los datos obtenidos del CSV
     private void ConfigurarPanelPistas()
     {
         if (uiImagePista != null && imagenPistaSprite != null) uiImagePista.sprite = imagenPistaSprite;
@@ -68,6 +121,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     {
         for (int i = 0; i < palabraCorrecta.Length; i++)//añade solamente las letras de la palabra correcta
         {
+            if (palabraCorrecta[i] == ' ') continue;
             letrasTeclado.Add(palabraCorrecta[i].ToString());
         }
 
@@ -78,9 +132,9 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
             string letraAleatoria = abecedario[Random.Range(0, abecedario.Length)].ToString();
             letrasTeclado.Add(letraAleatoria);
         }
-        
+
         //mezcla las letras
-        for (int i = 0; i < letrasTeclado.Count; i++) 
+        for (int i = 0; i < letrasTeclado.Count; i++)
         {
             string temp = letrasTeclado[i];
             int randomIndex = Random.Range(i, letrasTeclado.Count);
@@ -92,17 +146,55 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     //metodo para crear las casillas vacias de las palabras en pantalla 
     private void CrearEspaciosPalabra()
     {
-        for (int i = 0; i < palabraCorrecta.Length; i++)
+        string[] palabras = palabraCorrecta.Split(' ');
+        int letraGlobalIndex = 0;
+
+        for (int w = 0; w < palabras.Length; w++)
         {
-            int index = i; //obtenemos una copia del listener del boton
-            GameObject nuevoBoton = Instantiate(prefabBotonLetra, containerEspacios);
-            Button btn = nuevoBoton.GetComponent<Button>();
+            string palabraActual = palabras[w];
 
-            btn.GetComponentInChildren<TextMeshProUGUI>().text = "";//lo inicializamos vacio
+            GameObject subContenedor = new GameObject("SubContainer_" + palabraActual, typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(ContentSizeFitter));
+            subContenedor.transform.SetParent(containerEspacios, false);
 
-            btn.onClick.AddListener(() => RemoverLetraDeEspacio(index));//si la letra ya existe y se clickea se elimina 
+            HorizontalLayoutGroup layoutGroup = subContenedor.GetComponent<HorizontalLayoutGroup>();
+            layoutGroup.spacing = 8f;
+            layoutGroup.childAlignment = TextAnchor.MiddleCenter;
+            layoutGroup.childControlWidth = true;
+            layoutGroup.childControlHeight = true;
+            layoutGroup.childForceExpandWidth = false;
+            layoutGroup.childForceExpandHeight = false;
 
-            botonesEspaciosUI.Add(btn);
+            ContentSizeFitter fitter = subContenedor.GetComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            for (int i = 0; i < palabraActual.Length; i++)
+            {
+                int index = letraGlobalIndex;
+                GameObject nuevoBoton = Instantiate(prefabBotonLetra, subContenedor.transform);
+                Button btn = nuevoBoton.GetComponent<Button>();
+
+                btn.GetComponentInChildren<TextMeshProUGUI>().text = "";
+                btn.onClick.AddListener(() => RemoverLetraDeEspacio(index));
+
+                botonesEspaciosUI.Add(btn);
+                letraGlobalIndex++;
+            }
+
+            if (w < palabras.Length - 1)
+            {
+                int indexEspacio = letraGlobalIndex;
+                progresoUsuario[indexEspacio] = " ";
+
+                GameObject espacioInvis = new GameObject("EspacioSeparador", typeof(RectTransform));
+                espacioInvis.transform.SetParent(subContenedor.transform, false);
+
+                GameObject btnEspacioFake = Instantiate(prefabBotonLetra, containerEspacios);
+                btnEspacioFake.SetActive(false);
+                botonesEspaciosUI.Add(btnEspacioFake.GetComponent<Button>());
+
+                letraGlobalIndex++;
+            }
         }
     }
 
