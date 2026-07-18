@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
+using System.Collections;
 public class ControladorPreguntasNv1 : ControladorPreguntas
 {
     
@@ -16,7 +17,9 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     [SerializeField] private Image imagen;
     [Header("Botones")]
     [SerializeField] private List<Button> botonesAlternativas;
+
     
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,14 +31,7 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     {
         
     }
-    /*
-    + ObtenerImagen(): Image
-    + ComprobarRespuesta(String, String): void
-    + SeleccionarAlternativa(Button): void
-    + SeleccionarRespuestaCorrecta(Button): String
-    + RellenarRespuestas(Button, Button, Button): void
     
-    */
     //obtiene la imagen segun la id de la patologia
     public void ObtenerImagen()
     {
@@ -62,14 +58,16 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         if (ComprobarRespuesta(respuesta, respuestaCorrecta))
         {
             boton.GetComponent<Image>().color = Color.green;
+            GameManager.Instance.TotalAciertos++;
             Debug.Log("Respuesta Correcta");
         }
         else
         {
             boton.GetComponent<Image>().color = Color.red;
+            GameManager.Instance.TotalFallos++;
             Debug.Log("Respuesta Incorrecta");
         }
-        finished = true;
+        StartCoroutine(FinalizarPregunta());
     }
     
     public void RellenarRespuestas()
@@ -98,7 +96,19 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
 
     public override void EntregarRetroalimentacion()
     {
-        throw new System.NotImplementedException();
+        canvasJuego.gameObject.SetActive(false);
+        if(ComprobarRespuesta(respuesta, respuestaCorrecta))
+        {
+            textoResultado.text = "¡Respuesta Correcta!";
+        }
+        else
+        {
+            textoResultado.text = "Respuesta Incorrecta";
+        }
+        textoRespuesta.text = "La respuesta correcta es: " + respuestaCorrecta;
+        canvasRetroalimentacion.GetComponentInChildren<Button>().onClick.AddListener(() => finished = true);
+        canvasRetroalimentacion.gameObject.SetActive(true);
+
     }
 
     public override void InicializarPregunta(int indPatologiaAsignada)
@@ -117,6 +127,14 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         }
 
 
+    }
+
+
+
+    private IEnumerator FinalizarPregunta()
+    {
+        yield return new WaitForSeconds(1.5f);
+        EntregarRetroalimentacion();
     }
 
     
