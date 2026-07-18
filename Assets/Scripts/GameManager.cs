@@ -88,27 +88,20 @@ public class GameManager : MonoBehaviour
     // Este es el verdadero Loop que controla el flujo por turnos
     private IEnumerator LoopDeJuegoCorrutina(GameObject prefabNivel)
     {
-        switch (modoActual)
+        while (preguntaActualIndice < idsRondaActual.Count)
         {
-            case ModoJuego.Carrera:
-                for (preguntaActualIndice = 0; preguntaActualIndice < idsRondaActual.Count; preguntaActualIndice++)
-                {
-                    // Instanciar el prefab del nivel
-                    GameObject nivelInstanciado = Instantiate(prefabNivel);
-                    ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
+            int idPregunta = idsRondaActual[preguntaActualIndice];
+            // Aquí instancias tu prefab de nivel y le pasas la ID de la pregunta
+            GameObject nivelInstanciado = Instantiate(prefabNivel);
+            ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
+            controlador.InicializarPregunta(idPregunta);
 
-                    yield return null;
-                }
-                break;
-
-            case ModoJuego.QuickPlay:
-                // Implementar lógica para QuickPlay si es necesario
-                break;
-
-            case ModoJuego.Custom:
-                // Implementar lógica para Custom si es necesario
-                break;
+           
+            Destroy(nivelInstanciado);
         }
+
+        TerminarRonda();
+        yield return null;
     }
 
     private void TerminarRonda()
