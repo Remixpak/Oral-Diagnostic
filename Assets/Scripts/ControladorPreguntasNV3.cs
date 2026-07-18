@@ -285,12 +285,16 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
             }
         }
     }
-
-
-
     public override void EntregarRetroalimentacion()
     {
         // aun no hay la logica
     }
+
+
+    public override void InicializarPregunta(int indPatologiaAsignada)
+    {
+
+    }
+
 
 }
