@@ -286,6 +286,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ControladorPreguntasNV2
   finished: 0
+  canvasJuego: {fileID: 0}
+  canvasRetroalimentacion: {fileID: 0}
+  textoResultado: {fileID: 0}
+  textoRespuesta: {fileID: 0}
   patologiaIDTarget: 1
   colorNormal: {r: 1, g: 1, b: 1, a: 1}
   colorSeleccionado: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
@@ -307,6 +311,7 @@ MonoBehaviour:
   botonesLesiones:
   - {fileID: 1121809257}
   idLesionesBotones: 
+  lineaConectora: {fileID: 672021350}
 --- !u!4 &67052907
 Transform:
   m_ObjectHideFlags: 0
@@ -1317,6 +1322,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1699281775}
+  - {fileID: 672021351}
   - {fileID: 486642378}
   - {fileID: 771228556}
   m_Father: {fileID: 0}
@@ -1389,6 +1395,56 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &672021349
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 672021351}
+  - component: {fileID: 672021350}
+  m_Layer: 0
+  m_Name: LineasConectoras
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &672021350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672021349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 103f341b29de07744b8a8e57344a6d87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LineaConectora
+  grosorLinea: 10
+  colorLineaSeleccion: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  colorLineaCorrecta: {r: 0, g: 1, b: 0, a: 1}
+  colorLineaIncorrecta: {r: 1, g: 0, b: 0, a: 1}
+  offsetOrigenY: 0
+  offsetDestinoY: 0
+--- !u!4 &672021351
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672021349}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -36.23883, y: 435.16956, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 615307185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &679207488
 GameObject:
   m_ObjectHideFlags: 0

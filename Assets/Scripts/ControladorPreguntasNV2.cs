@@ -8,11 +8,12 @@ using UnityEngine.UI;
 public class ControladorDecisionNV3 : ControladorPreguntas
 {
     [Header("Configuración del Juego")]
-    [SerializeField] private int patologiaIDTarget = 1; // ID de la patología objetivo para el nivel
-    [SerializeField] private Color colorNormal = Color.white; // Color por defecto para los botones
-    [SerializeField] private Color colorSeleccionado = Color.yellow; // Color para el botón seleccionado
-    [SerializeField] private Button botonPausa; // Botón de pausa para el juego
+    [SerializeField] private int patologiaIDTarget = 1; // Id de la patologia que se debe seleccionar correctamente
+    [SerializeField] private Color colorNormal = Color.white; // Color por defecto de los botones
+    [SerializeField] private Color colorSeleccionado = Color.yellow;// Color cuando un botón está seleccionado
+    [SerializeField] private Button botonPausa;// asignar boton pausa en el inspector
 
+    // Variables de control de selección de patología, etiología, familia y lesión
     [Header("Componentes de la UI - Bloque 1: Patologías (Imagenes)")]
     [SerializeField] private Button[] botonesPatologias;
     [SerializeField] private int[] idPatologiasBotones;
@@ -29,16 +30,20 @@ public class ControladorDecisionNV3 : ControladorPreguntas
     [SerializeField] private Button[] botonesLesiones;
     [SerializeField] private int[] idLesionesBotones;
 
-    // Variables para almacenar los IDs correctos de cada bloque
-    private int targetEtiologiaID;
-    private int targetFamiliaID;
-    private int targetLesionID;
-    // Variables para almacenar los índices seleccionados y si son correctos
+    [Header("Líneas Conectoras")]
+    [SerializeField] private LineaConectora lineaConectora;
+
+    private int targetEtiologiaID; // Id de la etiología que se debe seleccionar correctamente
+    private int targetFamiliaID;// Id de la familia que se debe seleccionar correctamente
+    private int targetLesionID;// Id de la lesión que se debe seleccionar correctamente
+
+    //indice de las patologias, etiologias, familias y lesiones seleccionadas por el usuario
     private int indicePatologiaSeleccionada = -1;
     private int indiceEtiologiaSeleccionada = -1;
     private int indiceFamiliaSeleccionada = -1;
     private int indiceLesionSeleccionada = -1;
-    // Variables para verificar si la selección es correcta
+
+    // Variables de control para verificar si la selección es correcta
     private bool patologiaCorrectaSeleccionada = false;
     private bool etiologiaCorrectaSeleccionada = false;
     private bool familiaCorrectaSeleccionada = false;
@@ -58,7 +63,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
 
     }
 
-    //metodo para obtener una patología aleatoria de la lista de patologías del CsvManager
+    //metodo para obtener una patologia aleatoria de la lista de patologias del CsvManager
     private void ObtenerPatologiaAleatoria()
     {
         if (CsvManager.Instance != null && CsvManager.Instance.patologias != null && CsvManager.Instance.patologias.Count > 0)
@@ -69,7 +74,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
     }
 
-    //metodo para cargar los datos estructurales de la patología objetivo desde el CsvManager
+    //metodo para obtener los datos estructurales de la patologia objetivo desde el CsvManager
     private void CargarDatosEstructuralesCSV()
     {
         if (CsvManager.Instance == null) return;
@@ -83,7 +88,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
     }
 
-    //metodo para asignar datos aleatorios a los botones de cada bloque, asegurando que uno de ellos sea el correcto
+    //metodo para asignar datos aleatorios a los botones de patologia, etiologia, familia y lesion
     private void AsignarDatosAleatoriosABotones()
     {
         if (CsvManager.Instance == null) return;
@@ -92,7 +97,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         int indiceCorrectoPatologia = Random.Range(0, botonesPatologias.Length);
         idPatologiasBotones[indiceCorrectoPatologia] = patologiaIDTarget;
 
-        for (int i = 0; i < botonesPatologias.Length; i++) // Recorrer todos los botones de patologías
+        for (int i = 0; i < botonesPatologias.Length; i++)
         {
             if (i != indiceCorrectoPatologia)
             {
@@ -106,7 +111,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         int indiceCorrectoEtiologia = Random.Range(0, botonesEtiologias.Length);
         idEtiologiasBotones[indiceCorrectoEtiologia] = targetEtiologiaID;
 
-        for (int i = 0; i < botonesEtiologias.Length; i++) // Recorrer todos los botones de etiologías
+        for (int i = 0; i < botonesEtiologias.Length; i++)
         {
             if (i != indiceCorrectoEtiologia)
             {
@@ -119,7 +124,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         int indiceCorrectoFamilia = Random.Range(0, botonesFamilias.Length);
         idFamiliasBotones[indiceCorrectoFamilia] = targetFamiliaID;
 
-        for (int i = 0; i < botonesFamilias.Length; i++) // Recorrer todos los botones de familias
+        for (int i = 0; i < botonesFamilias.Length; i++)
         {
             if (i != indiceCorrectoFamilia)
             {
@@ -132,7 +137,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         int indiceCorrectoLesion = Random.Range(0, botonesLesiones.Length);
         idLesionesBotones[indiceCorrectoLesion] = targetLesionID;
 
-        for (int i = 0; i < botonesLesiones.Length; i++) // Recorrer todos los botones de lesiones
+        for (int i = 0; i < botonesLesiones.Length; i++)
         {
             if (i != indiceCorrectoLesion)
             {
@@ -141,7 +146,8 @@ public class ControladorDecisionNV3 : ControladorPreguntas
             ActualizarTextoBotonLesion(i);
         }
     }
-    //metodo para obtener un id de patología falso, diferente al id de la patología objetivo
+
+    //metodops para obtener ids falsos de patologia, etiologia, familia y lesion que no sean iguales a los ids correctos
     private int ObtenerIdPatologiaFalsa()
     {
         List<int> idsValidos = new List<int>();
@@ -151,7 +157,8 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
         return idsValidos.Count > 0 ? idsValidos[Random.Range(0, idsValidos.Count)] : 0;
     }
-    //metodo para obtener un id de etiología falso, diferente al id de la etiología objetivo
+
+    //metodo para obtener un id falso de etiologia que no sea igual al id correcto
     private int ObtenerIdEtiologiaFalsa()
     {
         List<int> idsValidos = new List<int>();
@@ -162,7 +169,8 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
         return idsValidos.Count > 0 ? idsValidos[Random.Range(0, idsValidos.Count)] : 0;
     }
-    //metodo para obtener un id de familia falso, diferente al id de la familia objetivo
+
+    //metodo para obtener un id falso de familia que no sea igual al id correcto
     private int ObtenerIdFamiliaFalsa()
     {
         List<int> idsValidos = new List<int>();
@@ -173,7 +181,8 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
         return idsValidos.Count > 0 ? idsValidos[Random.Range(0, idsValidos.Count)] : 0;
     }
-    //metodo para obtener un id de lesión falso, diferente al id de la lesión objetivo
+
+    //metodo para obtener un id falso de lesion que no sea igual al id correcto
     private int ObtenerIdLesionFalsa()
     {
         List<int> idsValidos = new List<int>();
@@ -184,7 +193,8 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
         return idsValidos.Count > 0 ? idsValidos[Random.Range(0, idsValidos.Count)] : 0;
     }
-    //metodo para actualizar la imagen del botón de patología según el índice y el id de patología correspondiente
+
+    //metodo para actualizar la imagen del boton de patologia segun el id de patologia asignado al boton
     private void ActualizarImagenBotonPatologia(int indice)
     {
         Patologia patologiaActual = CsvManager.Instance.ObtenerPatologiaPorId(idPatologiasBotones[indice]);
@@ -201,14 +211,15 @@ public class ControladorDecisionNV3 : ControladorPreguntas
             }
             else if (img == null)
             {
-                Debug.LogError("No se encontró la imagen a través de CsvManager para el código: " + nombreImagenLimpio);
+                Debug.LogError("No se encontro la imagen a través de CsvManager para el código: " + nombreImagenLimpio);
             }
 
             TextMeshProUGUI txt = botonesPatologias[indice].GetComponentInChildren<TextMeshProUGUI>();
             if (txt != null) txt.text = "";
         }
     }
-    //metodo para actualizar el texto del botón de etiología según el índice y el id de etiología correspondiente
+
+    //metodo para actualizar el texto del boton de etiologia segun el id de etiologia asignado al boton
     private void ActualizarTextoBotonEtiologia(int indice)
     {
         TextMeshProUGUI txt = botonesEtiologias[indice].GetComponentInChildren<TextMeshProUGUI>();
@@ -218,7 +229,8 @@ public class ControladorDecisionNV3 : ControladorPreguntas
             if (e != null) txt.text = e.nombre;
         }
     }
-    //metodo para actualizar el texto del botón de familia según el índice y el id de familia correspondiente
+
+    //metodo para actualizar el texto del boton de familia segun el id de familia asignado al boton
     private void ActualizarTextoBotonFamilia(int indice)
     {
         TextMeshProUGUI txt = botonesFamilias[indice].GetComponentInChildren<TextMeshProUGUI>();
@@ -228,7 +240,8 @@ public class ControladorDecisionNV3 : ControladorPreguntas
             if (f != null) txt.text = f.nombre;
         }
     }
-    //metodo para actualizar el texto del botón de lesión según el índice y el id de lesión correspondiente
+
+    //metodo para actualizar el texto del boton de lesion segun el id de lesion asignado al boton
     private void ActualizarTextoBotonLesion(int indice)
     {
         TextMeshProUGUI txt = botonesLesiones[indice].GetComponentInChildren<TextMeshProUGUI>();
@@ -238,15 +251,16 @@ public class ControladorDecisionNV3 : ControladorPreguntas
             if (l != null) txt.text = l.nombre;
         }
     }
-    //metodo para configurar la interactividad de los botones del árbol de decisiones, asignando los eventos de click a cada botón
+
+    //metodo para configurar la interactividad de los botones del arbol de decisiones
     private void ConfigurarInteractividadArbol()
     {
-        for (int i = 0; i < botonesPatologias.Length; i++)// Recorrer todos los botones de patologías
+        for (int i = 0; i < botonesPatologias.Length; i++)
         {
             int index = i;
             if (botonesPatologias[index] != null)
             {
-                botonesPatologias[index].onClick.AddListener(() => ValidarSeleccionPatologia(index));// Agregar el listener para el botón de patología
+                botonesPatologias[index].onClick.AddListener(() => ValidarSeleccionPatologia(index));
             }
         }
 
@@ -268,7 +282,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
             }
         }
 
-        for (int i = 0; i < botonesLesiones.Length; i++)// Recorrer todos los botones de lesiones
+        for (int i = 0; i < botonesLesiones.Length; i++)
         {
             int index = i;
             if (botonesLesiones[index] != null)
@@ -286,7 +300,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         SetBloqueInteractable(botonesLesiones, indicePatologiaSeleccionada != -1 && indiceEtiologiaSeleccionada != -1 && indiceFamiliaSeleccionada != -1);
     }
 
-    //metodo para establecer la interactividad de un bloque de botones, habilitando o deshabilitando los botones según el estado proporcionado
+    //metodo para establecer la interactividad de un bloque de botones y cambiar su color según el estado
     private void SetBloqueInteractable(Button[] bloque, bool estado)
     {
         for (int i = 0; i < bloque.Length; i++)
@@ -304,7 +318,78 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
     }
 
-    //metodos para limpiar las selecciones posteriores a cada bloque, restableciendo los índices y estados de selección, y restableciendo los colores de los botones
+    //metodo para actualizar las lineas conectoras entre los botones seleccionados(usa lineaconectora script)
+    private void ActualizarLineas()
+    {
+        if (lineaConectora == null) return;
+
+        lineaConectora.LimpiarLineas();
+
+        // Linea 1: patologia → etiologia
+        if (indicePatologiaSeleccionada != -1 && indiceEtiologiaSeleccionada != -1)
+        {
+            Button origen = botonesPatologias[indicePatologiaSeleccionada];
+            Button destino = botonesEtiologias[indiceEtiologiaSeleccionada];
+            Color color = lineaConectora.GetColorSeleccion();
+            lineaConectora.CrearLinea(origen, destino, color);
+        }
+
+        // linea 2: etiologia → familia
+        if (indiceEtiologiaSeleccionada != -1 && indiceFamiliaSeleccionada != -1)
+        {
+            Button origen = botonesEtiologias[indiceEtiologiaSeleccionada];
+            Button destino = botonesFamilias[indiceFamiliaSeleccionada];
+            Color color = lineaConectora.GetColorSeleccion();
+            lineaConectora.CrearLinea(origen, destino, color);
+        }
+
+        // linea 3: familia → lesion
+        if (indiceFamiliaSeleccionada != -1 && indiceLesionSeleccionada != -1)
+        {
+            Button origen = botonesFamilias[indiceFamiliaSeleccionada];
+            Button destino = botonesLesiones[indiceLesionSeleccionada];
+            Color color = lineaConectora.GetColorSeleccion();
+            lineaConectora.CrearLinea(origen, destino, color);
+        }
+
+        // Si todas las selecciones estan completas, cambiar colores a los colores correctos o incorrectos según la validación
+        if (lineaConectora.HayLineas() &&
+            indicePatologiaSeleccionada != -1 &&
+            indiceEtiologiaSeleccionada != -1 &&
+            indiceFamiliaSeleccionada != -1 &&
+            indiceLesionSeleccionada != -1)
+        {
+            int idx = 0;
+
+            if (lineaConectora.CantidadLineas() > idx)
+            {
+                Color color = (patologiaCorrectaSeleccionada && etiologiaCorrectaSeleccionada)
+                    ? lineaConectora.GetColorCorrecta()
+                    : lineaConectora.GetColorIncorrecta();
+                lineaConectora.CambiarColorLinea(idx, color);
+                idx++;
+            }
+
+            if (lineaConectora.CantidadLineas() > idx)
+            {
+                Color color = (etiologiaCorrectaSeleccionada && familiaCorrectaSeleccionada)
+                    ? lineaConectora.GetColorCorrecta()
+                    : lineaConectora.GetColorIncorrecta();
+                lineaConectora.CambiarColorLinea(idx, color);
+                idx++;
+            }
+
+            if (lineaConectora.CantidadLineas() > idx)
+            {
+                Color color = (familiaCorrectaSeleccionada && lesionCorrectaSeleccionada)
+                    ? lineaConectora.GetColorCorrecta()
+                    : lineaConectora.GetColorIncorrecta();
+                lineaConectora.CambiarColorLinea(idx, color);
+            }
+        }
+    }
+
+    //metodos para limpiar las selecciones posteriores a la seleccion de patologia, etiologia y familia
     private void LimpiarSeleccionesPosterioresAPatologia()
     {
         indiceEtiologiaSeleccionada = -1;
@@ -314,9 +399,10 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         indiceLesionSeleccionada = -1;
         lesionCorrectaSeleccionada = false;
         RestablecerColoresTodosLosBloques();
+        ActualizarLineas();
     }
 
-    //metodo para limpiar las selecciones posteriores al bloque de etiología, restableciendo los índices y estados de selección, y restableciendo los colores de los botones
+    //metodo para limpiar las selecciones posteriores a la seleccion de etiologia
     private void LimpiarSeleccionesPosterioresAEtiologia()
     {
         indiceFamiliaSeleccionada = -1;
@@ -324,16 +410,19 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         indiceLesionSeleccionada = -1;
         lesionCorrectaSeleccionada = false;
         RestablecerColoresTodosLosBloques();
+        ActualizarLineas();
     }
-    //metodo para limpiar las selecciones posteriores al bloque de familia, restableciendo los índices y estados de selección, y restableciendo los colores de los botones
+
+    //metodo para limpiar las selecciones posteriores a la seleccion de familia
     private void LimpiarSeleccionesPosterioresAFamilia()
     {
         indiceLesionSeleccionada = -1;
         lesionCorrectaSeleccionada = false;
         RestablecerColoresTodosLosBloques();
+        ActualizarLineas();
     }
 
-    //metodo para restablecer los colores de todos los bloques de botones, resaltando el botón seleccionado y restableciendo los demás al color normal
+    //metodo para restablecer los colores de todos los bloques de botones según la selección actual
     private void RestablecerColoresTodosLosBloques()
     {
         RestablecerColorBloque(botonesPatologias, indicePatologiaSeleccionada);
@@ -341,7 +430,8 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         RestablecerColorBloque(botonesFamilias, indiceFamiliaSeleccionada);
         RestablecerColorBloque(botonesLesiones, indiceLesionSeleccionada);
     }
-    //metodos para validar la selección de cada bloque, verificando si el índice seleccionado es el mismo que el previamente seleccionado, y actualizando los estados y colores de los botones en consecuencia
+
+    //metodos para validar la seleccion de patologia, etiologia, familia y lesion
     private void ValidarSeleccionPatologia(int indice)
     {
         if (indicePatologiaSeleccionada == indice)
@@ -358,10 +448,11 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         patologiaCorrectaSeleccionada = (indice < idPatologiasBotones.Length && idPatologiasBotones[indice] == patologiaIDTarget);
 
         RestablecerColoresTodosLosBloques();
+        ActualizarLineas();
         ActualizarInteractividadBloques();
     }
 
-    //metodo para validar la selección del bloque de etiología, verificando si el índice seleccionado es el mismo que el previamente seleccionado, y actualizando los estados y colores de los botones en consecuencia
+    //metodos para validar la seleccion de etiologia, familia y lesion
     private void ValidarSeleccionEtiologia(int indice)
     {
         if (indiceEtiologiaSeleccionada == indice)
@@ -378,10 +469,11 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         etiologiaCorrectaSeleccionada = (indice < idEtiologiasBotones.Length && idEtiologiasBotones[indice] == targetEtiologiaID);
 
         RestablecerColoresTodosLosBloques();
+        ActualizarLineas();
         ActualizarInteractividadBloques();
     }
 
-    //metodo para validar la selección del bloque de familia, verificando si el índice seleccionado es el mismo que el previamente seleccionado, y actualizando los estados y colores de los botones en consecuencia
+    //metodos para validar la seleccion de familia y lesion
     private void ValidarSeleccionFamilia(int indice)
     {
         if (indiceFamiliaSeleccionada == indice)
@@ -398,10 +490,11 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         familiaCorrectaSeleccionada = (indice < idFamiliasBotones.Length && idFamiliasBotones[indice] == targetFamiliaID);
 
         RestablecerColoresTodosLosBloques();
+        ActualizarLineas();
         ActualizarInteractividadBloques();
     }
 
-    //metodo para validar la selección del bloque de lesión, verificando si el índice seleccionado es el mismo que el previamente seleccionado, y actualizando los estados y colores de los botones en consecuencia
+    //metodos para validar la seleccion de lesion
     private void ValidarSeleccionLesion(int indice)
     {
         if (indiceLesionSeleccionada == indice)
@@ -410,6 +503,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
             indiceLesionSeleccionada = -1;
             lesionCorrectaSeleccionada = false;
             RestablecerColoresTodosLosBloques();
+            ActualizarLineas();
             ActualizarInteractividadBloques();
             return;
         }
@@ -419,11 +513,12 @@ public class ControladorDecisionNV3 : ControladorPreguntas
 
         RestablecerColoresTodosLosBloques();
         PintarCaminoFinal();
+        ActualizarLineas();
         ActualizarInteractividadBloques();
         VerificarProgresoArbol();
     }
 
-    //metodo para pintar el camino final del árbol de decisiones, resaltando los botones seleccionados en verde si son correctos o en rojo si son incorrectos
+    //metodo para pintar el camino final de seleccion de patologia, etiologia, familia y lesion con colores verde o rojo segun si la seleccion es correcta o incorrecta
     private void PintarCaminoFinal()
     {
         if (indicePatologiaSeleccionada != -1)
@@ -447,7 +542,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
     }
 
-    //metodo para restablecer el color de un bloque de botones, resaltando el botón seleccionado y restableciendo los demás al color normal
+    //metodo para restablecer el color de un bloque de botones según el índice seleccionado
     private void RestablecerColorBloque(Button[] bloque, int indiceSeleccionado)
     {
         for (int i = 0; i < bloque.Length; i++)
@@ -466,7 +561,7 @@ public class ControladorDecisionNV3 : ControladorPreguntas
         }
     }
 
-    //metodo para verificar el progreso del árbol de decisiones, comprobando si todas las selecciones son correctas y marcando el nivel como completado si es así
+    //metodo para verificar si el usuario ha completado correctamente el arbol de decisiones y marcar el nivel como terminado
     private void VerificarProgresoArbol()
     {
         if (patologiaCorrectaSeleccionada && etiologiaCorrectaSeleccionada && familiaCorrectaSeleccionada && lesionCorrectaSeleccionada)
