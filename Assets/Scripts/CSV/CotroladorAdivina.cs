@@ -21,11 +21,34 @@ public class ControladorAdivina : ControladorPreguntas
     [SerializeField] private GameObject panelSnackbar;
     [SerializeField] private TMP_Text textoSnackbar;
 
+    [Header("Libreta")]
+    [SerializeField] private GameObject libretaCanvas;
+    [SerializeField] private Transform contenidoLibreta;
+    [SerializeField] private GameObject prefabNota;
+    private HashSet<string> notas = new HashSet<string>();
+
     private Coroutine snackbarCoroutine;
 
     private void Awake()
     {
         alternativas = new List<string>();
+    }
+
+    private void AgregarNota(string texto)
+    {
+        if(!notas.Add(texto))
+            return;
+        GameObject nota = Instantiate(prefabNota, contenidoLibreta);
+        nota.GetComponentInChildren<TMP_Text>().text = texto;
+    }
+
+    public void AbrirLibreta()
+    {
+        libretaCanvas.SetActive(true);
+    }
+    public void CerrarLibreta()
+    {
+        libretaCanvas.SetActive(false);
     }
 
     private void ObtenerDiagnosticos()
@@ -74,19 +97,26 @@ public class ControladorAdivina : ControladorPreguntas
     {
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         Lesion l = CsvManager.Instance.ObtenerLesionPorId(p.lesionID);
-        MostrarPista($"La lesión es: {l.nombre}");
+        string pista = $"La lesión es: {l.nombre}";
+        MostrarPista(pista);
+        AgregarNota(pista);
+
     }
     public void PreguntarFamilia()
     {
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         Familia f = CsvManager.Instance.ObtenerFamiliaPorId(p.familiaID);
-        MostrarPista($"La familia es: {f.nombre}");
+        string pista = $"La familia es: {f.nombre}";
+        MostrarPista(pista);
+        AgregarNota(pista);
     }
     public void PreguntarEtiologia()
     {
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         Etiologia e = CsvManager.Instance.ObtenerEtiologiaPorId(p.etiologiaID);
-        MostrarPista($"La Etiologia es: {e.nombre}");
+        string pista = $"La Etiologia es: {e.nombre}";
+        MostrarPista(pista);
+        AgregarNota(pista);
     }
     private void PreguntarDescripcion()
     {
