@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "299030506590",
+    "project_id": "oraldiagnostic-6c995",
+    "storage_bucket": "oraldiagnostic-6c995.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299030506590:android:5889512a0f48a3cd0118cf",
+        "android_client_info": {
+          "package_name": "com.oraldiagnostic.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj0N8jHT7QuBhVA3tUGNouRW5WSiUWhw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

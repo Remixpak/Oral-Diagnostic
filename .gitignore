@@ -104,3 +104,28 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+#Firebase
+
+/[Aa]ssets/Firebase/Plugins/x86_64/*.bundle
+/[Aa]ssets/Firebase/Plugins/x86/*.bundle
+/[Aa]ssets/Firebase/Plugins/Android/*.aar
+/[Aa]ssets/Firebase/Plugins/iOS/*.framework
+/[Aa]ssets/Firebase/Plugins/*.bundle
+
+# Firebase configuration files (archivos de configuración personal)
+google-services.json
+GoogleService-Info.plist
+
+# External Dependency Manager (se regenera automáticamente)
+/[Aa]ssets/ExternalDependencyManager/
+
+# Firebase generated files
+/[Aa]ssets/Firebase/Editor/generate.xml
+/[Aa]ssets/Firebase/Editor/AppDependencies.xml
+/[Aa]ssets/Firebase/Editor/AnalyticsDependencies.xml
+/[Aa]ssets/Firebase/Editor/FirestoreDependencies.xml
+
+# Firebase logs
+firebase_logs/
+*.firebase.log

@@ -1,0 +1,161 @@
+using UnityEngine;
+using Firebase.Firestore;
+using Firebase.Extensions;
+using System.Collections.Generic;
+using System;
+
+public class ConexionFirestore : MonoBehaviour
+{
+    private static ConexionFirestore _instance;
+    public static ConexionFirestore Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                GameObject go = new GameObject("ConexionFirestore");
+                _instance = go.AddComponent<ConexionFirestore>();
+                DontDestroyOnLoad(go);
+            }
+            return _instance;
+        }
+    }
+
+    private FirebaseFirestore db;
+    private bool isReady = false;
+
+    void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    void Start() => Inicializar();
+
+    public void Inicializar()
+    {
+        if (FirebaseInit.IsReady)
+        {
+            db = FirebaseInit.Db;
+            isReady = true;
+            Debug.Log("✅ ConexionFirestore lista");
+        }
+        else
+        {
+            Invoke(nameof(Inicializar), 0.5f);
+        }
+    }
+
+    public void GuardarPartida(
+        string nivel,
+        int patologiaID,
+        bool patologiaOK,
+        bool etiologiaOK,
+        bool familiaOK,
+        bool lesionOK,
+        int errores,
+        float tiempo,
+        List<Dictionary<string, object>> erroresDetalle,
+        List<Dictionary<string, object>> respuestas)
+    {
+        if (!VerificarConexion()) return;
+
+        var datos = new Dictionary<string, object>()
+        {
+            { "nivel", nivel },
+            { "fecha", DateTime.Now.ToString("yyyy-MM-dd") },
+            { "hora", DateTime.Now.ToString("HH:mm:ss") },
+            { "patologia_id", patologiaID },
+            { "patologia_correcta", patologiaOK },
+            { "etiologia_correcta", etiologiaOK },
+            { "familia_correcta", familiaOK },
+            { "lesion_correcta", lesionOK },
+            { "errores", errores },
+            { "tiempo_segundos", Mathf.RoundToInt(tiempo) },
+            { "completado", patologiaOK && etiologiaOK && familiaOK && lesionOK },
+            { "errores_detalle", erroresDetalle },
+            { "respuestas", respuestas }
+        };
+
+        string userId = FirebaseInit.GetUserId();
+        DocumentReference docRef = db.Collection("usuarios").Document(userId)
+                                      .Collection("partidas").Document();
+
+        docRef.SetAsync(datos).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.LogError($"Error guardando partida: {task.Exception}");
+            }
+            else
+            {
+                Debug.Log($"Partida guardada para {FirebaseInit.GetUserName()}");
+                ActualizarEstadisticasUsuario();
+            }
+        });
+    }
+
+
+    private void ActualizarEstadisticasUsuario()
+    {
+        if (!VerificarConexion()) return;
+
+        string userId = FirebaseInit.GetUserId();
+
+        db.Collection("usuarios").Document(userId)
+          .Collection("partidas").GetSnapshotAsync().ContinueWithOnMainThread(task =>
+          {
+              if (task.IsFaulted) return;
+
+              int total = task.Result.Count;
+              int completadas = 0;
+
+              foreach (var doc in task.Result.Documents)
+              {
+                  if (doc.Exists && doc.TryGetValue("completado", out bool completado) && completado)
+                  {
+                      completadas++;
+                  }
+              }
+
+              var stats = new Dictionary<string, object>()
+            {
+                { "total_partidas", total },
+                { "partidas_completadas", completadas },
+                { "ultima_actualizacion", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }
+            };
+
+              db.Collection("usuarios").Document(userId).UpdateAsync(stats);
+          });
+    }
+
+    public void GuardarError(string nivel, string tipo, int indiceSeleccionado, string seleccionado, string correcto, int erroresAcumulados)
+    {
+
+        Debug.Log($"Error registrado: {tipo} - {seleccionado} (correcto: {correcto})");
+    }
+
+    private bool VerificarConexion()
+    {
+        if (!FirebaseInit.IsReady)
+        {
+            Debug.LogError("Firebase no está listo");
+            return false;
+        }
+        if (db == null)
+        {
+            db = FirebaseInit.Db;
+            if (db == null)
+            {
+                Debug.LogError("Firestore no inicializado");
+                return false;
+            }
+        }
+        return true;
+    }
+}
