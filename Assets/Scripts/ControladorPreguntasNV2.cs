@@ -15,9 +15,6 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     [SerializeField] private Color colorSeleccionado = Color.yellow;// Color cuando un boton esta seleccionado
     [SerializeField] private Button botonPausa;// asignar boton pausa en el inspector
 
-    [Header("Configuracion de Reinicio")]
-    [SerializeField] private float tiempoReinicio = 2f; // Tiempo en segundos antes de reiniciar
-
     // Variables de control de seleccion de lesion, familia, etiologia y patologia
     [Header("Componentes de la UI - Bloque 1: Lesiones (Texto)")]
     [SerializeField] private Button[] botonesLesiones;
@@ -38,6 +35,10 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     [Header("Lineas Conectoras")]
     [SerializeField] private LineaConectora lineaConectora;
 
+    [Header("Retroalimentacion")]
+    [SerializeField] public TMP_Text textoResultado;
+    [SerializeField] public TMP_Text textoRespuesta;
+
     private int targetLesionID; // Id de la lesion que se debe seleccionar correctamente
     private int targetFamiliaID;// Id de la familia que se debe seleccionar correctamente
     private int targetEtiologiaID;// Id de la etiologia que se debe seleccionar correctamente
@@ -55,21 +56,10 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     private bool etiologiaCorrectaSeleccionada = false;
     private bool patologiaCorrectaSeleccionada = false;
 
-    // Variables para metricas
-    private float tiempoInicioNivel;
-    private int erroresTotales = 0;
-    private List<Dictionary<string, object>> erroresDetalle = new List<Dictionary<string, object>>();
-    private List<Dictionary<string, object>> respuestas = new List<Dictionary<string, object>>();
-
-    private bool reiniciando = false;
+    private int erroresNivel = 0;
 
     void Start()
     {
-        tiempoInicioNivel = Time.time;
-        erroresTotales = 0;
-        reiniciando = false;
-
-        // configuracion de boton pausa para que no tome el tiempo de juego cuando se pausa y que siempre este activo
         if (botonPausa != null)
         {
             botonPausa.onClick.RemoveAllListeners();
@@ -78,57 +68,19 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             });
             botonPausa.interactable = true;
         }
-
-        ObtenerPatologiaAleatoria();
-        CargarDatosEstructuralesCSV();
-        AsignarDatosAleatoriosABotones();
-        ConfigurarInteractividadArbol();
-        ActualizarInteractividadBloques();
+        // comentar las siguientes dos lineas para funcionamiento con gamemanager ya que si se deje se duplicara el id de los niveles
+        /*
+        ObtenerPatologiaAleatoria(); 
+        InicializarPregunta(patologiaIDTarget);
+        */
     }
 
     void Update()
     {
-        // Mantener el boton de pausa siempre activo
         if (botonPausa != null && !botonPausa.interactable)
         {
             botonPausa.interactable = true;
         }
-    }
-
-    //metodo para reiniciar el nivel despues de un tiempo de espera en caso de cometer error
-    private IEnumerator ReiniciarNivel()
-    {
-        reiniciando = true;
-
-        yield return new WaitForSeconds(tiempoReinicio);
-
-        indiceLesionSeleccionada = -1;
-        indiceFamiliaSeleccionada = -1;
-        indiceEtiologiaSeleccionada = -1;
-        indicePatologiaSeleccionada = -1;
-
-        lesionCorrectaSeleccionada = false;
-        familiaCorrectaSeleccionada = false;
-        etiologiaCorrectaSeleccionada = false;
-        patologiaCorrectaSeleccionada = false;
-
-        respuestas.Clear();
-        erroresDetalle.Clear();
-        erroresTotales = 0;
-
-        RestablecerColorBloque(botonesLesiones, -1);
-        RestablecerColorBloque(botonesFamilias, -1);
-        RestablecerColorBloque(botonesEtiologias, -1);
-        RestablecerColorBloque(botonesPatologias, -1);
-
-        if (lineaConectora != null)
-        {
-            lineaConectora.LimpiarLineas();
-        }
-        ActualizarInteractividadBloques();
-
-        reiniciando = false;
-        Debug.Log("Nivel reiniciado correctamente");
     }
 
     //metodo para obtener una patologia aleatoria de la lista de patologias del CsvManager
@@ -457,13 +409,14 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
                 lineaConectora.CambiarColorLinea(idx, color);
             }
 
+            // 🔥 Si es incorrecto, mostrar retroalimentacion (sin reiniciar)
             if (!lesionCorrectaSeleccionada || !familiaCorrectaSeleccionada ||
                 !etiologiaCorrectaSeleccionada || !patologiaCorrectaSeleccionada)
             {
-                if (!reiniciando && !finished)
+                if (!finished)
                 {
-                    Debug.Log("Intento incorrecto-Reiniciando en " + tiempoReinicio + " segundos...");
-                    StartCoroutine(ReiniciarNivel());
+                    Debug.Log("Intento incorrecto - Mostrando retroalimentacion");
+                    EntregarRetroalimentacion();
                 }
             }
         }
@@ -512,8 +465,6 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     //metodos para validar la seleccion de lesion, familia, etiologia y patologia
     private void ValidarSeleccionLesion(int indice)
     {
-        if (reiniciando) return;
-
         if (indiceLesionSeleccionada == indice)
         {
             botonesLesiones[indice].GetComponent<Image>().color = colorNormal;
@@ -528,22 +479,17 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         indiceLesionSeleccionada = indice;
         lesionCorrectaSeleccionada = (indice < idLesionesBotones.Length && idLesionesBotones[indice] == targetLesionID);
 
-        respuestas.Add(new Dictionary<string, object>()
+        if (GameManager.Instance != null)
         {
-            { "tipo", "lesion" },
-            { "indice", indice },
-            { "correcto", lesionCorrectaSeleccionada }
-        });
-
-        if (!lesionCorrectaSeleccionada)
-        {
-            erroresTotales++;
-            erroresDetalle.Add(new Dictionary<string, object>()
+            if (lesionCorrectaSeleccionada)
             {
-                { "tipo", "lesion" },
-                { "seleccionado", indice },
-                { "correcto", targetLesionID }
-            });
+                GameManager.Instance.TotalAciertos++;
+            }
+            else
+            {
+                GameManager.Instance.TotalFallos++;
+                erroresNivel++;
+            }
         }
 
         RestablecerColoresTodosLosBloques();
@@ -553,8 +499,6 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
     private void ValidarSeleccionFamilia(int indice)
     {
-        if (reiniciando) return;
-
         if (indiceFamiliaSeleccionada == indice)
         {
             botonesFamilias[indice].GetComponent<Image>().color = colorNormal;
@@ -569,22 +513,17 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         indiceFamiliaSeleccionada = indice;
         familiaCorrectaSeleccionada = (indice < idFamiliasBotones.Length && idFamiliasBotones[indice] == targetFamiliaID);
 
-        respuestas.Add(new Dictionary<string, object>()
+        if (GameManager.Instance != null)
         {
-            { "tipo", "familia" },
-            { "indice", indice },
-            { "correcto", familiaCorrectaSeleccionada }
-        });
-
-        if (!familiaCorrectaSeleccionada)
-        {
-            erroresTotales++;
-            erroresDetalle.Add(new Dictionary<string, object>()
+            if (familiaCorrectaSeleccionada)
             {
-                { "tipo", "familia" },
-                { "seleccionado", indice },
-                { "correcto", targetFamiliaID }
-            });
+                GameManager.Instance.TotalAciertos++;
+            }
+            else
+            {
+                GameManager.Instance.TotalFallos++;
+                erroresNivel++;
+            }
         }
 
         RestablecerColoresTodosLosBloques();
@@ -594,8 +533,6 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
     private void ValidarSeleccionEtiologia(int indice)
     {
-        if (reiniciando) return;
-
         if (indiceEtiologiaSeleccionada == indice)
         {
             botonesEtiologias[indice].GetComponent<Image>().color = colorNormal;
@@ -610,22 +547,17 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         indiceEtiologiaSeleccionada = indice;
         etiologiaCorrectaSeleccionada = (indice < idEtiologiasBotones.Length && idEtiologiasBotones[indice] == targetEtiologiaID);
 
-        respuestas.Add(new Dictionary<string, object>()
+        if (GameManager.Instance != null)
         {
-            { "tipo", "etiologia" },
-            { "indice", indice },
-            { "correcto", etiologiaCorrectaSeleccionada }
-        });
-
-        if (!etiologiaCorrectaSeleccionada)
-        {
-            erroresTotales++;
-            erroresDetalle.Add(new Dictionary<string, object>()
+            if (etiologiaCorrectaSeleccionada)
             {
-                { "tipo", "etiologia" },
-                { "seleccionado", indice },
-                { "correcto", targetEtiologiaID }
-            });
+                GameManager.Instance.TotalAciertos++;
+            }
+            else
+            {
+                GameManager.Instance.TotalFallos++;
+                erroresNivel++;
+            }
         }
 
         RestablecerColoresTodosLosBloques();
@@ -635,8 +567,6 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
     private void ValidarSeleccionPatologia(int indice)
     {
-        if (reiniciando) return;
-
         if (indicePatologiaSeleccionada == indice)
         {
             botonesPatologias[indice].GetComponent<Image>().color = colorNormal;
@@ -651,22 +581,17 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         indicePatologiaSeleccionada = indice;
         patologiaCorrectaSeleccionada = (indice < idPatologiasBotones.Length && idPatologiasBotones[indice] == targetPatologiaID);
 
-        respuestas.Add(new Dictionary<string, object>()
+        if (GameManager.Instance != null)
         {
-            { "tipo", "patologia" },
-            { "indice", indice },
-            { "correcto", patologiaCorrectaSeleccionada }
-        });
-
-        if (!patologiaCorrectaSeleccionada)
-        {
-            erroresTotales++;
-            erroresDetalle.Add(new Dictionary<string, object>()
+            if (patologiaCorrectaSeleccionada)
             {
-                { "tipo", "patologia" },
-                { "seleccionado", indice },
-                { "correcto", targetPatologiaID }
-            });
+                GameManager.Instance.TotalAciertos++;
+            }
+            else
+            {
+                GameManager.Instance.TotalFallos++;
+                erroresNivel++;
+            }
         }
 
         RestablecerColoresTodosLosBloques();
@@ -719,6 +644,51 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         }
     }
 
+    public override void EntregarRetroalimentacion()
+    {
+        if(botonPausa != null)
+        {
+            botonPausa.gameObject.SetActive(false);// desactivamos el boton de pausa en la pantalal de retroalimentacion para evitar acoplamiento
+        }
+
+        if (lesionCorrectaSeleccionada && familiaCorrectaSeleccionada &&
+            etiologiaCorrectaSeleccionada && patologiaCorrectaSeleccionada)
+        {
+            textoResultado.text = "¡Respuesta Correcta!";
+            textoResultado.color = Color.green;
+            textoRespuesta.text = "¡Todos los bloques son correctos!";
+        }
+        else
+        {
+            textoResultado.text = "Respuesta Incorrecta";
+            textoResultado.color = Color.red;
+
+            string erroresTexto = "";
+            if (!lesionCorrectaSeleccionada) erroresTexto += "- Lesion incorrecta\n";
+            if (!familiaCorrectaSeleccionada) erroresTexto += "- Familia incorrecta\n";
+            if (!etiologiaCorrectaSeleccionada) erroresTexto += "- Etiologia incorrecta\n";
+            if (!patologiaCorrectaSeleccionada) erroresTexto += "- Patologia incorrecta\n";
+            textoRespuesta.text = "Errores encontrados:\n" + erroresTexto;
+        }
+
+        if (canvasRetroalimentacion != null)
+        {
+            Button continuarBtn = canvasRetroalimentacion.GetComponentInChildren<Button>();
+            if (continuarBtn != null)
+            {
+                continuarBtn.onClick.RemoveAllListeners();
+                continuarBtn.onClick.AddListener(() => {
+                    finished = true;
+                });
+            }
+            canvasRetroalimentacion.gameObject.SetActive(true);
+        }
+        else
+        {
+            finished = true;
+        }
+    }
+
     //metodo para verificar si el usuario ha completado correctamente el arbol de decisiones y marcar el nivel como terminado
     private void VerificarProgresoArbol()
     {
@@ -726,12 +696,14 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             etiologiaCorrectaSeleccionada && patologiaCorrectaSeleccionada)
         {
             finished = true;
-            float tiempoTotal = Time.time - tiempoInicioNivel;
-
             Debug.Log("<color=green>¡Nivel Completado!</color>");
-
             if (ConexionFirestore.Instance != null)
             {
+                float tiempoTotal = 0f;
+                if (GameManager.Instance != null)
+                {
+                    tiempoTotal = GameManager.Instance.TiempoJuego;
+                }
                 ConexionFirestore.Instance.GuardarPartida(
                     nivel: "Nivel_3",
                     patologiaID: targetPatologiaID,
@@ -739,12 +711,14 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
                     etiologiaOK: etiologiaCorrectaSeleccionada,
                     familiaOK: familiaCorrectaSeleccionada,
                     lesionOK: lesionCorrectaSeleccionada,
-                    errores: erroresTotales,
+                    errores: erroresNivel,
                     tiempo: tiempoTotal,
-                    erroresDetalle: erroresDetalle,
-                    respuestas: respuestas
+                    erroresDetalle: new List<Dictionary<string, object>>(),
+                    respuestas: new List<Dictionary<string, object>>()
                 );
             }
+
+            EntregarRetroalimentacion();
         }
         else
         {
@@ -752,13 +726,41 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         }
     }
 
-    public override void EntregarRetroalimentacion()
-    {
-
-    }
-
     public override void InicializarPregunta(int indPatologiaAsignada)
     {
 
+        if (botonPausa != null)
+        {
+            botonPausa.gameObject.SetActive(true);//lo activamos de vuelta para cuando se inicialize una pregunta
+        }
+
+
+        patologiaIDTarget = indPatologiaAsignada;
+        erroresNivel = 0;
+
+        indiceLesionSeleccionada = -1;
+        indiceFamiliaSeleccionada = -1;
+        indiceEtiologiaSeleccionada = -1;
+        indicePatologiaSeleccionada = -1;
+
+        lesionCorrectaSeleccionada = false;
+        familiaCorrectaSeleccionada = false;
+        etiologiaCorrectaSeleccionada = false;
+        patologiaCorrectaSeleccionada = false;
+
+        if (canvasRetroalimentacion != null)
+        {
+            canvasRetroalimentacion.gameObject.SetActive(false);
+        }
+
+        CargarDatosEstructuralesCSV();
+        AsignarDatosAleatoriosABotones();
+        ConfigurarInteractividadArbol();
+        ActualizarInteractividadBloques();
+
+        if (lineaConectora != null)
+        {
+            lineaConectora.LimpiarLineas();
+        }
     }
 }

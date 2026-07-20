@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class ControladorPreguntasNV3 : ControladorPreguntas
 {
+    [Header("Pausa")]
+    [SerializeField]private Button botonPausa;
 
     [Header("Configuración del Juego")]
 
@@ -33,8 +35,9 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     [SerializeField] private string NombreFamilia = "Dermatologica";
     [SerializeField] private string DescripcionEtiopatogenia = "Perdida continuidad de la piel";
 
-
-
+    [Header("Retroalimentacion")]
+    [SerializeField] public TMP_Text textoResultado;
+    [SerializeField] public TMP_Text textoRespuesta;
 
     private List<string> letrasTeclado = new List<string>();
     private string[] progresoUsuario; //variable que guarda las letras que el usuario va ingresando
@@ -43,17 +46,16 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     private List<Button> botonesEspaciosUI = new List<Button>();
     private List<Button> botonesTecladoUI = new List<Button>();
 
+    private bool nivelCompletado = false;
+    private int erroresNivel = 0;
 
     void Start()
     {
+        // comentar las siguientes dos lineas para funcionamiento con gamemanager ya que si se deje se duplicara el id de los niveles
+        /*
         ObtenerPatologiaAleatoria();
-        CargarDatosDesdeCSV();
-
-        progresoUsuario = new string[palabraCorrecta.Length];
-        ConfigurarPanelPistas();
-        GenerarLetrasTeclado();
-        CrearEspaciosPalabra();
-        CrearTeclado();
+        InicializarPregunta(patologiaIDTarget);
+        */
     }
     void Update()
     {
@@ -220,6 +222,8 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     //metodo para seleccionar la tecla
     private void SeleccionarLetraTeclado(int indiceTeclado, string letra)
     {
+        if (nivelCompletado) return;
+
         for (int i = 0; i < progresoUsuario.Length; i++)//busca espacio de izquierda a derecha
         {
             if (string.IsNullOrEmpty(progresoUsuario[i]))
@@ -242,6 +246,8 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     //metodo para devolver la tecla a su posicion original
     private void RemoverLetraDeEspacio(int indiceEspacio)
     {
+
+        if (nivelCompletado) return;
         if (!string.IsNullOrEmpty(progresoUsuario[indiceEspacio]))
         {
             if (int.TryParse(botonesEspaciosUI[indiceEspacio].name, out int indiceTecladoOriginal)) //obtenemos de que boton provenia la letra seleccionada
@@ -261,6 +267,8 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     //verifica el resultado correcto con la palabra respuesta
     private void ComprobarResultado()
     {
+        if (nivelCompletado) return;
+
         string palabraFormada = "";
         for (int i = 0; i < progresoUsuario.Length; i++)
         {
@@ -270,30 +278,135 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
 
         if (palabraFormada == palabraCorrecta)
         {
+            nivelCompletado = true;
             Debug.Log("<color=green>¡Correcto! Has descubierto el diagnóstico clínico.</color>");
             foreach (Button btn in botonesEspaciosUI)
             {
                 btn.GetComponent<Image>().color = Color.green;
             }
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.TotalAciertos++;
+            }
+
+            if (ConexionFirestore.Instance != null)
+            {
+                float tiempoTotal = 0f;
+                if (GameManager.Instance != null)
+                {
+                    tiempoTotal = GameManager.Instance.TiempoJuego;
+                }
+
+                ConexionFirestore.Instance.GuardarPartida(
+                    nivel: "Nivel_3",
+                    patologiaID: patologiaIDTarget,
+                    patologiaOK: true,
+                    etiologiaOK: true,
+                    familiaOK: true,
+                    lesionOK: true,
+                    errores: erroresNivel,
+                    tiempo: tiempoTotal,
+                    erroresDetalle: new List<Dictionary<string, object>>(),
+                    respuestas: new List<Dictionary<string, object>>()
+                );
+            }
+
+            EntregarRetroalimentacion();
         }
         else
         {
+            erroresNivel++;
             Debug.Log("<color=red>Palabra incorrecta. Sigue intentando.</color>");
             foreach (Button btn in botonesEspaciosUI)
             {
                 btn.GetComponent<Image>().color = Color.red;
             }
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.TotalFallos++;
+            }
+
+            StartCoroutine(RestaurarColoresEspacios());
         }
     }
+
+    private IEnumerator RestaurarColoresEspacios()
+    {
+        yield return new WaitForSeconds(0.5f);
+        foreach (Button btn in botonesEspaciosUI)
+        {
+            if (btn != null && !nivelCompletado)
+            {
+                btn.GetComponent<Image>().color = Color.white;
+            }
+        }
+    }
+
     public override void EntregarRetroalimentacion()
     {
-        // aun no hay la logica
+        if (botonPausa != null)
+        {
+            botonPausa.gameObject.SetActive(false); // desactivamos el boton de pausa en la pantalal de retroalimentacion para evitar acoplamiento
+        }
+
+        if (nivelCompletado)
+        {
+            textoResultado.text = "Respuesta Correcta!";
+            textoResultado.color = Color.green;
+            textoRespuesta.text = "Has descubierto el diagnostico clinico: " + palabraCorrecta;
+        }
+        else
+        {
+            textoResultado.text = "Respuesta Incorrecta";
+            textoResultado.color = Color.red;
+            textoRespuesta.text = "La respuesta correcta era: " + palabraCorrecta;
+        }
+
+        if (canvasRetroalimentacion != null)
+        {
+            Button continuarBtn = canvasRetroalimentacion.GetComponentInChildren<Button>();
+            if (continuarBtn != null)
+            {
+                continuarBtn.onClick.RemoveAllListeners();
+                continuarBtn.onClick.AddListener(() => {
+                    finished = true;
+                });
+            }
+            canvasRetroalimentacion.gameObject.SetActive(true);
+        }
+        else
+        {
+            finished = true;
+        }
     }
 
 
     public override void InicializarPregunta(int indPatologiaAsignada)
     {
 
+        if (botonPausa != null)
+        {
+            botonPausa.gameObject.SetActive(true);//lo activamos de vuelta para cuando se inicialize una pregunta
+        }
+
+        patologiaIDTarget = indPatologiaAsignada;
+        nivelCompletado = false;
+        erroresNivel = 0;
+        letrasTeclado.Clear();
+
+        if (canvasRetroalimentacion != null)
+        {
+            canvasRetroalimentacion.gameObject.SetActive(false);
+        }
+
+        CargarDatosDesdeCSV();
+        progresoUsuario = new string[palabraCorrecta.Length];
+        ConfigurarPanelPistas();
+        GenerarLetrasTeclado();
+        CrearEspaciosPalabra();
+        CrearTeclado();
     }
 
 
