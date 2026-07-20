@@ -17,6 +17,9 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     [SerializeField] private Image imagen;
     [Header("Botones")]
     [SerializeField] private List<Button> botonesAlternativas;
+    [Header("Textos de retroalimentacion")]
+    [SerializeField] public TMP_Text textoResultado;//correcto o incorrecto
+    [SerializeField] public TMP_Text textoRespuesta;//cual era la respuesta
 
     
 
