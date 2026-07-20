@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections; // Necesario para las Corrutinas
+using System.Collections; 
 using TMPro;
 public class GameManager : MonoBehaviour
 {
@@ -22,9 +22,10 @@ public class GameManager : MonoBehaviour
 
     [Header("Prefabs de Niveles")]
     // Cambiamos a tipo ControladorPreguntas para acceder directo a sus funciones
-    [SerializeField] private GameObject prefabNv1;
-    [SerializeField] private GameObject prefabNv2;
-    [SerializeField] private GameObject prefabNv3;
+    [SerializeField] private GameObject prefabTrivia;
+    [SerializeField] private GameObject prefabArbolDeciciones;
+    [SerializeField] private GameObject prefabNv4Conceptos;
+    [SerializeField] private GameObject prefabAdivinaQuien;
     [SerializeField] public Canvas canvasResultados;
     [Header("Textos de resultados")]
     [SerializeField] public TMP_Text textoAciertos;//cuantos aciertos tuvo el jugador
@@ -33,8 +34,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] public TMP_Text textoIntentos;//cuantos intentos tuvo el jugador
     [SerializeField] public TMP_Text textoReinicios;//cuantos reinicios tuvo el jugador
 
-    private List<int> idsRondaActual = new List<int>();
-    private int preguntaActualIndice = 0;
+   
+
+    private Queue<PreguntaRonda> colaPreguntas = new Queue<PreguntaRonda>();
+    private Queue<int> idsDisponibles = new Queue<int>();
 
     void Awake()
     {
@@ -57,94 +60,158 @@ public class GameManager : MonoBehaviour
     {
         modoActual = ModoJuego.Carrera;
         juegoActivo = true;
-        ConfigurarJuego(ModoJuego.Carrera, 1);
+        ConfigurarJuego(ModoJuego.Carrera);
+        
     }
 
-    public void ConfigurarJuego(ModoJuego modo, int nivel)//resivira mas parametros dependiendo del modo
+    public void ConfigurarJuego(ModoJuego modo)//resivira mas parametros dependiendo del modo
     {
-        idsRondaActual.Clear();
-        preguntaActualIndice = 0;
+        
 
-        // 1. Obtener todas las IDs disponibles en el CSV
-        List<int> todasLasIds = new List<int>();
-        foreach (var patologia in CsvManager.Instance.patologias)
+        
+        switch(modo)
         {
-            todasLasIds.Add(patologia.id);
-        }
-
-        // 2. Barajar las IDs (Algoritmo Fisher-Yates) para que queden aleatorias pero sin repetir
-        for (int i = 0; i < todasLasIds.Count; i++)
-        {
-            int temp = todasLasIds[i];
-            int randomIndex = Random.Range(i, todasLasIds.Count);
-            todasLasIds[i] = todasLasIds[randomIndex];
-            todasLasIds[randomIndex] = temp;
-        }
-
-        // 3. Tomar las primeras 5 IDs únicas
-        int cantidadPreguntas = Mathf.Min(5, todasLasIds.Count);//cantidad preguntas será un parametro despues para el modo custom
-        for (int i = 0; i < cantidadPreguntas; i++)
-        {
-            idsRondaActual.Add(todasLasIds[i]);
-        }
-
-        // 4. Seleccionar el prefab del nivel correspondiente
-        GameObject prefabElegido = null;
-        switch (nivel)
-        {
-            case 1:
-                prefabElegido = prefabNv1;
+            case ModoJuego.Carrera:
+                ConfigurarCarrera(1);
                 break;
-            case 2:
-                prefabElegido = prefabNv2;
+            case ModoJuego.QuickPlay:
                 break;
-            case 3:
-                prefabElegido = prefabNv3;
+            case ModoJuego.Custom:
                 break;
             default:
-                Debug.LogWarning("Nivel no reconocido. Usando nivel 1 por defecto.");
-                prefabElegido = prefabNv1;
                 break;
         }
-        // else if (nivel == 2) prefabElegido = prefabNv2; // etc...
+        StartCoroutine(LoopDeJuegoCorrutina());
+    }
 
-        // 5. Arrancar el Loop de juego de forma secuencial
-        if (prefabElegido != null)
+    private void PrepararIDs()
+    {
+        List<int> ids = new List<int>();
+        foreach(var p in CsvManager.Instance.patologias)
         {
-            StartCoroutine(LoopDeJuegoCorrutina(prefabElegido));
+            ids.Add(p.id);
         }
+        //fisher-Yates pa revolver
+        for(int i = 0; i < ids.Count; i++)
+        {
+            int random = Random.Range(i, ids.Count);
+            int temp = ids[i];
+            ids[i] = ids[random];
+            ids[random] = temp;
+        }
+        idsDisponibles.Clear();
+        foreach(int id in ids)
+        {
+            idsDisponibles.Enqueue(id);
+        }
+    }
+
+    private int ObtenerID()
+    {
+        if(idsDisponibles.Count == 0)
+        {
+            Debug.LogError("No quedan ids");
+            return -1;
+        }
+        return idsDisponibles.Dequeue();
+    }
+
+    private void ConfigurarCarrera(int nivel)
+    {
+        PrepararIDs();
+        switch(nivel)
+        {
+            case 1:
+                for(int i = 0; i < 5; i++)
+                {
+                    colaPreguntas.Enqueue(
+                        new PreguntaRonda
+                        {
+                            idPatologia = ObtenerID(),
+                            tipo = TipoPregunta.Trivia
+                        });
+                }
+                break;
+            case 2:
+                for(int i = 0; i < 5; i++)
+                {
+                    colaPreguntas.Enqueue(
+                        new PreguntaRonda
+                        {
+                            idPatologia = ObtenerID(),
+                            tipo = TipoPregunta.Arbol
+                        });
+                }
+                break;
+            case 3:
+                for(int i = 0; i < 5; i++)
+                {
+                    TipoPregunta tipoRandom = Random.value > 0.5f? TipoPregunta.Conceptos: TipoPregunta.AdivinaQuien;
+                    colaPreguntas.Enqueue(
+                        new PreguntaRonda
+                        {
+                            idPatologia = ObtenerID(),
+                            tipo = tipoRandom
+                        });
+                }
+                break;
+        }
+        
+    }
+    private void ConfigurarQuickPlay()
+    {
+        TipoPregunta[] tipos =
+        {
+            TipoPregunta.Trivia,
+            TipoPregunta.Arbol,
+            TipoPregunta.Conceptos,
+            TipoPregunta.AdivinaQuien
+        };
+
+        TipoPregunta elegida = tipos[Random.Range(0, tipos.Length)];
+        
+    }
+    private void ConfigurarCustom()
+    {
+        
+    }
+
+    private GameObject ObtenerPrefab(TipoPregunta tipo)
+    {
+        switch(tipo)
+        {
+            case TipoPregunta.Trivia:
+                return prefabTrivia;
+            case TipoPregunta.Arbol:
+                return prefabArbolDeciciones;
+            case TipoPregunta.Conceptos:
+                return prefabNv4Conceptos;
+            case TipoPregunta.AdivinaQuien:
+                return prefabAdivinaQuien;
+        }
+        return null;
     }
 
     // Este es el verdadero Loop que controla el flujo por turnos
-    private IEnumerator LoopDeJuegoCorrutina(GameObject prefabNivel)
-{
-    
-    while (preguntaActualIndice < idsRondaActual.Count)
+    private IEnumerator LoopDeJuegoCorrutina()
     {
-        int idPregunta = idsRondaActual[preguntaActualIndice];
+    
+    
+        while(colaPreguntas.Count > 0)
+        {
+            PreguntaRonda pregunta = colaPreguntas.Dequeue();
+            GameObject prefab = ObtenerPrefab(pregunta.tipo);
+            GameObject nivelInstanciado = Instantiate(prefab);
+            ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
+            controlador.InicializarPregunta(pregunta.idPatologia);
+            yield return new WaitUntil(() => controlador.finished);
+            Destroy(nivelInstanciado);
+            
+        }
+        TotalIntentos++;
+        TerminarRonda();
 
-        GameObject nivelInstanciado = Instantiate(prefabNivel);
-
-        ControladorPreguntas controlador =
-            nivelInstanciado.GetComponent<ControladorPreguntas>();
-
-        controlador.InicializarPregunta(idPregunta);//le pasa la id de la patologia por la que pregunta
-        /*
-        por ejemplo para el nivel 1 le pasa la id de la patologia 30 
-        y el controlador de nivel 1 obtiene la lesion y la imagen de la patologia 
-        con ese ID
-        */
-
-        // Esperar hasta que el jugador responda
-        yield return new WaitUntil(() => controlador.finished);//todos los controladores de nivel deben setear finished a true cuando el jugador responda
-
-        Destroy(nivelInstanciado);//destruye el nivel actual para pasar al siguiente
-
-        preguntaActualIndice++;//ahora le pasara el sigiente id de la lista de ids
     }
-    TotalIntentos++;
-    TerminarRonda();
-}
     private void MostrarResultados()
     {
         canvasResultados.gameObject.SetActive(true);

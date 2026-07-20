@@ -20,9 +20,7 @@ public abstract class ControladorPreguntas : MonoBehaviour
     [SerializeField] public Canvas canvasRetroalimentacion;
     
 
-    [Header("Textos de retroalimentacion")]
-    [SerializeField] public TMP_Text textoResultado;//correcto o incorrecto
-    [SerializeField] public TMP_Text textoRespuesta;//cual era la respuesta
+    
 
     
 
