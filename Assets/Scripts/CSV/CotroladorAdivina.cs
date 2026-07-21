@@ -3,6 +3,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Unity.VisualScripting;
+
 
 public class ControladorAdivina : ControladorPreguntas
 {
@@ -22,12 +24,28 @@ public class ControladorAdivina : ControladorPreguntas
     [SerializeField] private TMP_Text textoSnackbar;
 
     [Header("Libreta")]
-    [SerializeField] private GameObject libretaCanvas;
+    /*[SerializeField] private GameObject libretaCanvas;
     [SerializeField] private Transform contenidoLibreta;
     [SerializeField] private GameObject prefabNota;
     private HashSet<string> notas = new HashSet<string>();
+    [SerializeField] private float margenEntreNotas = 15f;
+
+    private float siguientePosicionY = 0f;*/
+    [SerializeField] private GameObject libretaCanvas;
+    [SerializeField] private TMP_Text textoNota;
+    [Header("Seleccion")]
+    [SerializeField] private TMP_Text textoDiag;
+    [SerializeField] private Canvas canvasSeleccion;
+    [SerializeField] private Button Seleccionado;
+
+    private List<string> notas = new List<string>();
+    private int indiceNotaActual = 0;
 
     private Coroutine snackbarCoroutine;
+
+    [Header("Retroalimentacion")]
+    [SerializeField] private TMP_Text textoRespuesta;
+    [SerializeField] private TMP_Text textoResultado;
 
     private void Awake()
     {
@@ -36,11 +54,45 @@ public class ControladorAdivina : ControladorPreguntas
 
     private void AgregarNota(string texto)
     {
-        if(!notas.Add(texto))
+        if(notas.Contains(texto))
             return;
-        GameObject nota = Instantiate(prefabNota, contenidoLibreta);
-        nota.GetComponentInChildren<TMP_Text>().text = texto;
+        notas.Add(texto);
+        if(notas.Count == 1)
+        {
+            indiceNotaActual = 0;
+            ActualizarNota();
+        }
     }
+    private void ActualizarNota()
+    {
+        if(notas.Count == 0)
+        {
+            textoNota.text = "no hay nada escrito";
+            return;
+        }
+        textoNota.text = notas[indiceNotaActual];
+    }
+
+    public void SiguienteNota()
+    {
+        if(notas.Count == 0)
+            return;
+        indiceNotaActual++;
+        if(indiceNotaActual >= notas.Count)
+            indiceNotaActual = notas.Count - 1;
+        ActualizarNota();
+    }
+    public void NotaAnterior()
+    {
+        if(notas.Count == 0)
+            return;
+        indiceNotaActual--;
+        if(indiceNotaActual < 0)
+            indiceNotaActual = (indiceNotaActual + 1)% notas.Count;
+        ActualizarNota();
+        
+    }
+
 
     public void AbrirLibreta()
     {
@@ -88,10 +140,66 @@ public class ControladorAdivina : ControladorPreguntas
         }
     }
 
-    private void Seleccionar(Button boton)
+    public void Seleccionar(Button boton)
     {
-        // Se implementará más adelante
+        Seleccionado = boton;
+        textoDiag.text = boton.GetComponentInChildren<TMP_Text>().text;
+
+        Debug.Log("Seleccionado: " + boton.name);
+
+        canvasSeleccion.gameObject.SetActive(true);
     }
+    public void Descartar()
+    {
+        Debug.Log("Descartando: " + Seleccionado);
+
+        diagnosticos.Remove(Seleccionado);
+        Destroy(Seleccionado.gameObject);
+
+        Seleccionado = null;
+        canvasSeleccion.gameObject.SetActive(false);
+    }
+    public void SeleccionarDiagnostico()
+    {
+        patologiaSeleccionada = Seleccionado.GetComponentInChildren<TMP_Text>().text;
+        if(ValidarRespuesta(patologiaSeleccionada))
+            GameManager.Instance.TotalAciertos++;
+        else   
+            GameManager.Instance.TotalFallos++;
+        StartCoroutine(FinalizarPregunta());
+
+
+        /*
+        respuesta = boton.GetComponentInChildren<TMP_Text>().text;
+        if (ComprobarRespuesta(respuesta, respuestaCorrecta))
+        {
+            boton.GetComponent<Image>().color = Color.green;
+            GameManager.Instance.TotalAciertos++;
+            Debug.Log("Respuesta Correcta");
+        }
+        else
+        {
+            boton.GetComponent<Image>().color = Color.red;
+            GameManager.Instance.TotalFallos++;
+            Debug.Log("Respuesta Incorrecta");
+        }
+        StartCoroutine(FinalizarPregunta());
+    }
+        */
+        
+
+    }
+
+    private IEnumerator FinalizarPregunta()
+    {
+        yield return new WaitForSeconds(1.0f);
+        EntregarRetroalimentacion();
+    }
+    private bool ValidarRespuesta(string respuesta)
+    {
+        return respuesta == patologiaCorrecta;
+    }
+
 
     public void PreguntarLesion()
     {
@@ -148,6 +256,15 @@ public class ControladorAdivina : ControladorPreguntas
 
     public override void EntregarRetroalimentacion()
     {
+        canvasJuego.gameObject.SetActive(false);
+        canvasSeleccion.gameObject.SetActive(false);
+        if(ValidarRespuesta(patologiaSeleccionada))
+            textoResultado.text = "Respuesta correcta";
+        else    
+            textoResultado.text = "Respuesta incorrecta";
+        textoRespuesta.text = "La respuesta es: " + patologiaCorrecta;
+        canvasRetroalimentacion.GetComponentInChildren<Button>().onClick.AddListener(() => finished = true);
+        canvasRetroalimentacion.gameObject.SetActive(true);
 
     }
 
@@ -155,6 +272,9 @@ public class ControladorAdivina : ControladorPreguntas
     {
         idPatologia = indPatologiaAsignada;
 
+        notas.Clear();
+        indiceNotaActual = 0;
+        textoNota.text = "";
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         patologiaCorrecta = p.nombre;
 
