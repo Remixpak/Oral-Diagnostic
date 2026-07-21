@@ -226,9 +226,31 @@ public class ControladorAdivina : ControladorPreguntas
         MostrarPista(pista);
         AgregarNota(pista);
     }
-    private void PreguntarDescripcion()
+    public void PreguntarDescripcion()
     {
-        
+        Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
+        if (p == null) return;
+
+        Lesion l = CsvManager.Instance.ObtenerLesionPorId(p.lesionID);
+        if (l == null) return;
+
+        List<Descripcion> listaDescripciones = CsvManager.Instance.ObtenerDescripcionesDeLesion(l);
+
+        if (listaDescripciones == null || listaDescripciones.Count == 0)
+        {
+            MostrarPista("No hay descripciones disponibles para esta lesión.");
+            return;
+        }
+
+        // Construye una lista numerada o con viñetas de todas las descripciones
+        string pista = "Descripciones de la lesión:";
+        for (int i = 0; i < listaDescripciones.Count; i++)
+        {
+            pista += $"\n{i + 1}. {listaDescripciones[i].texto}";
+        }
+
+        MostrarPista(pista);
+        AgregarNota(pista);
     }
 
     private IEnumerator MostrarSnackbar(string mensaje)
