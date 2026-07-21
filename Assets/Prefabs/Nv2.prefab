@@ -2388,7 +2388,6 @@ MonoBehaviour:
   colorNormal: {r: 1, g: 1, b: 1, a: 1}
   colorSeleccionado: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   botonPausa: {fileID: 3664457425277529726}
-  tiempoReinicio: 2
   botonesLesiones:
   - {fileID: 2412357916088481996}
   idLesionesBotones: 
@@ -2561,7 +2560,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}

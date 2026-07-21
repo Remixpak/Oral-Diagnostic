@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections; 
+using System.Collections;
 using TMPro;
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -11,30 +12,31 @@ public class GameManager : MonoBehaviour
 
     private bool juegoActivo = false;
 
+    [Header("Pantalla inicio")]
+    [SerializeField] private GameObject pantallaInicio;
+    private GameObject instanciaPantallaInicio; 
+
     [Header("Metricas de control")]
     [SerializeField] public float TiempoJuego;
-    
     [SerializeField] public int TotalIntentos = 0;
     [SerializeField] public int TotalReinicios = 0;
-
     [SerializeField] public int TotalAciertos = 0;
     [SerializeField] public int TotalFallos = 0;
 
     [Header("Prefabs de Niveles")]
-    // Cambiamos a tipo ControladorPreguntas para acceder directo a sus funciones
     [SerializeField] private GameObject prefabTrivia;
     [SerializeField] private GameObject prefabArbolDeciciones;
     [SerializeField] private GameObject prefabNv4Conceptos;
     [SerializeField] private GameObject prefabAdivinaQuien;
-    [SerializeField] public Canvas canvasResultados;
-    [Header("Textos de resultados")]
-    [SerializeField] public TMP_Text textoAciertos;//cuantos aciertos tuvo el jugador
-    [SerializeField] public TMP_Text textoFallos;//cuantos fallos tuvo el jugador
-    [SerializeField] public TMP_Text textoTiempo;//cuanto tiempo tomo completar la pregunta
-    [SerializeField] public TMP_Text textoIntentos;//cuantos intentos tuvo el jugador
-    [SerializeField] public TMP_Text textoReinicios;//cuantos reinicios tuvo el jugador
 
-   
+    [SerializeField] public Canvas canvasResultados;
+
+    [Header("Textos de resultados")]
+    [SerializeField] public TMP_Text textoAciertos;
+    [SerializeField] public TMP_Text textoFallos;
+    [SerializeField] public TMP_Text textoTiempo;
+    [SerializeField] public TMP_Text textoIntentos;
+    [SerializeField] public TMP_Text textoReinicios;
 
     private Queue<PreguntaRonda> colaPreguntas = new Queue<PreguntaRonda>();
     private Queue<int> idsDisponibles = new Queue<int>();
@@ -44,35 +46,74 @@ public class GameManager : MonoBehaviour
         if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
         else { Destroy(gameObject); }
     }
+
     void Start()
     {
         TiempoJuego = 0;
-        IniciarModoCarrera();//por ahora prueba
+
+        InstanciarPantallaInicio();
+
+        // IniciarModoCarrera(); // Comentado para mostrar menú primero
     }
+
+    private void InstanciarPantallaInicio()
+    {
+        // Verificicamos si esta el prefab
+        if (pantallaInicio == null)
+        {
+            return;
+        }
+
+        if (instanciaPantallaInicio != null)
+        {
+            instanciaPantallaInicio.SetActive(true);
+            return;
+        }
+
+        instanciaPantallaInicio = Instantiate(pantallaInicio);
+
+        DontDestroyOnLoad(instanciaPantallaInicio);
+
+        instanciaPantallaInicio.SetActive(true);
+
+    }
+
+    public GameObject GetPantallaInicio()
+    {
+        return instanciaPantallaInicio;
+    }
+
+    public void MostrarPantallaInicio(bool mostrar)
+    {
+        if (instanciaPantallaInicio != null)
+        {
+            instanciaPantallaInicio.SetActive(mostrar);
+        }
+    }
+
     void Update()
     {
-        if(juegoActivo)
+        if (juegoActivo)
             TiempoJuego += Time.deltaTime;
     }
 
-    // Ejemplo de cómo iniciarías el juego desde tu menú
     public void IniciarModoCarrera()
     {
+
+        // ocultamos la pantalla de inicio al empezar el los niveles
+        MostrarPantallaInicio(false);
+
         modoActual = ModoJuego.Carrera;
         juegoActivo = true;
         ConfigurarJuego(ModoJuego.Carrera);
-        
     }
 
-    public void ConfigurarJuego(ModoJuego modo)//resivira mas parametros dependiendo del modo
+    public void ConfigurarJuego(ModoJuego modo)
     {
-        
-
-        
-        switch(modo)
+        switch (modo)
         {
             case ModoJuego.Carrera:
-                ConfigurarCarrera(1);
+                ConfigurarCarrera();
                 break;
             case ModoJuego.QuickPlay:
                 break;
@@ -87,20 +128,21 @@ public class GameManager : MonoBehaviour
     private void PrepararIDs()
     {
         List<int> ids = new List<int>();
-        foreach(var p in CsvManager.Instance.patologias)
+        foreach (var p in CsvManager.Instance.patologias)
         {
             ids.Add(p.id);
         }
-        //fisher-Yates pa revolver
-        for(int i = 0; i < ids.Count; i++)
+
+        for (int i = 0; i < ids.Count; i++)
         {
             int random = Random.Range(i, ids.Count);
             int temp = ids[i];
             ids[i] = ids[random];
             ids[random] = temp;
         }
+
         idsDisponibles.Clear();
-        foreach(int id in ids)
+        foreach (int id in ids)
         {
             idsDisponibles.Enqueue(id);
         }
@@ -108,7 +150,7 @@ public class GameManager : MonoBehaviour
 
     private int ObtenerID()
     {
-        if(idsDisponibles.Count == 0)
+        if (idsDisponibles.Count == 0)
         {
             Debug.LogError("No quedan ids");
             return -1;
@@ -116,48 +158,55 @@ public class GameManager : MonoBehaviour
         return idsDisponibles.Dequeue();
     }
 
-    private void ConfigurarCarrera(int nivel)
+    private void ConfigurarCarrera()
     {
         PrepararIDs();
-        switch(nivel)
+
+        // NIVEL 1: trivia (5 preguntas)
+        for (int i = 0; i < 5; i++)
         {
-            case 1:
-                for(int i = 0; i < 5; i++)
-                {
-                    colaPreguntas.Enqueue(
-                        new PreguntaRonda
-                        {
-                            idPatologia = ObtenerID(),
-                            tipo = TipoPregunta.Trivia
-                        });
-                }
-                break;
-            case 2:
-                for(int i = 0; i < 5; i++)
-                {
-                    colaPreguntas.Enqueue(
-                        new PreguntaRonda
-                        {
-                            idPatologia = ObtenerID(),
-                            tipo = TipoPregunta.Arbol
-                        });
-                }
-                break;
-            case 3:
-                for(int i = 0; i < 5; i++)
-                {
-                    TipoPregunta tipoRandom = Random.value > 0.5f? TipoPregunta.Conceptos: TipoPregunta.AdivinaQuien;
-                    colaPreguntas.Enqueue(
-                        new PreguntaRonda
-                        {
-                            idPatologia = ObtenerID(),
-                            tipo = tipoRandom
-                        });
-                }
-                break;
+            colaPreguntas.Enqueue(new PreguntaRonda
+            {
+                idPatologia = ObtenerID(),
+                tipo = TipoPregunta.Trivia
+            });
         }
-        
+
+        // NIVEL 2: arbol (5 preguntas)
+        for (int i = 0; i < 5; i++)
+        {
+            colaPreguntas.Enqueue(new PreguntaRonda
+            {
+                idPatologia = ObtenerID(),
+                tipo = TipoPregunta.Arbol
+            });
+        }
+
+        // NIVEL 3: Concepto
+        for (int i = 0; i < 5; i++)
+        {
+            colaPreguntas.Enqueue(new PreguntaRonda
+            {
+                idPatologia = ObtenerID(),
+                tipo = TipoPregunta.Conceptos
+            });
+        }
+
+        // nivel 3: concepto mezclado con adivina quien
+        /*
+        for (int i = 0; i < 5; i++)
+        {
+            TipoPregunta tipoRandom = Random.value > 0.5f ? TipoPregunta.Conceptos : TipoPregunta.AdivinaQuien;
+            colaPreguntas.Enqueue(new PreguntaRonda
+            {
+                idPatologia = ObtenerID(),
+                tipo = tipoRandom
+            });
+        }
+        */
+
     }
+
     private void ConfigurarQuickPlay()
     {
         TipoPregunta[] tipos =
@@ -169,16 +218,16 @@ public class GameManager : MonoBehaviour
         };
 
         TipoPregunta elegida = tipos[Random.Range(0, tipos.Length)];
-        
     }
+
     private void ConfigurarCustom()
     {
-        
+
     }
 
     private GameObject ObtenerPrefab(TipoPregunta tipo)
     {
-        switch(tipo)
+        switch (tipo)
         {
             case TipoPregunta.Trivia:
                 return prefabTrivia;
@@ -192,12 +241,9 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    // Este es el verdadero Loop que controla el flujo por turnos
     private IEnumerator LoopDeJuegoCorrutina()
     {
-    
-    
-        while(colaPreguntas.Count > 0)
+        while (colaPreguntas.Count > 0)
         {
             PreguntaRonda pregunta = colaPreguntas.Dequeue();
             GameObject prefab = ObtenerPrefab(pregunta.tipo);
@@ -206,12 +252,11 @@ public class GameManager : MonoBehaviour
             controlador.InicializarPregunta(pregunta.idPatologia);
             yield return new WaitUntil(() => controlador.finished);
             Destroy(nivelInstanciado);
-            
         }
         TotalIntentos++;
         TerminarRonda();
-
     }
+
     private void MostrarResultados()
     {
         canvasResultados.gameObject.SetActive(true);
@@ -231,6 +276,5 @@ public class GameManager : MonoBehaviour
         MostrarResultados();
         TiempoJuego = 0;
         Debug.Log("¡Ronda Terminada! Mostrando pantalla de resultados.");
-        
     }
 }

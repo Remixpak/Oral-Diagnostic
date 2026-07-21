@@ -21,6 +21,8 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     [SerializeField] public TMP_Text textoResultado;//correcto o incorrecto
     [SerializeField] public TMP_Text textoRespuesta;//cual era la respuesta
 
+    private bool yaRespondio = false;
+
     
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -57,6 +59,15 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     }
     public void SeleccionarAlternativa(Button boton)
     {
+        if (yaRespondio) return;
+        yaRespondio = true;
+
+        foreach(Button btn in botonesAlternativas)//si el jugador ya respondio los botones se deshabilitan
+        {
+            btn.interactable=false;
+        }
+        
+
         respuesta = boton.GetComponentInChildren<TMP_Text>().text;
         if (ComprobarRespuesta(respuesta, respuestaCorrecta))
         {
@@ -116,10 +127,18 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
 
     public override void InicializarPregunta(int indPatologiaAsignada)
     {
+        yaRespondio = false;
         idPatologiaNumerica = indPatologiaAsignada;
         idPatologia = idPatologiaNumerica.ToString();
         botonesAlternativas = new List<Button>(GetComponentsInChildren<Button>());//revisar esto despues
         alternativas = new List<string>();
+
+        foreach (Button btn in botonesAlternativas)
+        {
+            btn.interactable = true;
+            btn.GetComponent<Image>().color = Color.white;//si el usuario no ha respondido los botones siguen igual
+        }
+
         ObtnerLesion();
         ObtenerImagen();
         RellenarRespuestas();
