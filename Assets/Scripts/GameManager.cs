@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,12 +10,9 @@ public class GameManager : MonoBehaviour
 
     public enum ModoJuego { Carrera, QuickPlay, Custom }
     public ModoJuego modoActual;
+    public string Dificultad;
 
     private bool juegoActivo = false;
-
-    [Header("Pantalla inicio")]
-    [SerializeField] private GameObject pantallaInicio;
-    private GameObject instanciaPantallaInicio; 
 
     [Header("Metricas de control")]
     [SerializeField] public float TiempoJuego;
@@ -41,55 +39,82 @@ public class GameManager : MonoBehaviour
     private Queue<PreguntaRonda> colaPreguntas = new Queue<PreguntaRonda>();
     private Queue<int> idsDisponibles = new Queue<int>();
 
+    private int nivelActual;
+    private bool lv1Completado;
+    private bool lv2Completado;
+    private bool lv3Completado;
+    private string dificultadSeleccionada;
+
     void Awake()
     {
         if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
         else { Destroy(gameObject); }
+        
     }
 
     void Start()
     {
         TiempoJuego = 0;
-
-        InstanciarPantallaInicio();
+        modoActual = ConfiguracionPartida.Modo;
+        Dificultad = ConfiguracionPartida.Dificultad;
+        Debug.Log($"Modo: {modoActual}");
+        Debug.Log($"Dificultad: {Dificultad}");
+        if(SceneManager.GetActiveScene().name == "MainSecene")
+            IniciarModoCarrera();
 
         // IniciarModoCarrera(); // Comentado para mostrar menú primero
     }
 
-    private void InstanciarPantallaInicio()
+    private void ActualizarProgreso(bool lv1, bool lv2, bool lv3)
     {
-        // Verificicamos si esta el prefab
-        if (pantallaInicio == null)
+        // Mantener consistencia del progreso
+
+        if (!lv1)
         {
-            return;
+            lv2 = false;
+            lv3 = false;
+        }
+        else if (!lv2)
+        {
+            lv3 = false;
         }
 
-        if (instanciaPantallaInicio != null)
+        if (lv3)
         {
-            instanciaPantallaInicio.SetActive(true);
-            return;
+            lv1 = true;
+            lv2 = true;
+        }
+        else if (lv2)
+        {
+            lv1 = true;
         }
 
-        instanciaPantallaInicio = Instantiate(pantallaInicio);
+        lv1Completado = lv1;
+        lv2Completado = lv2;
+        lv3Completado = lv3;
 
-        DontDestroyOnLoad(instanciaPantallaInicio);
+        // Calcular el nivel que corresponde jugar
 
-        instanciaPantallaInicio.SetActive(true);
+        if (!lv1Completado)
+            nivelActual = 1;
+        else if (!lv2Completado)
+            nivelActual = 2;
+        else if (!lv3Completado)
+            nivelActual = 3;
+        else
+            nivelActual = 4; // Carrera completada
 
+        Debug.Log($"Nivel actual: {nivelActual}");
     }
 
-    public GameObject GetPantallaInicio()
+    
+
+    
+    private Partida CrearPartidaData(string dificulta, bool lv1, bool lv2, bool lv3)
     {
-        return instanciaPantallaInicio;
+        return new Partida(dificulta, lv1,lv2,lv3);
     }
-
-    public void MostrarPantallaInicio(bool mostrar)
-    {
-        if (instanciaPantallaInicio != null)
-        {
-            instanciaPantallaInicio.SetActive(mostrar);
-        }
-    }
+    
 
     void Update()
     {
@@ -101,7 +126,7 @@ public class GameManager : MonoBehaviour
     {
 
         // ocultamos la pantalla de inicio al empezar el los niveles
-        MostrarPantallaInicio(false);
+        
 
         modoActual = ModoJuego.Carrera;
         juegoActivo = true;
@@ -171,7 +196,7 @@ public class GameManager : MonoBehaviour
                 tipo = TipoPregunta.Trivia
             });
         }
-
+        /*
         // NIVEL 2: arbol (5 preguntas)
         for (int i = 0; i < 5; i++)
         {
@@ -190,7 +215,7 @@ public class GameManager : MonoBehaviour
                 idPatologia = ObtenerID(),
                 tipo = TipoPregunta.Conceptos
             });
-        }
+        }*/
 
         // nivel 3: concepto mezclado con adivina quien
         /*
@@ -253,6 +278,29 @@ public class GameManager : MonoBehaviour
             yield return new WaitUntil(() => controlador.finished);
             Destroy(nivelInstanciado);
         }
+        if(modoActual == ModoJuego.Carrera)
+        {
+            switch(nivelActual)
+            {
+                case 1:
+                    ActualizarProgreso(true, false, false);
+                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(dificultadSeleccionada, lv1Completado,lv2Completado, lv3Completado));
+                    Debug.Log("se llamo a guardar para: " + nivelActual);
+                    break;
+                case 2: 
+                    ActualizarProgreso(true, true, false);
+                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(dificultadSeleccionada, lv1Completado,lv2Completado, lv3Completado));
+                    Debug.Log("se llamo a guardar para: " + nivelActual);
+                    break;
+                case 3:
+                    ActualizarProgreso(true, true, true);
+                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(dificultadSeleccionada, lv1Completado,lv2Completado, lv3Completado));
+                    Debug.Log("se llamo a guardar para: " + nivelActual);
+                    break;
+                default:
+                    break;
+            }
+        }
         TotalIntentos++;
         TerminarRonda();
     }
@@ -268,6 +316,10 @@ public class GameManager : MonoBehaviour
         textoIntentos.text = "Intentos: " + TotalIntentos;
         textoReinicios.text = "Reinicios: " + TotalReinicios;
         canvasResultados.gameObject.SetActive(true);
+        if(nivelActual< 4)
+            ControladorGuardarDatos.Instance.GuardarMetricas(nivelActual.ToString());
+        else
+            ControladorGuardarDatos.Instance.GuardarMetricas("Carrera completada");
     }
 
     private void TerminarRonda()
