@@ -33,15 +33,22 @@ public class ControladorAdivina : ControladorPreguntas
     private float siguientePosicionY = 0f;*/
     [SerializeField] private GameObject libretaCanvas;
     [SerializeField] private TMP_Text textoNota;
+    [SerializeField] private RectTransform panelNota;
+
     [Header("Seleccion")]
     [SerializeField] private TMP_Text textoDiag;
     [SerializeField] private Canvas canvasSeleccion;
     [SerializeField] private Button Seleccionado;
+    [SerializeField] private Button cerrarSeleccion;
+    [SerializeField] private Button btnDescartar;
 
     private List<string> notas = new List<string>();
     private int indiceNotaActual = 0;
 
     private Coroutine snackbarCoroutine;
+    private float alturaMaximaSnackbar;
+    private float alturaMinimaSnackbar = 80f;
+    private bool respuestaCorrectaDescartada = false; 
 
     [Header("Retroalimentacion")]
     [SerializeField] private TMP_Text textoRespuesta;
@@ -50,6 +57,18 @@ public class ControladorAdivina : ControladorPreguntas
     private void Awake()
     {
         alternativas = new List<string>();
+
+        if (cerrarSeleccion != null)
+        {
+            cerrarSeleccion.onClick.RemoveAllListeners();
+            cerrarSeleccion.onClick.AddListener(CerrarPanelSeleccion);
+        }
+    }
+
+    public void CerrarPanelSeleccion()
+    {
+        canvasSeleccion.gameObject.SetActive(false);
+        Seleccionado = null; 
     }
 
     private void AgregarNota(string texto)
@@ -63,6 +82,52 @@ public class ControladorAdivina : ControladorPreguntas
             ActualizarNota();
         }
     }
+
+    private IEnumerator AjustarPanelNotaDelay()
+    {
+        yield return null;
+        yield return null;
+        AjustarPanelNota();
+    }
+
+    private void AjustarPanelNota()
+    {
+        if (textoNota == null || panelNota == null) return;
+
+        textoNota.alignment = TextAlignmentOptions.TopLeft;
+        textoNota.ForceMeshUpdate();
+        Canvas.ForceUpdateCanvases();
+
+        float anchoPanel = panelNota.rect.width - 30f; 
+        if (anchoPanel < 10f) anchoPanel = 200f;
+
+        textoNota.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, anchoPanel);
+        textoNota.ForceMeshUpdate();
+
+        float alturaTexto = textoNota.preferredHeight;
+        float alturaMaxima = Screen.height * 0.5f;
+        float alturaMinima = 60f;
+        float alturaFinal = Mathf.Clamp(alturaTexto + 30f, alturaMinima, alturaMaxima);
+
+        Vector2 anchorMin = panelNota.anchorMin;
+        Vector2 anchorMax = panelNota.anchorMax;
+        Vector2 pivot = panelNota.pivot;
+
+        panelNota.anchorMin = new Vector2(anchorMin.x, 0);
+        panelNota.anchorMax = new Vector2(anchorMax.x, 0);
+        panelNota.pivot = new Vector2(pivot.x, 0);
+
+        panelNota.offsetMax = new Vector2(panelNota.offsetMax.x, alturaFinal);
+
+        panelNota.anchorMin = anchorMin;
+        panelNota.anchorMax = anchorMax;
+        panelNota.pivot = pivot;
+
+        textoNota.rectTransform.offsetMin = new Vector2(15, 15);
+        textoNota.rectTransform.offsetMax = new Vector2(-15, -15);
+    }
+
+
     private void ActualizarNota()
     {
         if(notas.Count == 0)
@@ -71,6 +136,7 @@ public class ControladorAdivina : ControladorPreguntas
             return;
         }
         textoNota.text = notas[indiceNotaActual];
+        StartCoroutine(AjustarPanelNotaDelay());
     }
 
     public void SiguienteNota()
@@ -107,16 +173,12 @@ public class ControladorAdivina : ControladorPreguntas
     {
         alternativas.Clear();
 
-        // Agrega la correcta
         alternativas.Add(patologiaCorrecta);
 
-        // Copia de la lista de patologías
         List<Patologia> lista = new List<Patologia>(CsvManager.Instance.patologias);
 
-        // Elimina la correcta
         lista.RemoveAll(p => p.nombre == patologiaCorrecta);
 
-        // Rellena con respuestas aleatorias
         while (alternativas.Count < diagnosticos.Count)
         {
             int indice = Random.Range(0, lista.Count);
@@ -126,14 +188,12 @@ public class ControladorAdivina : ControladorPreguntas
             lista.RemoveAt(indice);
         }
 
-        // Barajar respuestas
         for (int i = 0; i < alternativas.Count; i++)
         {
             int j = Random.Range(i, alternativas.Count);
             (alternativas[i], alternativas[j]) = (alternativas[j], alternativas[i]);
         }
 
-        // Asignar textos a los botones
         for (int i = 0; i < diagnosticos.Count; i++)
         {
             diagnosticos[i].GetComponentInChildren<TMP_Text>().text = alternativas[i];
@@ -151,14 +211,27 @@ public class ControladorAdivina : ControladorPreguntas
     }
     public void Descartar()
     {
-        Debug.Log("Descartando: " + Seleccionado);
+        if (Seleccionado == null) return;
+        string diagnosticoSeleccionado = Seleccionado.GetComponentInChildren<TMP_Text>().text;
 
+        if (diagnosticoSeleccionado == patologiaCorrecta)
+        {
+            respuestaCorrectaDescartada = true;
+            canvasSeleccion.gameObject.SetActive(false);
+            Seleccionado = null;
+            StartCoroutine(FinalizarPregunta());
+            return;
+        }
+
+        Debug.Log("Descartando: " + Seleccionado.name);
         diagnosticos.Remove(Seleccionado);
         Destroy(Seleccionado.gameObject);
-
         Seleccionado = null;
         canvasSeleccion.gameObject.SetActive(false);
+
+        VerificarOpcionesDisponibles();
     }
+
     public void SeleccionarDiagnostico()
     {
         patologiaSeleccionada = Seleccionado.GetComponentInChildren<TMP_Text>().text;
@@ -186,13 +259,39 @@ public class ControladorAdivina : ControladorPreguntas
         StartCoroutine(FinalizarPregunta());
     }
         */
-        
+       
+    }
 
+    private void VerificarOpcionesDisponibles()
+    {
+        if (btnDescartar == null) return;
+
+        int opcionesRestantes = 0;
+        int opcionesCorrectas = 0;
+
+        foreach (Button boton in diagnosticos)
+        {
+            if (boton != null)
+            {
+                opcionesRestantes++;
+                string texto = boton.GetComponentInChildren<TMP_Text>().text;
+                if (texto == patologiaCorrecta)
+                    opcionesCorrectas++;
+            }
+        }
+        if (opcionesRestantes == 1 && opcionesCorrectas == 1)
+        {
+            btnDescartar.interactable = false;
+        }
+        else
+        {
+            btnDescartar.interactable = true;
+        }
     }
 
     private IEnumerator FinalizarPregunta()
     {
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(0.5f);
         EntregarRetroalimentacion();
     }
     private bool ValidarRespuesta(string respuesta)
@@ -242,7 +341,6 @@ public class ControladorAdivina : ControladorPreguntas
             return;
         }
 
-        // Construye una lista numerada o con viñetas de todas las descripciones
         string pista = "Descripciones de la lesión:";
         for (int i = 0; i < listaDescripciones.Count; i++)
         {
@@ -253,26 +351,131 @@ public class ControladorAdivina : ControladorPreguntas
         AgregarNota(pista);
     }
 
+    private void ConfigurarSnackbar()
+    {
+        if (panelSnackbar == null || textoSnackbar == null) return;
+
+        RectTransform panelRect = panelSnackbar.GetComponent<RectTransform>();
+        if (panelRect != null)
+        {
+            panelRect.anchorMin = new Vector2(0, 0);
+            panelRect.anchorMax = new Vector2(1, 0);
+            panelRect.pivot = new Vector2(0.5f, 0);
+            panelRect.offsetMin = new Vector2(30, 40);
+            panelRect.offsetMax = new Vector2(-30, 100);
+            panelRect.localScale = Vector3.one;
+        }
+
+        textoSnackbar.alignment = TextAlignmentOptions.MidlineLeft;
+        textoSnackbar.color = Color.white;
+
+        Image img = panelSnackbar.GetComponent<Image>();
+        if (img == null)
+            img = panelSnackbar.AddComponent<Image>();
+        img.color = new Color(0.1f, 0.1f, 0.18f, 0.92f);
+        img.raycastTarget = false;
+
+        alturaMaximaSnackbar = Screen.height * 0.35f;
+        if (alturaMaximaSnackbar < 100f)
+            alturaMaximaSnackbar = 100f;
+
+        panelSnackbar.SetActive(false);
+    }
+
+
     private IEnumerator MostrarSnackbar(string mensaje)
     {
         panelSnackbar.SetActive(true);
         textoSnackbar.text = "";
 
-        foreach (char c in mensaje)
+        RectTransform panelRect = panelSnackbar.GetComponent<RectTransform>();
+        if (panelRect != null)
         {
-            textoSnackbar.text += c;
-            yield return new WaitForSeconds(0.03f);
+            panelRect.anchorMin = new Vector2(0, 0);
+            panelRect.anchorMax = new Vector2(1, 0);
+            panelRect.pivot = new Vector2(0.5f, 0);
+            panelRect.offsetMin = new Vector2(30, 40);
+            panelRect.offsetMax = new Vector2(-30, 100);
         }
 
+        string[] lineas = mensaje.Split('\n');
+        List<string> lineasVisibles = new List<string>();
+        string textoActual = "";
+
+        foreach (string linea in lineas)
+        {
+            string lineaActual = "";
+            for (int i = 0; i < linea.Length; i++)
+            {
+                lineaActual += linea[i];
+                textoActual = "";
+                foreach (string l in lineasVisibles)
+                    textoActual += l + "\n";
+                textoActual += lineaActual;
+
+                textoSnackbar.text = textoActual;
+
+                yield return null;
+                textoSnackbar.ForceMeshUpdate();
+                float alturaTexto = textoSnackbar.preferredHeight;
+
+                if (alturaTexto > alturaMaximaSnackbar && lineasVisibles.Count > 0)
+                {
+                    lineasVisibles.RemoveAt(0);
+                    textoActual = "";
+                    foreach (string l in lineasVisibles)
+                        textoActual += l + "\n";
+                    textoActual += lineaActual;
+                    textoSnackbar.text = textoActual;
+                    textoSnackbar.ForceMeshUpdate();
+                }
+
+                if (panelRect != null)
+                {
+                    float alturaFinal = Mathf.Clamp(textoSnackbar.preferredHeight + 30f, alturaMinimaSnackbar, alturaMaximaSnackbar);
+                    panelRect.offsetMax = new Vector2(-30, alturaFinal + 20);
+                }
+
+                yield return new WaitForSeconds(0.025f);
+            }
+
+            lineasVisibles.Add(lineaActual);
+        }
+
+        string textoFinal = "";
+        foreach (string l in lineasVisibles)
+            textoFinal += l + "\n";
+        textoSnackbar.text = textoFinal;
+        textoSnackbar.ForceMeshUpdate();
+
+        if (panelRect != null)
+        {
+            float alturaFinal = Mathf.Clamp(textoSnackbar.preferredHeight + 30f, alturaMinimaSnackbar, alturaMaximaSnackbar);
+            panelRect.offsetMax = new Vector2(-30, alturaFinal + 20);
+        }
         yield return new WaitForSeconds(3f);
 
+        CanvasGroup canvasGroup = panelSnackbar.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = panelSnackbar.AddComponent<CanvasGroup>();
+
+        float tiempo = 0f;
+        while (tiempo < 0.3f)
+        {
+            tiempo += Time.deltaTime;
+            canvasGroup.alpha = 1f - (tiempo / 0.3f);
+            yield return null;
+        }
+
         panelSnackbar.SetActive(false);
+        canvasGroup.alpha = 1f;
     }
+
     private void MostrarPista(string mensaje)
     {
         if (snackbarCoroutine != null)
             StopCoroutine(snackbarCoroutine);
-
+        ConfigurarSnackbar();
         snackbarCoroutine = StartCoroutine(MostrarSnackbar(mensaje));
     }
 
@@ -280,7 +483,14 @@ public class ControladorAdivina : ControladorPreguntas
     {
         canvasJuego.gameObject.SetActive(false);
         canvasSeleccion.gameObject.SetActive(false);
-        if(ValidarRespuesta(patologiaSeleccionada))
+
+        if (respuestaCorrectaDescartada)
+        {
+            textoResultado.text = "Has fallado";
+            textoRespuesta.text = "La palabra correcta era:" + patologiaCorrecta;
+        }
+
+        else if(ValidarRespuesta(patologiaSeleccionada))
             textoResultado.text = "Respuesta correcta";
         else    
             textoResultado.text = "Respuesta incorrecta";
@@ -293,7 +503,7 @@ public class ControladorAdivina : ControladorPreguntas
     public override void InicializarPregunta(int indPatologiaAsignada)
     {
         idPatologia = indPatologiaAsignada;
-
+        respuestaCorrectaDescartada = false;
         notas.Clear();
         indiceNotaActual = 0;
         textoNota.text = "";
@@ -307,5 +517,11 @@ public class ControladorAdivina : ControladorPreguntas
             boton.onClick.RemoveAllListeners();
             boton.onClick.AddListener(() => Seleccionar(boton));
         }
+
+        if (btnDescartar != null)
+        {
+            btnDescartar.interactable = true;
+        }
+        VerificarOpcionesDisponibles();
     }
 }
