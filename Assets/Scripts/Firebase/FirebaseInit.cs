@@ -33,7 +33,7 @@ public class FirebaseInit : MonoBehaviour
                 Db = FirebaseFirestore.DefaultInstance;
                 AnalyticsEnabled = true;
 
-                InicializarUsuario();
+                
 
                 Debug.Log($"Firebase inicializado");
                 Debug.Log($"Usuario: {UserName}");
@@ -46,62 +46,7 @@ public class FirebaseInit : MonoBehaviour
     }
 
     // Función para inicializar el usuario, recuperando datos guardados o generando nuevos
-    private void InicializarUsuario()
-    {
-        string userNameGuardado = PlayerPrefs.GetString("UserName", "");
-        string userIdGuardado = PlayerPrefs.GetString("UserId", "");
-
-        if (!string.IsNullOrEmpty(userNameGuardado) && !string.IsNullOrEmpty(userIdGuardado))
-        {
-            UserName = userNameGuardado;
-            UserId = userIdGuardado;
-            Debug.Log($"Usuario recuperado: {UserName}");
-
-            ActualizarConexion();
-            return;
-        }
-
-        UserName = GenerarNombreAleatorio(10);
-        UserId = System.Guid.NewGuid().ToString();
-
-        PlayerPrefs.SetString("UserName", UserName);
-        PlayerPrefs.SetString("UserId", UserId);
-        PlayerPrefs.Save();
-
-        Debug.Log($"Nuevo usuario: {UserName}");
-        RegistrarUsuarioEnFirestore();
-    }
-
-    // Función para generar un nombre aleatorio de longitud especificada
-    private string GenerarNombreAleatorio(int longitud)
-    {
-        string caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        string nombre = "";
-        for (int i = 0; i < longitud; i++)
-        {
-            nombre += caracteres[Random.Range(0, caracteres.Length)];
-        }
-        return nombre;
-    }
-
-    // Función para registrar un nuevo usuario en Firestore con datos iniciales
-    private void RegistrarUsuarioEnFirestore()
-    {
-        if (!IsReady || Db == null) return;
-
-        var datos = new Dictionary<string, object>()
-        {
-            { "nombre", UserName },
-            { "fecha_registro", System.DateTime.Now.ToString("yyyy-MM-dd") },
-            { "dispositivo", SystemInfo.deviceModel },
-            { "version", Application.version },
-            { "ultima_conexion", System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
-            { "total_partidas", 0 },
-            { "partidas_completadas", 0 }
-        };
-
-        Db.Collection("usuarios").Document(UserId).SetAsync(datos);
-    }
+    
 
     // Función para actualizar la última conexión del usuario en Firestore
     private void ActualizarConexion()

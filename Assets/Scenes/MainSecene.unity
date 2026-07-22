@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 86642064}
   - component: {fileID: 86642063}
   - component: {fileID: 86642065}
+  - component: {fileID: 86642066}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -150,15 +151,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   modoActual: 0
+  pantallaInicio: {fileID: 4539813358951927295, guid: 6a9782687fca98a40b2b0cc637fe0c1f, type: 3}
   TiempoJuego: 0
   TotalIntentos: 0
   TotalReinicios: 0
   TotalAciertos: 0
   TotalFallos: 0
-  prefabTrivia: {fileID: 4756381046916451345, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
-  prefabArbolDeciciones: {fileID: 6497719214539273604, guid: 496f8ec9d0ea54344899441d085c7f31, type: 3}
-  prefabNv4Conceptos: {fileID: 7826586429254416265, guid: bd99bf8ce4171fb4aa920ac9d394a3fb, type: 3}
-  prefabAdivinaQuien: {fileID: 6497719214539273604, guid: 496f8ec9d0ea54344899441d085c7f31, type: 3}
+  prefabTrivia: {fileID: 6497719214539273604, guid: 496f8ec9d0ea54344899441d085c7f31, type: 3}
+  prefabArbolDeciciones: {fileID: 5179271380761848784, guid: c15545bb3caff65459806f86ea18e88e, type: 3}
+  prefabNv4Conceptos: {fileID: 1883780828410608334, guid: bd99bf8ce4171fb4aa920ac9d394a3fb, type: 3}
+  prefabAdivinaQuien: {fileID: 4756381046916451345, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
   canvasResultados: {fileID: 258850311}
   textoAciertos: {fileID: 1696278156}
   textoFallos: {fileID: 1118843107}
@@ -193,6 +195,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc1bc12f30404cc47bebcb716da747b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CsvManager
+--- !u!114 &86642066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86642062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 549662a1b47ef9f44b58a37b001dc21b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ControladorGuardarDatos
 --- !u!1 &91116358
 GameObject:
   m_ObjectHideFlags: 0
@@ -546,6 +560,50 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &250821954
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 250821956}
+  - component: {fileID: 250821955}
+  m_Layer: 0
+  m_Name: firebaseManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &250821955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250821954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8e8828713a6e24baf4693203aa0039, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FirebaseInit
+--- !u!4 &250821956
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250821954}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -17.07313, y: 0.65045, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &258850307
 GameObject:
   m_ObjectHideFlags: 0
@@ -1774,3 +1832,4 @@ SceneRoots:
   - {fileID: 86642064}
   - {fileID: 236172318669269847}
   - {fileID: 1060955025}
+  - {fileID: 250821956}

@@ -3,7 +3,7 @@ using Firebase.Firestore;
 using Firebase.Extensions;
 using System.Collections.Generic;
 using System;
-
+using System.Text.RegularExpressions;
 public class ConexionFirestore : MonoBehaviour
 {
     private static ConexionFirestore _instance;
@@ -157,5 +157,61 @@ public class ConexionFirestore : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public void ReservarNumeroJugador(Action<int> callback)
+    {
+        if (!VerificarConexion())
+            return;
+
+        DocumentReference contadorRef =
+            db.Collection("config").Document("contador");
+
+        db.RunTransactionAsync(async transaction =>
+        {
+            DocumentSnapshot snapshot =
+                await transaction.GetSnapshotAsync(contadorRef);
+
+            int ultimoNumero = 0;
+
+            if (snapshot.Exists)
+                ultimoNumero = snapshot.GetValue<int>("ultimoNumeroJugador");
+
+            int siguienteNumero = ultimoNumero + 1;
+
+            transaction.Update(contadorRef,
+                "ultimoNumeroJugador",
+                siguienteNumero);
+
+            return siguienteNumero;
+        })
+        .ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.LogError(task.Exception);
+                return;
+            }
+
+            callback?.Invoke(task.Result);
+        });
+    }
+    public void RegistrarData(IFirestoreData data, string collection, Action<string> onSuccess = null)
+    {
+        if (!VerificarConexion())
+            return;
+
+        DocumentReference doc = db.Collection(collection).Document();
+
+        doc.SetAsync(data.ToFirestore()).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.LogError(task.Exception);
+                return;
+            }
+
+            onSuccess?.Invoke(doc.Id);
+        });
     }
 }
