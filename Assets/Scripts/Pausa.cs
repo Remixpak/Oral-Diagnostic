@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Pausa : MonoBehaviour
 {
     [Header("Interfaz de Pausa")]
     [SerializeField] private GameObject panelPausa;
+    [SerializeField] private GameObject panelConfirmacion;
 
     
     public void AbrirPanelPausa()
@@ -12,7 +14,8 @@ public class Pausa : MonoBehaviour
         if (panelPausa != null)
         {
             panelPausa.SetActive(true);
-            Time.timeScale = 0f;
+            GameManager.Instance.PausarJuego();
+
         }
     }
 
@@ -21,25 +24,32 @@ public class Pausa : MonoBehaviour
         if (panelPausa != null)
         {
             panelPausa.SetActive(false);
-            Time.timeScale = 1f;
+            GameManager.Instance.ReanudarJuego();
         }
     }
 
     public void ReiniciarNivel()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+       GameManager.Instance.ReiniciarPartida();
     }
 
-    public void CargarEscena(string nombreEscena)
+    public void activarConfirmacion()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(nombreEscena);
+        panelConfirmacion.SetActive(true);
+    }
+    public void cerrarConfirmacion()
+    {
+        panelConfirmacion.SetActive(false);
+    }
+
+    public void Salir()
+    {
+        SceneManager.LoadScene("PantallaInicio");
     }
 
     void Start()
     {
-
+        panelConfirmacion.SetActive(false);
     }
 
     void Update()
