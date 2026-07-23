@@ -655,13 +655,13 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             etiologiaCorrectaSeleccionada && patologiaCorrectaSeleccionada)
         {
             textoResultado.text = "¡Respuesta Correcta!";
-            textoResultado.color = Color.green;
+            textoResultado.color = Color.white;
             textoRespuesta.text = "¡Todos los bloques son correctos!";
         }
         else
         {
             textoResultado.text = "Respuesta Incorrecta";
-            textoResultado.color = Color.red;
+            textoResultado.color = Color.white;
 
             string erroresTexto = "";
             if (!lesionCorrectaSeleccionada) erroresTexto += "- Lesion incorrecta\n";

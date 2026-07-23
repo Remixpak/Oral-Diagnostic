@@ -17,6 +17,7 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
     [SerializeField] private Image imagen;
     [Header("Botones")]
     [SerializeField] private List<Button> botonesAlternativas;
+    [SerializeField] private Button botonPausa;
     [Header("Textos de retroalimentacion")]
     [SerializeField] public TMP_Text textoResultado;//correcto o incorrecto
     [SerializeField] public TMP_Text textoRespuesta;//cual era la respuesta
@@ -130,13 +131,25 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         yaRespondio = false;
         idPatologiaNumerica = indPatologiaAsignada;
         idPatologia = idPatologiaNumerica.ToString();
-        botonesAlternativas = new List<Button>(GetComponentsInChildren<Button>());//revisar esto despues
+
+        Button[] todosLosBotones = GetComponentsInChildren<Button>();
+        botonesAlternativas = new List<Button>();
+
+        foreach (Button btn in todosLosBotones)
+        {
+            if (btn == botonPausa) continue;
+            if (btn.CompareTag("Pausa")) continue;
+            if (btn.name.Contains("Pausa")) continue;
+
+            botonesAlternativas.Add(btn);
+        }
+
         alternativas = new List<string>();
 
         foreach (Button btn in botonesAlternativas)
         {
             btn.interactable = true;
-            btn.GetComponent<Image>().color = Color.white;//si el usuario no ha respondido los botones siguen igual
+            btn.GetComponent<Image>().color = Color.white;
         }
 
         ObtnerLesion();
@@ -147,8 +160,6 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         {
             boton.onClick.AddListener(() => SeleccionarAlternativa(boton));
         }
-
-
     }
 
 
