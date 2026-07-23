@@ -697,26 +697,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         {
             finished = true;
             Debug.Log("<color=green>¡Nivel Completado!</color>");
-            if (ConexionFirestore.Instance != null)
-            {
-                float tiempoTotal = 0f;
-                if (GameManager.Instance != null)
-                {
-                    tiempoTotal = GameManager.Instance.TiempoJuego;
-                }
-                ConexionFirestore.Instance.GuardarPartida(
-                    nivel: "Nivel_3",
-                    patologiaID: targetPatologiaID,
-                    patologiaOK: patologiaCorrectaSeleccionada,
-                    etiologiaOK: etiologiaCorrectaSeleccionada,
-                    familiaOK: familiaCorrectaSeleccionada,
-                    lesionOK: lesionCorrectaSeleccionada,
-                    errores: erroresNivel,
-                    tiempo: tiempoTotal,
-                    erroresDetalle: new List<Dictionary<string, object>>(),
-                    respuestas: new List<Dictionary<string, object>>()
-                );
-            }
+            
 
             EntregarRetroalimentacion();
         }

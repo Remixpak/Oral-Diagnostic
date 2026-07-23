@@ -45,10 +45,11 @@ public class GameManager : MonoBehaviour
     private bool lv3Completado;
     private string dificultadSeleccionada;
 
+    private GameObject nivelInstanciado;
+
     void Awake()
     {
-        if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
-        else { Destroy(gameObject); }
+        Instance = this;
         
     }
 
@@ -272,7 +273,7 @@ public class GameManager : MonoBehaviour
         {
             PreguntaRonda pregunta = colaPreguntas.Dequeue();
             GameObject prefab = ObtenerPrefab(pregunta.tipo);
-            GameObject nivelInstanciado = Instantiate(prefab);
+            nivelInstanciado = Instantiate(prefab);
             ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
             controlador.InicializarPregunta(pregunta.idPatologia);
             yield return new WaitUntil(() => controlador.finished);
@@ -328,5 +329,38 @@ public class GameManager : MonoBehaviour
         MostrarResultados();
         TiempoJuego = 0;
         Debug.Log("¡Ronda Terminada! Mostrando pantalla de resultados.");
+    }
+
+
+    public void PausarJuego()
+    {
+        juegoActivo = false;
+        Time.timeScale = 0f;
+    }
+
+    public void ReanudarJuego()
+    {
+        juegoActivo = true;
+        Time.timeScale = 1f;
+    }
+
+    public void ReiniciarPartida()
+    {
+        StopAllCoroutines();
+        if(nivelInstanciado != null)
+            Destroy(nivelInstanciado);
+
+        juegoActivo = false;
+
+        TiempoJuego = 0;
+        TotalIntentos = 0;
+        TotalReinicios++;
+        TotalAciertos = 0;
+        TotalFallos = 0;
+
+        colaPreguntas.Clear();
+        idsDisponibles.Clear();
+
+        ConfigurarJuego(modoActual);
     }
 }
