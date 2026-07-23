@@ -290,27 +290,6 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
                 GameManager.Instance.TotalAciertos++;
             }
 
-            if (ConexionFirestore.Instance != null)
-            {
-                float tiempoTotal = 0f;
-                if (GameManager.Instance != null)
-                {
-                    tiempoTotal = GameManager.Instance.TiempoJuego;
-                }
-
-                ConexionFirestore.Instance.GuardarPartida(
-                    nivel: "Nivel_3",
-                    patologiaID: patologiaIDTarget,
-                    patologiaOK: true,
-                    etiologiaOK: true,
-                    familiaOK: true,
-                    lesionOK: true,
-                    errores: erroresNivel,
-                    tiempo: tiempoTotal,
-                    erroresDetalle: new List<Dictionary<string, object>>(),
-                    respuestas: new List<Dictionary<string, object>>()
-                );
-            }
 
             EntregarRetroalimentacion();
         }
@@ -354,13 +333,13 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         if (nivelCompletado)
         {
             textoResultado.text = "Respuesta Correcta!";
-            textoResultado.color = Color.green;
+            textoResultado.color = Color.white;
             textoRespuesta.text = "Has descubierto el diagnostico clinico: " + palabraCorrecta;
         }
         else
         {
             textoResultado.text = "Respuesta Incorrecta";
-            textoResultado.color = Color.red;
+            textoResultado.color = Color.white;
             textoRespuesta.text = "La respuesta correcta era: " + palabraCorrecta;
         }
 
