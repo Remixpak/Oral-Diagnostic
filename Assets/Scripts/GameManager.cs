@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviour
 
     [Header("Resultados")]
     [SerializeField] public Canvas canvasResultados;
-   
 
     [Header("Textos de resultados")]
     [SerializeField] public TMP_Text textoAciertos;
@@ -38,7 +37,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public TMP_Text textoTiempo;
     [SerializeField] public TMP_Text textoIntentos;
     [SerializeField] public TMP_Text textoReinicios;
-    
+
     [Header("Tutorial")]
     [SerializeField] private GameObject prefabTutorial;
     private Queue<PreguntaRonda> colaPreguntas = new Queue<PreguntaRonda>();
@@ -51,40 +50,173 @@ public class GameManager : MonoBehaviour
     private string dificultadSeleccionada;
 
     private GameObject nivelInstanciado;
+    private GameObject tutorialInstanciado;
     private bool continuarCarrera = false;
     [SerializeField] private LvPass lvPass;
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
-        
     }
 
     void Start()
     {
-        //ControladorGuardarDatos.Instance.EliminarPartida();
-        Debug.Log($"Nivel actual: {nivelActual}");
-        if(ControladorGuardarDatos.Instance.ExistePartida())
+        Debug.Log($"Nivel actual inicial: {nivelActual}");
+        if (ControladorGuardarDatos.Instance != null && ControladorGuardarDatos.Instance.ExistePartida())
         {
-            ActualizarProgreso(ControladorGuardarDatos.Instance.CargarPartida().Lv1Completado,
-            ControladorGuardarDatos.Instance.CargarPartida().Lv2Completado,
-            ControladorGuardarDatos.Instance.CargarPartida().Lv3Completado);
+            var partida = ControladorGuardarDatos.Instance.CargarPartida();
+            ActualizarProgreso(partida.Lv1Completado, partida.Lv2Completado, partida.Lv3Completado);
         }
         else
+        {
             nivelActual = 1;
+        }
+
         TiempoJuego = 0;
         modoActual = ConfiguracionPartida.Modo;
         Dificultad = ConfiguracionPartida.Dificultad;
-        Debug.Log($"Modo: {modoActual}");
-        Debug.Log($"Dificultad: {Dificultad}");
-        lvPass = GetComponent<LvPass>();
-        if(SceneManager.GetActiveScene().name == "MainSecene")
-            IniciarModoCarrera();
 
-        // IniciarModoCarrera(); // Comentado para mostrar menú primero
+        // Solo busca el componente si no fue asignado previamente en el Inspector
+        if (lvPass == null)
+        {
+            lvPass = GetComponentInChildren<LvPass>();
+        }
+
+        if (SceneManager.GetActiveScene().name == "MainSecene")
+        {
+            IniciarModoCarrera();
+        }
     }
 
-    private GameObject tutorialInstanciado; // Guardamos la referencia para destruirlo si reiniciamos
+    void Update()
+    {
+        if (juegoActivo)
+            TiempoJuego += Time.deltaTime;
+    }
+
+    public void IniciarModoCarrera()
+    {
+        modoActual = ModoJuego.Carrera;
+        StopAllCoroutines(); // Detener cualquier loop previo por seguridad
+        StartCoroutine(LoopPrincipalJuego());
+    }
+
+    // --- LOOP PRINCIPAL SECUENCIAL (Sin recursividad) ---
+    private IEnumerator LoopPrincipalJuego()
+    {
+        while (modoActual == ModoJuego.Carrera && nivelActual < 4)
+        {
+            // 1. Resetear métricas del nivel actual
+            TotalAciertos = 0;
+            TotalFallos = 0;
+            continuarCarrera = false;
+            
+            if (canvasResultados != null) 
+                canvasResultados.gameObject.SetActive(false);
+
+            // 2. Configurar preguntas e iniciar tutorial
+            ConfigurarCarrera(nivelActual);
+            yield return StartCoroutine(MostrarTutorialNivel(nivelActual));
+
+            juegoActivo = true;
+
+            // 3. Resolver cola de preguntas
+            while (colaPreguntas.Count > 0)
+            {
+                PreguntaRonda pregunta = colaPreguntas.Dequeue();
+                GameObject prefab = ObtenerPrefab(pregunta.tipo);
+
+                nivelInstanciado = Instantiate(prefab);
+                ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
+                controlador.InicializarPregunta(pregunta.idPatologia);
+
+                yield return new WaitUntil(() => controlador.finished);
+
+                Destroy(nivelInstanciado);
+            }
+
+            // 4. Evaluar fin de nivel y guardar progreso
+           
+            if (PuedePasar())
+            {
+                switch (nivelActual)
+                {
+                    case 1: ActualizarProgreso(true, false, false); break;
+                    case 2: ActualizarProgreso(true, true, false); break;
+                    case 3: ActualizarProgreso(true, true, true); break;
+                }
+                
+                if (ControladorGuardarDatos.Instance != null)
+                {
+                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(Dificultad, lv1Completado, lv2Completado, lv3Completado));
+                }
+            }
+
+            TotalIntentos++;
+            juegoActivo = false;
+
+            // 5. Mostrar UI de resultados y esperar acción del usuario
+            MostrarResultados();
+
+            
+
+            // Aseguramos que la bandera empiece en false antes de la espera
+            continuarCarrera = false;
+            yield return new WaitUntil(() => continuarCarrera);
+
+            // Si aprobó, avanzar de nivel. Si no, volverá a repetir el nivelActual en la siguiente vuelta.
+            if (PuedePasar() && nivelActual < 4)
+            {
+                nivelActual++;
+            }
+        }
+    }
+
+    public void ContinuarCarrera()
+    {
+        continuarCarrera = true;
+    }
+
+    private void MostrarResultados()
+    {
+        // Validación de seguridad para evitar Crash en Android si falta la referencia
+        if (lvPass != null)
+        {
+            if (PuedePasar())
+                lvPass.MostrarPass(nivelActual);
+            else
+                lvPass.MostrarReintento();
+        }
+        else
+        {
+            Debug.LogError("¡Atención! La referencia a LvPass es NULL en el GameManager.");
+        }
+
+        if (canvasResultados != null)
+        {
+            canvasResultados.gameObject.SetActive(true);
+            if (textoAciertos != null) textoAciertos.text = "Aciertos: " + TotalAciertos;
+            if (textoFallos != null) textoFallos.text = "Fallos: " + TotalFallos;
+            
+            int minutos = Mathf.FloorToInt(TiempoJuego / 60);
+            int segundos = Mathf.FloorToInt(TiempoJuego % 60);
+            if (textoTiempo != null) textoTiempo.text = "Tiempo: " + minutos.ToString("00") + ":" + segundos.ToString("00");
+            
+            if (textoIntentos != null) textoIntentos.text = "Intentos: " + TotalIntentos;
+            if (textoReinicios != null) textoReinicios.text = "Reinicios: " + TotalReinicios;
+        }
+
+        if (ControladorGuardarDatos.Instance != null)
+        {
+            string claveNivel = nivelActual < 4 ? nivelActual.ToString() : "Carrera completada";
+            ControladorGuardarDatos.Instance.GuardarMetricas(claveNivel);
+        }
+    }
 
     private IEnumerator MostrarTutorialNivel(int nivel)
     {
@@ -119,12 +251,10 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        // Damos 1 frame de espera para que la UI de TextMeshPro en el prefab se despierte e inicialice limpia
-        yield return null;
+        yield return null; // Esperar 1 frame para la UI
 
         tutorial.ActivarTutorial();
 
-        // Esperamos a que finalice comprobando que el objeto aún siga existiendo
         yield return new WaitUntil(() => tutorial == null || tutorial.Finalizado);
 
         if (tutorialInstanciado != null)
@@ -134,92 +264,29 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void ActualizarProgreso(bool lv1, bool lv2, bool lv3)
+    private void ConfigurarCarrera(int nivel)
     {
-        // Mantener consistencia del progreso
+        PrepararIDs();
+        colaPreguntas.Clear();
 
-        if (!lv1)
+        switch (nivel)
         {
-            lv2 = false;
-            lv3 = false;
-        }
-        else if (!lv2)
-        {
-            lv3 = false;
-        }
-
-        if (lv3)
-        {
-            lv1 = true;
-            lv2 = true;
-        }
-        else if (lv2)
-        {
-            lv1 = true;
-        }
-
-        lv1Completado = lv1;
-        lv2Completado = lv2;
-        lv3Completado = lv3;
-
-        // Calcular el nivel que corresponde jugar
-
-        if (!lv1Completado)
-            nivelActual = 1;
-        else if (!lv2Completado)
-            nivelActual = 2;
-        else if (!lv3Completado)
-            nivelActual = 3;
-        else
-            nivelActual = 4; // Carrera completada
-
-        Debug.Log($"Nivel actual: {nivelActual}");
-    }
-
-    
-
-    
-    private Partida CrearPartidaData(string dificulta, bool lv1, bool lv2, bool lv3)
-    {
-        return new Partida(dificulta, lv1,lv2,lv3);
-    }
-    
-
-    void Update()
-    {
-        if (juegoActivo)
-            TiempoJuego += Time.deltaTime;
-    }
-
-    public void IniciarModoCarrera()
-    {
-
-        // ocultamos la pantalla de inicio al empezar el los niveles
-        
-
-        modoActual = ModoJuego.Carrera;
-        //juegoActivo = true;
-        ConfigurarJuego(ModoJuego.Carrera);
-
-        StartCoroutine(LoopDeJuegoCorrutina());
-    }
-
-    public void ConfigurarJuego(ModoJuego modo)
-    {
-        switch (modo)
-        {
-            case ModoJuego.Carrera:
-                ConfigurarCarrera(nivelActual);
+            case 1:
+                for (int i = 0; i < 5; i++)
+                    colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Trivia });
                 break;
-            case ModoJuego.QuickPlay:
+            case 2:
+                for (int i = 0; i < 5; i++)
+                    colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Arbol });
                 break;
-            case ModoJuego.Custom:
-                break;
-            default:
+            case 3:
+                for (int i = 0; i < 5; i++)
+                {
+                    TipoPregunta tipoRandom = Random.value > 0.5f ? TipoPregunta.Conceptos : TipoPregunta.AdivinaQuien;
+                    colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = tipoRandom });
+                }
                 break;
         }
-        // NOTA: Quitamos 'StartCoroutine(LoopDeJuegoCorrutina());' de aquí 
-        // para controlar explícitamente cuándo arranca.
     }
 
     private void PrepararIDs()
@@ -247,259 +314,44 @@ public class GameManager : MonoBehaviour
 
     private int ObtenerID()
     {
-        if (idsDisponibles.Count == 0)
-        {
-            Debug.LogError("No quedan ids");
-            return -1;
-        }
+        if (idsDisponibles.Count == 0) return -1;
         return idsDisponibles.Dequeue();
-    }
-
-    private void ConfigurarCarrera(int nivel)
-    {
-        PrepararIDs();
-        Debug.Log($"Se esta configurando el modo modo carrera con nivel: {nivel}");
-        switch(nivel)
-        {
-            case 1: 
-                for (int i = 0; i < 5; i++)
-                {
-                    colaPreguntas.Enqueue(new PreguntaRonda
-                    {
-                        idPatologia = ObtenerID(),
-                        tipo = TipoPregunta.Trivia
-                    });
-                }
-                break;
-            case 2: 
-
-                for (int i = 0; i < 5; i++)
-                {
-                    Debug.Log($"cargando arbol: {i}");
-                    colaPreguntas.Enqueue(new PreguntaRonda
-                    {
-                        
-                        idPatologia = ObtenerID(),
-                        tipo = TipoPregunta.Arbol
-                    });
-                }
-                break;
-            case 3:
-                for (int i = 0; i < 5; i++)
-                {
-                    TipoPregunta tipoRandom = Random.value > 0.5f ? TipoPregunta.Conceptos : TipoPregunta.AdivinaQuien;
-                    colaPreguntas.Enqueue(new PreguntaRonda
-                    {
-                        idPatologia = ObtenerID(),
-                        tipo = tipoRandom
-                    });
-                }
-                break;
-            default:
-                break;
-        }
-        // NIVEL 1: trivia (5 preguntas)
-        /*for (int i = 0; i < 5; i++)
-        {
-            colaPreguntas.Enqueue(new PreguntaRonda
-            {
-                idPatologia = ObtenerID(),
-                tipo = TipoPregunta.Trivia
-            });
-        }
-        /*
-        // NIVEL 2: arbol (5 preguntas)
-        for (int i = 0; i < 5; i++)
-        {
-            colaPreguntas.Enqueue(new PreguntaRonda
-            {
-                idPatologia = ObtenerID(),
-                tipo = TipoPregunta.Arbol
-            });
-        }
-
-        // NIVEL 3: Concepto
-        for (int i = 0; i < 5; i++)
-        {
-            colaPreguntas.Enqueue(new PreguntaRonda
-            {
-                idPatologia = ObtenerID(),
-                tipo = TipoPregunta.Conceptos
-            });
-        }*/
-
-        // nivel 3: concepto mezclado con adivina quien
-        /*
-        for (int i = 0; i < 5; i++)
-        {
-            TipoPregunta tipoRandom = Random.value > 0.5f ? TipoPregunta.Conceptos : TipoPregunta.AdivinaQuien;
-            colaPreguntas.Enqueue(new PreguntaRonda
-            {
-                idPatologia = ObtenerID(),
-                tipo = tipoRandom
-            });
-        }
-        */
-
-    }
-
-    private void ConfigurarQuickPlay()
-    {
-        TipoPregunta[] tipos =
-        {
-            TipoPregunta.Trivia,
-            TipoPregunta.Arbol,
-            TipoPregunta.Conceptos,
-            TipoPregunta.AdivinaQuien
-        };
-
-        TipoPregunta elegida = tipos[Random.Range(0, tipos.Length)];
-    }
-
-    private void ConfigurarCustom()
-    {
-
     }
 
     private GameObject ObtenerPrefab(TipoPregunta tipo)
     {
         switch (tipo)
         {
-            case TipoPregunta.Trivia:
-                return prefabTrivia;
-            case TipoPregunta.Arbol:
-                return prefabArbolDeciciones;
-            case TipoPregunta.Conceptos:
-                return prefabNv4Conceptos;
-            case TipoPregunta.AdivinaQuien:
-                return prefabAdivinaQuien;
+            case TipoPregunta.Trivia: return prefabTrivia;
+            case TipoPregunta.Arbol: return prefabArbolDeciciones;
+            case TipoPregunta.Conceptos: return prefabNv4Conceptos;
+            case TipoPregunta.AdivinaQuien: return prefabAdivinaQuien;
         }
         return null;
     }
 
-    private IEnumerator LoopDeJuegoCorrutina()
+    private void ActualizarProgreso(bool lv1, bool lv2, bool lv3)
     {
-        canvasResultados.gameObject.SetActive(false);
+        if (!lv1) { lv2 = false; lv3 = false; }
+        else if (!lv2) { lv3 = false; }
 
-        yield return StartCoroutine(MostrarTutorialNivel(nivelActual));
-        juegoActivo = true;
-        Debug.Log($"cola preguntas: {colaPreguntas.Count}");
-        while (colaPreguntas.Count > 0)
-        {
-            PreguntaRonda pregunta = colaPreguntas.Dequeue();
-            GameObject prefab = ObtenerPrefab(pregunta.tipo);
-            Debug.Log(prefab.name);
-            nivelInstanciado = Instantiate(prefab);
-            Debug.Log(nivelInstanciado.name);
-            ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
-            Debug.Log(controlador.GetType().Name);
-            Debug.Log("Antes de inicializar");
-            controlador.InicializarPregunta(pregunta.idPatologia);
-            Debug.Log("Despues de inicializar");
-            Debug.Log("Esperando...");
-            yield return new WaitUntil(() => controlador.finished);
-            Debug.Log("Pregunta terminada");
-            Destroy(nivelInstanciado);
-        }
-        if(modoActual == ModoJuego.Carrera && PuedePasar())
-        {
-            switch(nivelActual)
-            {
-                case 1:
-                    ActualizarProgreso(true, false, false);
-                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(dificultadSeleccionada, lv1Completado,lv2Completado, lv3Completado));
-                    Debug.Log("se llamo a guardar para: " + nivelActual);
-                    break;
-                case 2: 
-                    ActualizarProgreso(true, true, false);
-                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(dificultadSeleccionada, lv1Completado,lv2Completado, lv3Completado));
-                    Debug.Log("se llamo a guardar para: " + nivelActual);
-                    break;
-                case 3:
-                    ActualizarProgreso(true, true, true);
-                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(dificultadSeleccionada, lv1Completado,lv2Completado, lv3Completado));
-                    Debug.Log("se llamo a guardar para: " + nivelActual);
-                    break;
-                default:
-                    break;
-            }
-           
-        }
-        TotalIntentos++;
-        yield return StartCoroutine(TerminarRonda());
+        if (lv3) { lv1 = true; lv2 = true; }
+        else if (lv2) { lv1 = true; }
 
-        if (nivelActual < 4)
-        {
-            ConfigurarCarrera(nivelActual);
-            juegoActivo = true;
-            StartCoroutine(LoopDeJuegoCorrutina());
-        }
+        lv1Completado = lv1;
+        lv2Completado = lv2;
+        lv3Completado = lv3;
+
+        if (!lv1Completado) nivelActual = 1;
+        else if (!lv2Completado) nivelActual = 2;
+        else if (!lv3Completado) nivelActual = 3;
+        else nivelActual = 4;
     }
 
-    public void ContinuarCarrera()
+    private Partida CrearPartidaData(string dificulta, bool lv1, bool lv2, bool lv3)
     {
-        
-        continuarCarrera = true;
+        return new Partida(dificulta, lv1, lv2, lv3);
     }
-    private void MostrarResultados()
-    {
-        canvasResultados.gameObject.SetActive(true);
-        textoAciertos.text = "Aciertos: " + TotalAciertos;
-        textoFallos.text = "Fallos: " + TotalFallos;
-        int minutos = Mathf.FloorToInt(TiempoJuego / 60);
-        int segundos = Mathf.FloorToInt(TiempoJuego % 60);
-        textoTiempo.text = "Tiempo: " + minutos.ToString("00") + ":" + segundos.ToString("00");
-        textoIntentos.text = "Intentos: " + TotalIntentos;
-        textoReinicios.text = "Reinicios: " + TotalReinicios;
-        canvasResultados.gameObject.SetActive(true);
-        if(nivelActual< 4)
-            ControladorGuardarDatos.Instance.GuardarMetricas(nivelActual.ToString());
-        else
-            ControladorGuardarDatos.Instance.GuardarMetricas("Carrera completada");
-    }
-
-    private IEnumerator TerminarRonda()
-    {
-        juegoActivo = false;
-
-        MostrarResultados();
-       
-
-        
-
-        if(PuedePasar())
-        {
-            lvPass.MostrarPass(nivelActual);
-        }
-        else
-        {
-            lvPass.MostrarReintento();
-        }
-        //Debug.Log($"[TerminarRonda] Precision: {porcentajeAciertos * 100:F1}% | Requerido para ({Dificultad}): {porcentajeRequerido * 100}%");
-
-        TiempoJuego = 0;
-
-        if (nivelActual < 4)
-        {
-            continuarCarrera = false;
-            yield return new WaitUntil(() => continuarCarrera);
-            // Comprobamos si se cumple el porcentaje según la dificultad
-            /*if (porcentajeAciertos >= porcentajeRequerido)
-            {
-                continuarCarrera = false;
-               
-                yield return new WaitUntil(() => continuarCarrera);
-            }
-            else
-            {
-                Debug.Log("GameOver");
-                continuarCarrera = false;
-                
-                // La carrera se detiene aquí y no se espera a la bandera continuarCarrera
-            }*/
-        }
-    }
-
 
     public void PausarJuego()
     {
@@ -515,11 +367,7 @@ public class GameManager : MonoBehaviour
 
     public void ReiniciarPartida()
     {
-        Debug.Log("Reiniciando Partida...");
-
-        // ¡CRUCIAL! Asegurar que el tiempo del juego no esté pausado
         Time.timeScale = 1f;
-
         StopAllCoroutines();
 
         if (nivelInstanciado != null) Destroy(nivelInstanciado);
@@ -535,40 +383,25 @@ public class GameManager : MonoBehaviour
         colaPreguntas.Clear();
         idsDisponibles.Clear();
 
-        ConfigurarJuego(modoActual);
-        StartCoroutine(LoopDeJuegoCorrutina());
+        StartCoroutine(LoopPrincipalJuego());
     }
 
     private float ObtenerPorcentajeRequerido()
     {
-        // Normalizamos el string para evitar problemas de mayúsculas/minúsculas o espacios
         string dif = Dificultad != null ? Dificultad.Trim().ToLower() : "";
-
         switch (dif)
         {
-            
-            case "Practicante":
-                return 0.80f; // 80%
-
-            
-            case "Asistente":
-                return 0.85f; // 85%
-
-            
-            case "Experto":
-                return 0.90f; // 90%
-
-            default:
-                // Valor por defecto si no reconoce el string de dificultad
-                return 0.80f;
+            case "practicante": return 0.80f;
+            case "asistente": return 0.85f;
+            case "experto": return 0.90f;
+            default: return 0.80f;
         }
     }
-    
+
     private bool PuedePasar()
     {
         int totalRespuestas = TotalAciertos + TotalFallos;
         float porcentajeAciertos = totalRespuestas > 0 ? (float)TotalAciertos / totalRespuestas : 0f;
-
         return porcentajeAciertos >= ObtenerPorcentajeRequerido();
     }
 }
