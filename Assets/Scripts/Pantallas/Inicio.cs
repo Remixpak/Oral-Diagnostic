@@ -23,6 +23,7 @@ public class Inicio : MonoBehaviour
     private Coroutine corrutinaCuentaRegresiva;
     void Start()
     {
+        StartCoroutine(ControladorGuardarDatos.Instance.CrearUsuarioCuandoFirebaseEsteListo("xxxx"));
         if (toggleSonido != null && ControladorSonido.Instance != null)
         {
             toggleSonido.SetIsOnWithoutNotify(ControladorSonido.Instance.SonidoActivado());
@@ -68,6 +69,7 @@ public class Inicio : MonoBehaviour
 
     public void IrAJugar()
     {
+
         ControladorSonido.Instance?.ReproducirClick();
         SceneManager.LoadScene("PantallaSeleccion");
     }

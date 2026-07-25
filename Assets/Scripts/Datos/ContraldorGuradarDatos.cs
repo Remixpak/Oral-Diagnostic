@@ -31,6 +31,8 @@ public class ControladorGuardarDatos : MonoBehaviour
 
     public IEnumerator CrearUsuarioCuandoFirebaseEsteListo(string nick)
     {
+        if(ExisteUsuario())
+            yield break;
         yield return new WaitUntil(() => FirebaseInit.IsReady);
 
         CrearUsuario(nick);
