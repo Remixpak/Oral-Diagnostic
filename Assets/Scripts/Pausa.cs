@@ -44,6 +44,7 @@ public class Pausa : MonoBehaviour
 
     public void Salir()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene("PantallaInicio");
     }
 
