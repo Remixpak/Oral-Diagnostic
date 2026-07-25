@@ -4,7 +4,6 @@ using Firebase.Extensions;
 using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
-using System.Collections;
 public class ConexionFirestore : MonoBehaviour
 {
     private static ConexionFirestore _instance;
@@ -162,41 +161,27 @@ public class ConexionFirestore : MonoBehaviour
 
     public void ReservarNumeroJugador(Action<int> callback)
     {
-        StartCoroutine(EsperarYReservarNumeroJugador(callback));
-    }
+        if (!VerificarConexion())
+            return;
 
-    private IEnumerator EsperarYReservarNumeroJugador(Action<int> callback)
-    {
-        // Espera hasta que Firebase realmente esté listo
-        yield return new WaitUntil(() => FirebaseInit.IsReady);
-
-        if (db == null)
-        {
-            db = FirebaseInit.Db;
-        }
-
-        if (db == null)
-        {
-            Debug.LogError("Error crítico: Firestore no pudo inicializarse correctamente.");
-            yield break;
-        }
-
-        DocumentReference contadorRef = db.Collection("config").Document("contador");
+        DocumentReference contadorRef =
+            db.Collection("config").Document("contador");
 
         db.RunTransactionAsync(async transaction =>
         {
-            DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(contadorRef);
+            DocumentSnapshot snapshot =
+                await transaction.GetSnapshotAsync(contadorRef);
 
             int ultimoNumero = 0;
 
-            if (snapshot.Exists && snapshot.ContainsField("ultimoNumeroJugador"))
-            {
+            if (snapshot.Exists)
                 ultimoNumero = snapshot.GetValue<int>("ultimoNumeroJugador");
-            }
 
             int siguienteNumero = ultimoNumero + 1;
 
-            transaction.Update(contadorRef, "ultimoNumeroJugador", siguienteNumero);
+            transaction.Update(contadorRef,
+                "ultimoNumeroJugador",
+                siguienteNumero);
 
             return siguienteNumero;
         })
@@ -204,7 +189,7 @@ public class ConexionFirestore : MonoBehaviour
         {
             if (task.IsFaulted)
             {
-                Debug.LogError($"Error en la transacción de Firestore: {task.Exception}");
+                Debug.LogError(task.Exception);
                 return;
             }
 
