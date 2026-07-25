@@ -9,28 +9,56 @@ public class LvPass : MonoBehaviour
     [SerializeField] private Button BtnContinar;
     [SerializeField] private Button BtnReintentar;
 
+    private void Awake()
+    {
+        // Nos aseguramos por código de que los botones escuchen los clics/toques
+        if (BtnContinar != null)
+        {
+            BtnContinar.onClick.RemoveAllListeners();
+            BtnContinar.onClick.AddListener(Continuar);
+        }
+
+        if (BtnReintentar != null)
+        {
+            BtnReintentar.onClick.RemoveAllListeners();
+            BtnReintentar.onClick.AddListener(Reintentar);
+        }
+    }
+
     public void Continuar()
     {
+        Debug.Log("Btn Continuar presionado");
         GameManager.Instance.ContinuarCarrera();
+    }
+
+    public void Reintentar()
+    {
+        Debug.Log("Btn Reintentar presionado");
+        GameManager.Instance.ContinuarCarrera(); // Desbloquea la espera del WaitUntil para repetir el nivel
     }
 
     public void Salir()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene("PantallaInicio");
     }
 
     public void MostrarPass(int nivel)
     {
         nivel--;
-        textoLv.text = $"Nivel {nivel} completado";
-        BtnReintentar.gameObject.SetActive(false);
-        BtnContinar.gameObject.SetActive(true);
+        if (textoLv != null)
+            textoLv.text = $"Nivel {nivel} completado";
+
+        if (BtnReintentar != null) BtnReintentar.gameObject.SetActive(false);
+        if (BtnContinar != null) BtnContinar.gameObject.SetActive(true);
     }
+
     public void MostrarReintento()
     {
-        textoLv.text = "GameOver";
-        BtnReintentar.gameObject.SetActive(true);
-        BtnContinar.gameObject.SetActive(false);
+        if (textoLv != null)
+            textoLv.text = "GameOver";
 
+        if (BtnReintentar != null) BtnReintentar.gameObject.SetActive(true);
+        if (BtnContinar != null) BtnContinar.gameObject.SetActive(false);
     }
 }
