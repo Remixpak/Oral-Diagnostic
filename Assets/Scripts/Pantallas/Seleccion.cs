@@ -4,12 +4,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class Seleccion: MonoBehaviour
+public class Seleccion : MonoBehaviour
 {
+
     [Header("Canvas")]
     [SerializeField] private Canvas canvasModo;
     [SerializeField] private Canvas canvasDificultad;
-    
+
     [SerializeField] private string modoSeleccionado;
     [SerializeField] private string dificultadSeleccionada;
     [Header("Textos")]
@@ -17,7 +18,9 @@ public class Seleccion: MonoBehaviour
     [SerializeField] private TMP_Text descripcionD;
     [Header("Botones")]
     [SerializeField] private Button siguienteM;
+    [SerializeField] private Button siguienteM_alt;
     [SerializeField] private Button sigueinteD;
+    [SerializeField] private Button sigueinteD_alt;
 
     [Header("Descripciones")]
     [SerializeField, TextArea] private string descripcionCarrera;
@@ -32,16 +35,18 @@ public class Seleccion: MonoBehaviour
 
     private Coroutine escrituraActual;
 
-
     void Start()
     {
         siguienteM.interactable = false;
+        siguienteM_alt.interactable = false;
         sigueinteD.interactable = false;
+        sigueinteD_alt.interactable = false;
     }
-    
 
     private void MostrarDescripcion(TMP_Text textoUI, string mensaje)
     {
+        if (textoUI == null) return;
+
         if (escrituraActual != null)
             StopCoroutine(escrituraActual);
 
@@ -58,20 +63,25 @@ public class Seleccion: MonoBehaviour
             yield return new WaitForSeconds(velocidadEscritura);
         }
     }
+
     public void PasarADificultad()
     {
         canvasModo.gameObject.SetActive(false);
         canvasDificultad.gameObject.SetActive(true);
     }
+
     public void RegresarAModo()
     {
         canvasDificultad.gameObject.SetActive(false);
         canvasModo.gameObject.SetActive(true);
     }
+
     public void seleccionarModo(Button boton)
     {
         modoSeleccionado = boton.GetComponentInChildren<TMP_Text>().text.Trim();
         siguienteM.interactable = true;
+        siguienteM_alt.interactable = true;
+
         switch (modoSeleccionado)
         {
             case "Carrera":
@@ -90,11 +100,14 @@ public class Seleccion: MonoBehaviour
                 break;
         }
     }
+
     public void SeleccionarDificultad(Button boton)
     {
         dificultadSeleccionada = boton.GetComponentInChildren<TMP_Text>().text.Trim();
         ConfiguracionPartida.Dificultad = dificultadSeleccionada;
         sigueinteD.interactable = true;
+        sigueinteD_alt.interactable = true;
+
         switch (dificultadSeleccionada)
         {
             case "Practicante":
@@ -111,18 +124,13 @@ public class Seleccion: MonoBehaviour
         }
     }
 
-
-
     public void RegresarAInicio()
     {
         SceneManager.LoadScene("PantallaInicio");
     }
+
     public void IrAJuego()
     {
         SceneManager.LoadScene("MainSecene");
     }
-
-    
-
-
 }
