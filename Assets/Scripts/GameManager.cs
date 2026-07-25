@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,7 +28,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject prefabNv4Conceptos;
     [SerializeField] private GameObject prefabAdivinaQuien;
 
+    [Header("Resultados")]
     [SerializeField] public Canvas canvasResultados;
+   
 
     [Header("Textos de resultados")]
     [SerializeField] public TMP_Text textoAciertos;
@@ -35,8 +38,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public TMP_Text textoTiempo;
     [SerializeField] public TMP_Text textoIntentos;
     [SerializeField] public TMP_Text textoReinicios;
-    [Header("Canvas LvPass")]
-    [SerializeField] private Canvas canvasLvPass;
+    
     [Header("Tutorial")]
     [SerializeField] private GameObject prefabTutorial;
     private Queue<PreguntaRonda> colaPreguntas = new Queue<PreguntaRonda>();
@@ -399,7 +401,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Pregunta terminada");
             Destroy(nivelInstanciado);
         }
-        if(modoActual == ModoJuego.Carrera)
+        if(modoActual == ModoJuego.Carrera && PuedePasar())
         {
             switch(nivelActual)
             {
@@ -461,18 +463,40 @@ public class GameManager : MonoBehaviour
         juegoActivo = false;
 
         MostrarResultados();
-        lvPass.Mostrar(nivelActual);
+       
+
+        
+
+        if(PuedePasar())
+        {
+            lvPass.MostrarPass(nivelActual);
+        }
+        else
+        {
+            lvPass.MostrarReintento();
+        }
+        //Debug.Log($"[TerminarRonda] Precision: {porcentajeAciertos * 100:F1}% | Requerido para ({Dificultad}): {porcentajeRequerido * 100}%");
 
         TiempoJuego = 0;
 
         if (nivelActual < 4)
         {
-            
             continuarCarrera = false;
-
             yield return new WaitUntil(() => continuarCarrera);
-
-            
+            // Comprobamos si se cumple el porcentaje según la dificultad
+            /*if (porcentajeAciertos >= porcentajeRequerido)
+            {
+                continuarCarrera = false;
+               
+                yield return new WaitUntil(() => continuarCarrera);
+            }
+            else
+            {
+                Debug.Log("GameOver");
+                continuarCarrera = false;
+                
+                // La carrera se detiene aquí y no se espera a la bandera continuarCarrera
+            }*/
         }
     }
 
@@ -514,5 +538,37 @@ public class GameManager : MonoBehaviour
         ConfigurarJuego(modoActual);
         StartCoroutine(LoopDeJuegoCorrutina());
     }
+
+    private float ObtenerPorcentajeRequerido()
+    {
+        // Normalizamos el string para evitar problemas de mayúsculas/minúsculas o espacios
+        string dif = Dificultad != null ? Dificultad.Trim().ToLower() : "";
+
+        switch (dif)
+        {
+            
+            case "Practicante":
+                return 0.80f; // 80%
+
+            
+            case "Asistente":
+                return 0.85f; // 85%
+
+            
+            case "Experto":
+                return 0.90f; // 90%
+
+            default:
+                // Valor por defecto si no reconoce el string de dificultad
+                return 0.80f;
+        }
+    }
     
+    private bool PuedePasar()
+    {
+        int totalRespuestas = TotalAciertos + TotalFallos;
+        float porcentajeAciertos = totalRespuestas > 0 ? (float)TotalAciertos / totalRespuestas : 0f;
+
+        return porcentajeAciertos >= ObtenerPorcentajeRequerido();
+    }
 }
