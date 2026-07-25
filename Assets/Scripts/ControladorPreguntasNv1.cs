@@ -44,6 +44,7 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         Patologia patologia = CsvManager.Instance.ObtenerPatologiaPorId(int.Parse(idPatologia));
         Debug.Log("Buscando imagn: " + patologia.codigoImagen + " Largo: " + patologia.codigoImagen.Length);
         imagen.sprite = CsvManager.Instance.spritePorCodigo(patologia.codigoImagen);
+        Debug.Log("Termino de buscar la imagen");
        
     }
     //obtiene la lesion segun la patologia
@@ -121,6 +122,7 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
             textoResultado.text = "Respuesta Incorrecta";
         }
         textoRespuesta.text = "La respuesta correcta es: " + respuestaCorrecta;
+        canvasRetroalimentacion.GetComponentInChildren<Button>().onClick.RemoveAllListeners();
         canvasRetroalimentacion.GetComponentInChildren<Button>().onClick.AddListener(() => finished = true);
         canvasRetroalimentacion.gameObject.SetActive(true);
 
@@ -128,6 +130,8 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
 
     public override void InicializarPregunta(int indPatologiaAsignada)
     {
+        Debug.Log("NV1 Inicializar");
+        Debug.Log("A");
         yaRespondio = false;
         idPatologiaNumerica = indPatologiaAsignada;
         idPatologia = idPatologiaNumerica.ToString();
@@ -151,13 +155,17 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
             btn.interactable = true;
             btn.GetComponent<Image>().color = Color.white;
         }
-
+        Debug.Log("B");
         ObtnerLesion();
+        Debug.Log("C");
         ObtenerImagen();
-        RellenarRespuestas();
+        Debug.Log("D");
 
+        RellenarRespuestas();
+        Debug.Log("E");
         foreach (Button boton in botonesAlternativas)
         {
+            boton.onClick.RemoveAllListeners();
             boton.onClick.AddListener(() => SeleccionarAlternativa(boton));
         }
     }
