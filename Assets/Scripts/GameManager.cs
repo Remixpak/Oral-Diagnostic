@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        ControladorGuardarDatos.Instance.EliminarPartida();
+        //ControladorGuardarDatos.Instance.EliminarPartida();
         Debug.Log($"Nivel actual: {nivelActual}");
         if(ControladorGuardarDatos.Instance.ExistePartida())
         {

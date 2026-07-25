@@ -43,7 +43,7 @@ public class Seleccion : MonoBehaviour
         sigueinteD_alt.interactable = false;
     }
 
-    private void MostrarDescripcion(TMP_Text textoUI, string mensaje)
+    public void MostrarDescripcion(TMP_Text textoUI, string mensaje)
     {
         if (textoUI == null) return;
 

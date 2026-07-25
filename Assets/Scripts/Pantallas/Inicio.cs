@@ -1,11 +1,14 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Inicio : MonoBehaviour
 {
-    [Header("PanelAjustes")]
+    [Header("Paneles")]
     [SerializeField] private GameObject panelAjustes;
+    [SerializeField] private GameObject panelConfirmacion;
 
     [Header("Audio")]
     [SerializeField] private Toggle toggleSonido;
@@ -13,6 +16,11 @@ public class Inicio : MonoBehaviour
     [Header("Modo zurdo")]
     [SerializeField] private Toggle toggleModoZurdo;
 
+    [Header("BntConfirmacion")]
+    [SerializeField] private Button btnConfirmar;
+
+    private bool pasoCuentaRegresiva = false;
+    private Coroutine corrutinaCuentaRegresiva;
     void Start()
     {
         if (toggleSonido != null && ControladorSonido.Instance != null)
@@ -23,6 +31,11 @@ public class Inicio : MonoBehaviour
         }
 
         ConfigurarToggleModoZurdo();
+    }
+
+    void Update()
+    {
+        
     }
 
     private void ConfigurarToggleModoZurdo()
@@ -81,5 +94,54 @@ public class Inicio : MonoBehaviour
         {
             ControladorSonido.Instance.SetSonidoActivado(activado);
         }
+    }
+
+    public void AbrirConfirmacion()
+    {
+        panelConfirmacion.SetActive(true);
+        if(!pasoCuentaRegresiva)
+        {
+            if(corrutinaCuentaRegresiva != null)
+            {
+                StopCoroutine(corrutinaCuentaRegresiva);
+            }
+            corrutinaCuentaRegresiva = StartCoroutine(CuentaRegresivaConfirmacion());
+        }
+        else
+        {
+            btnConfirmar.interactable = true;
+            btnConfirmar.GetComponentInChildren<TMP_Text>().text = "Confirmar";
+        }
+    }
+    public void CerrarConfirmacion()
+    {
+        if (!pasoCuentaRegresiva && corrutinaCuentaRegresiva != null)
+        {
+            StopCoroutine(corrutinaCuentaRegresiva);
+            corrutinaCuentaRegresiva = null;
+        }
+
+        panelConfirmacion.SetActive(false);
+    }
+
+    public void BorrarPartida()
+    {
+        ControladorGuardarDatos.Instance.EliminarPartida();
+    }
+
+    private IEnumerator CuentaRegresivaConfirmacion()
+    {
+        btnConfirmar.interactable = false;
+        int tiempoRestante = 5;
+        while(tiempoRestante > 0)
+        {
+            btnConfirmar.GetComponentInChildren<TMP_Text>().text = $"({tiempoRestante})";
+            yield return new WaitForSeconds(1f);
+            tiempoRestante--;
+        }
+
+        btnConfirmar.GetComponentInChildren<TMP_Text>().text = "Confirmar";
+        btnConfirmar.interactable = true;
+        pasoCuentaRegresiva = true;
     }
 }
