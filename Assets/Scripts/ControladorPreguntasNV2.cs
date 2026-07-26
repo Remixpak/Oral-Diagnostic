@@ -695,7 +695,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         if (lesionCorrectaSeleccionada && familiaCorrectaSeleccionada &&
             etiologiaCorrectaSeleccionada && patologiaCorrectaSeleccionada)
         {
-            finished = true;
+           
             Debug.Log("<color=green>¡Nivel Completado!</color>");
             
 

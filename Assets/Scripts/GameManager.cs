@@ -77,6 +77,20 @@ public class GameManager : MonoBehaviour
             nivelActual = 1;
         }
 
+        if (nivelActual >= 4)
+        {
+            Debug.Log("[GameManager] El juego ya estaba completado. Reiniciando desde nivel 1...");
+
+            if (ControladorGuardarDatos.Instance != null)
+            {
+                ControladorGuardarDatos.Instance.EliminarPartida();
+            }
+
+            nivelActual = 1;
+            lv1Completado = false;
+            lv2Completado = false;
+            lv3Completado = false;
+        }
         TiempoJuego = 0;
         modoActual = ConfiguracionPartida.Modo;
         Dificultad = ConfiguracionPartida.Dificultad;
@@ -170,9 +184,9 @@ public class GameManager : MonoBehaviour
             yield return new WaitUntil(() => continuarCarrera);
 
             // Si aprobó, avanzar de nivel. Si no, volverá a repetir el nivelActual en la siguiente vuelta.
-            if (PuedePasar() && nivelActual < 4)
+            if (PuedePasar() && nivelActual >= 4)
             {
-                nivelActual++;
+                nivelActual = 4;
             }
         }
     }
