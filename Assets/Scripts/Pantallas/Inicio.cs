@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,26 +12,31 @@ public class Inicio : MonoBehaviour
     [SerializeField] private GameObject panelConfirmacion;
 
     [Header("Audio")]
-    [SerializeField] private Toggle toggleSonido;
-
-    [Header("Modo zurdo")]
-    [SerializeField] private Toggle toggleModoZurdo;
+    [SerializeField] private ToggleSwitch toggleSonido;
+    [SerializeField] private ToggleSwitch toggleModoZurdo;
 
     [Header("BntConfirmacion")]
     [SerializeField] private Button btnConfirmar;
 
     private bool pasoCuentaRegresiva = false;
     private Coroutine corrutinaCuentaRegresiva;
+
+    [Header("borrado")]
+    [SerializeField] private GameObject panelBorrado;
+    [SerializeField] private TMP_Text textoBorrado;
     void Start()
     {
         if (toggleSonido != null && ControladorSonido.Instance != null)
         {
-            toggleSonido.SetIsOnWithoutNotify(ControladorSonido.Instance.SonidoActivado());
-            toggleSonido.onValueChanged.RemoveAllListeners();
-            toggleSonido.onValueChanged.AddListener(DesactivarSonido);
+            toggleSonido.SetValue(ControladorSonido.Instance.SonidoActivado(), false);
+
+            bool zurdo = PlayerPrefs.GetInt("ModoZurdo", 0) == 1;
+            toggleModoZurdo.SetValue(zurdo, false);
         }
 
-        ConfigurarToggleModoZurdo();
+        StartCoroutine(ControladorGuardarDatos.Instance.CrearUsuarioCuandoFirebaseEsteListo(" "));
+
+        //ConfigurarToggleModoZurdo();
     }
 
     void Update()
@@ -38,7 +44,7 @@ public class Inicio : MonoBehaviour
         
     }
 
-    private void ConfigurarToggleModoZurdo()
+    /*private void ConfigurarToggleModoZurdo()
     {
         if (toggleModoZurdo == null)
         {
@@ -52,7 +58,7 @@ public class Inicio : MonoBehaviour
         toggleModoZurdo.onValueChanged.RemoveAllListeners();
         toggleModoZurdo.onValueChanged.AddListener(AlternarModoZurdo);
 
-    }
+    }*/
 
     public void ActivarAjustes()
     {
@@ -90,10 +96,12 @@ public class Inicio : MonoBehaviour
 
     public void DesactivarSonido(bool activado)
     {
+        Debug.Log($"Inicio recibió: {activado}");
         if (ControladorSonido.Instance != null)
         {
             ControladorSonido.Instance.SetSonidoActivado(activado);
         }
+        
     }
 
     public void AbrirConfirmacion()
@@ -126,7 +134,12 @@ public class Inicio : MonoBehaviour
 
     public void BorrarPartida()
     {
+        if(ControladorGuardarDatos.Instance.ExistePartida())
+            textoBorrado.text = "Partida eliminada con éxito";
+        else
+            textoBorrado.text = "No existe partida";
         ControladorGuardarDatos.Instance.EliminarPartida();
+        StartCoroutine(PanelBorrado());
     }
 
     private IEnumerator CuentaRegresivaConfirmacion()
@@ -143,5 +156,14 @@ public class Inicio : MonoBehaviour
         btnConfirmar.GetComponentInChildren<TMP_Text>().text = "Confirmar";
         btnConfirmar.interactable = true;
         pasoCuentaRegresiva = true;
+    }
+
+
+    private IEnumerator PanelBorrado()
+    {
+        
+        panelBorrado.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        panelBorrado.gameObject.SetActive(false);
     }
 }
