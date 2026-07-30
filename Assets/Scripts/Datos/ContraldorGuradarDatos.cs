@@ -31,17 +31,27 @@ public class ControladorGuardarDatos : MonoBehaviour
 
     public IEnumerator CrearUsuarioCuandoFirebaseEsteListo(string nick)
     {
-        if(ExisteUsuario())
+        if (ExisteUsuario())
+        {
+            Debug.Log("Ya existe usuario.");
             yield break;
+        }
+
+        Debug.Log("Firebase listo? " + FirebaseInit.IsReady);
+
         yield return new WaitUntil(() => FirebaseInit.IsReady);
 
+        Debug.Log("Firebase ya está listo");
         CrearUsuario(nick);
     }
 
     public void CrearUsuario(string nick)
     {
         if(ExisteUsuario())
+        {
+            Debug.Log("Existe usuario retornando desde el crear");
             return;
+        }
         ConexionFirestore.Instance.ReservarNumeroJugador(numeroJugador =>
         {
             Usuario usuario = new Usuario();
@@ -54,6 +64,7 @@ public class ControladorGuardarDatos : MonoBehaviour
                 "usuarios",
                 idFirestore =>
                 {
+                    Debug.Log("Se va a llamar a guardar usuario");
                     GuardarUsuario(usuario);
                     Debug.Log($"Usuario creado.");
 

@@ -33,9 +33,14 @@ public class Inicio : MonoBehaviour
             bool zurdo = PlayerPrefs.GetInt("ModoZurdo", 0) == 1;
             toggleModoZurdo.SetValue(zurdo, false);
         }
-
-        StartCoroutine(ControladorGuardarDatos.Instance.CrearUsuarioCuandoFirebaseEsteListo(" "));
-
+        Debug.Log("comprobando usuario");
+        if(!ControladorGuardarDatos.Instance.ExisteUsuario())
+        {
+            Debug.Log("no existe usuario ");
+            StartCoroutine(ControladorGuardarDatos.Instance.CrearUsuarioCuandoFirebaseEsteListo(" "));
+        }
+        else    
+            Debug.Log("si existe usuario");
         //ConfigurarToggleModoZurdo();
     }
 
