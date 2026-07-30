@@ -1,0 +1,559 @@
+fileFormatVersion: 2
+guid: efe0a42c38f9c514dacf1e75d787759d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7592887360546369952
+    second: Oral_Diagnostic_logo_0
+  - first:
+      213: -3027320634443552093
+    second: Oral_Diagnostic_logo_1
+  - first:
+      213: -3647235065074742771
+    second: Oral_Diagnostic_logo_2
+  - first:
+      213: -9068488268591470438
+    second: Oral_Diagnostic_logo_3
+  - first:
+      213: 6486933114191254622
+    second: Oral_Diagnostic_logo_4
+  - first:
+      213: -3403160089892660309
+    second: Oral_Diagnostic_logo_5
+  - first:
+      213: 791243560001259281
+    second: Oral_Diagnostic_logo_6
+  - first:
+      213: -530330008415832278
+    second: Oral_Diagnostic_logo_7
+  - first:
+      213: -4812583321615713402
+    second: Oral_Diagnostic_logo_8
+  - first:
+      213: 496582766368851306
+    second: Oral_Diagnostic_logo_9
+  - first:
+      213: -2937243315013653137
+    second: Oral_Diagnostic_logo_10
+  - first:
+      213: 3294601773445452373
+    second: Oral_Diagnostic_logo_11
+  - first:
+      213: -9187941747279552853
+    second: Oral_Diagnostic_logo_12
+  - first:
+      213: -3111110005909933934
+    second: Oral_Diagnostic_logo_13
+  - first:
+      213: 5320505097828227626
+    second: Oral_Diagnostic_logo_14
+  - first:
+      213: 2219227262548025957
+    second: Oral_Diagnostic_logo_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_0
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 15
+        width: 46
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06e8417ac25a0a690800000000000000
+      internalID: -7592887360546369952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_1
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 54
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3aa28c22cebccf5d0800000000000000
+      internalID: -3027320634443552093
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_2
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 55
+        width: 53
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0a0fdd380b626dc0800000000000000
+      internalID: -3647235065074742771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_3
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 55
+        width: 19
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a98eec477f1462280800000000000000
+      internalID: -9068488268591470438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_4
+      rect:
+        serializedVersion: 2
+        x: 178
+        y: 55
+        width: 43
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5496115c47360a50800000000000000
+      internalID: 6486933114191254622
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_5
+      rect:
+        serializedVersion: 2
+        x: 222
+        y: 55
+        width: 11
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bab5920ddeb85c0d0800000000000000
+      internalID: -3403160089892660309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_6
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 15
+        width: 43
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 117c0bc53df0bfa00800000000000000
+      internalID: 791243560001259281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_7
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 54
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a27f4aacaa3e3a8f0800000000000000
+      internalID: -530330008415832278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_8
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 15
+        width: 11
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68b302797f4463db0800000000000000
+      internalID: -4812583321615713402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_9
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 15
+        width: 43
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a650ffe156734e600800000000000000
+      internalID: 496582766368851306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_10
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 0
+        width: 38
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6d68b564c0dc37d0800000000000000
+      internalID: -2937243315013653137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_11
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 15
+        width: 35
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 552969e7bd6c8bd20800000000000000
+      internalID: 3294601773445452373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_12
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 15
+        width: 39
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bae9b6029afdd7080800000000000000
+      internalID: -9187941747279552853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_13
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 15
+        width: 35
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2903398deed13d4d0800000000000000
+      internalID: -3111110005909933934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_14
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 15
+        width: 11
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2ad4bd723b36d940800000000000000
+      internalID: 5320505097828227626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oral_Diagnostic_logo_15
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 15
+        width: 39
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 562a904ff674cce10800000000000000
+      internalID: 2219227262548025957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Oral_Diagnostic_logo_0: -7592887360546369952
+      Oral_Diagnostic_logo_1: -3027320634443552093
+      Oral_Diagnostic_logo_10: -2937243315013653137
+      Oral_Diagnostic_logo_11: 3294601773445452373
+      Oral_Diagnostic_logo_12: -9187941747279552853
+      Oral_Diagnostic_logo_13: -3111110005909933934
+      Oral_Diagnostic_logo_14: 5320505097828227626
+      Oral_Diagnostic_logo_15: 2219227262548025957
+      Oral_Diagnostic_logo_2: -3647235065074742771
+      Oral_Diagnostic_logo_3: -9068488268591470438
+      Oral_Diagnostic_logo_4: 6486933114191254622
+      Oral_Diagnostic_logo_5: -3403160089892660309
+      Oral_Diagnostic_logo_6: 791243560001259281
+      Oral_Diagnostic_logo_7: -530330008415832278
+      Oral_Diagnostic_logo_8: -4812583321615713402
+      Oral_Diagnostic_logo_9: 496582766368851306
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

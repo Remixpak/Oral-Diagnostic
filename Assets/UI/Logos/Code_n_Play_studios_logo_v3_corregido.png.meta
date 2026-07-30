@@ -1,0 +1,455 @@
+fileFormatVersion: 2
+guid: df9b03776100d8442b7fc26cb81c5d74
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5036399263855516944
+    second: Code_n_Play_studios_logo_v3_corregido_0
+  - first:
+      213: -2261083700915003084
+    second: Code_n_Play_studios_logo_v3_corregido_1
+  - first:
+      213: 3705753782092881996
+    second: Code_n_Play_studios_logo_v3_corregido_2
+  - first:
+      213: -4069863009790995392
+    second: Code_n_Play_studios_logo_v3_corregido_3
+  - first:
+      213: 7691342578496226889
+    second: Code_n_Play_studios_logo_v3_corregido_4
+  - first:
+      213: 7812519289740281730
+    second: Code_n_Play_studios_logo_v3_corregido_5
+  - first:
+      213: 1342243557281363388
+    second: Code_n_Play_studios_logo_v3_corregido_6
+  - first:
+      213: 2098766158769482838
+    second: Code_n_Play_studios_logo_v3_corregido_7
+  - first:
+      213: 2690886512194997513
+    second: Code_n_Play_studios_logo_v3_corregido_8
+  - first:
+      213: 310351612910347659
+    second: Code_n_Play_studios_logo_v3_corregido_9
+  - first:
+      213: 7299029027897208301
+    second: Code_n_Play_studios_logo_v3_corregido_10
+  - first:
+      213: -8904492959239511250
+    second: Code_n_Play_studios_logo_v3_corregido_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_0
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 35
+        width: 68
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f26ad2bd8d1b1ab0800000000000000
+      internalID: -5036399263855516944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_1
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 31
+        width: 171
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 431298f8a540f90e0800000000000000
+      internalID: -2261083700915003084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_2
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 45
+        width: 27
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c40e4be4e6b7d6330800000000000000
+      internalID: 3705753782092881996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_3
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 45
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 044d7e8d721f487c0800000000000000
+      internalID: -4069863009790995392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_4
+      rect:
+        serializedVersion: 2
+        x: 173
+        y: 45
+        width: 27
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 946ca1d13532dba60800000000000000
+      internalID: 7691342578496226889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_5
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 45
+        width: 25
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2874bd9c6e4ab6c60800000000000000
+      internalID: 7812519289740281730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_6
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 45
+        width: 33
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb5ffc1676b90a210800000000000000
+      internalID: 1342243557281363388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_7
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 45
+        width: 27
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65ce010a3b0502d10800000000000000
+      internalID: 2098766158769482838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_8
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 45
+        width: 27
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90dc542a603f75520800000000000000
+      internalID: 2690886512194997513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_9
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 45
+        width: 27
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b85adfac5279e4400800000000000000
+      internalID: 310351612910347659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_10
+      rect:
+        serializedVersion: 2
+        x: 358
+        y: 45
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dede31d9a3c5b4560800000000000000
+      internalID: 7299029027897208301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Code_n_Play_studios_logo_v3_corregido_11
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 31
+        width: 164
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e23ef83e4d2ec6480800000000000000
+      internalID: -8904492959239511250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Code_n_Play_studios_logo_v3_corregido_0: -5036399263855516944
+      Code_n_Play_studios_logo_v3_corregido_1: -2261083700915003084
+      Code_n_Play_studios_logo_v3_corregido_10: 7299029027897208301
+      Code_n_Play_studios_logo_v3_corregido_11: -8904492959239511250
+      Code_n_Play_studios_logo_v3_corregido_2: 3705753782092881996
+      Code_n_Play_studios_logo_v3_corregido_3: -4069863009790995392
+      Code_n_Play_studios_logo_v3_corregido_4: 7691342578496226889
+      Code_n_Play_studios_logo_v3_corregido_5: 7812519289740281730
+      Code_n_Play_studios_logo_v3_corregido_6: 1342243557281363388
+      Code_n_Play_studios_logo_v3_corregido_7: 2098766158769482838
+      Code_n_Play_studios_logo_v3_corregido_8: 2690886512194997513
+      Code_n_Play_studios_logo_v3_corregido_9: 310351612910347659
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
