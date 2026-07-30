@@ -83,50 +83,6 @@ public class ControladorAdivina : ControladorPreguntas
         }
     }
 
-    private IEnumerator AjustarPanelNotaDelay()
-    {
-        yield return null;
-        yield return null;
-        AjustarPanelNota();
-    }
-
-    private void AjustarPanelNota()
-    {
-        if (textoNota == null || panelNota == null) return;
-
-        textoNota.alignment = TextAlignmentOptions.TopLeft;
-        textoNota.ForceMeshUpdate();
-        Canvas.ForceUpdateCanvases();
-
-        float anchoPanel = panelNota.rect.width - 30f; 
-        if (anchoPanel < 10f) anchoPanel = 200f;
-
-        textoNota.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, anchoPanel);
-        textoNota.ForceMeshUpdate();
-
-        float alturaTexto = textoNota.preferredHeight;
-        float alturaMaxima = Screen.height * 0.5f;
-        float alturaMinima = 60f;
-        float alturaFinal = Mathf.Clamp(alturaTexto + 30f, alturaMinima, alturaMaxima);
-
-        Vector2 anchorMin = panelNota.anchorMin;
-        Vector2 anchorMax = panelNota.anchorMax;
-        Vector2 pivot = panelNota.pivot;
-
-        panelNota.anchorMin = new Vector2(anchorMin.x, 0);
-        panelNota.anchorMax = new Vector2(anchorMax.x, 0);
-        panelNota.pivot = new Vector2(pivot.x, 0);
-
-        panelNota.offsetMax = new Vector2(panelNota.offsetMax.x, alturaFinal);
-
-        panelNota.anchorMin = anchorMin;
-        panelNota.anchorMax = anchorMax;
-        panelNota.pivot = pivot;
-
-        textoNota.rectTransform.offsetMin = new Vector2(15, 15);
-        textoNota.rectTransform.offsetMax = new Vector2(-15, -15);
-    }
-
 
     private void ActualizarNota()
     {
@@ -136,7 +92,6 @@ public class ControladorAdivina : ControladorPreguntas
             return;
         }
         textoNota.text = notas[indiceNotaActual];
-        StartCoroutine(AjustarPanelNotaDelay());
     }
 
     public void SiguienteNota()
@@ -514,8 +469,9 @@ public class ControladorAdivina : ControladorPreguntas
 
         foreach (Button boton in diagnosticos)
         {
+            Button btnactual = boton;
             boton.onClick.RemoveAllListeners();
-            boton.onClick.AddListener(() => Seleccionar(boton));
+            boton.onClick.AddListener(() => Seleccionar(btnactual));
         }
 
         if (btnDescartar != null)

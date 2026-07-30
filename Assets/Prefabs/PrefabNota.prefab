@@ -148,7 +148,6 @@ GameObject:
   - component: {fileID: 6523142926271299298}
   - component: {fileID: 7455946059304968237}
   - component: {fileID: 7308589318781830818}
-  - component: {fileID: 6145340269100375682}
   m_Layer: 0
   m_Name: Panel
   m_TagString: Untagged
@@ -214,19 +213,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6145340269100375682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7274729820404190599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Mask
-  m_ShowMaskGraphic: 1
 --- !u!1 &7929203907079814399
 GameObject:
   m_ObjectHideFlags: 0

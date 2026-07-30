@@ -95,7 +95,6 @@ public class GameManager : MonoBehaviour
         modoActual = ConfiguracionPartida.Modo;
         Dificultad = ConfiguracionPartida.Dificultad;
 
-        // Solo busca el componente si no fue asignado previamente en el Inspector
         if (lvPass == null)
         {
             lvPass = GetComponentInChildren<LvPass>();
@@ -103,7 +102,14 @@ public class GameManager : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == "MainSecene")
         {
-            IniciarModoCarrera();
+            if (modoActual == ModoJuego.QuickPlay)
+            {
+                IniciarModoQuickPlay();
+            }
+            else
+            {
+                IniciarModoCarrera();
+            }
         }
     }
 
@@ -116,30 +122,102 @@ public class GameManager : MonoBehaviour
     public void IniciarModoCarrera()
     {
         modoActual = ModoJuego.Carrera;
-        StopAllCoroutines(); // Detener cualquier loop previo por seguridad
+        StopAllCoroutines();
         StartCoroutine(LoopPrincipalJuego());
     }
 
-    // --- LOOP PRINCIPAL SECUENCIAL (Sin recursividad) ---
+    //modo de juego 30 preguntas 
+    public void IniciarModoQuickPlay()
+    {
+        modoActual = ModoJuego.QuickPlay;
+        StopAllCoroutines();
+        StartCoroutine(LoopQuickPlay());
+    }
+
+    private IEnumerator LoopQuickPlay()
+    {
+        //reiniciamos las metricas 
+        TotalAciertos = 0;
+        TotalFallos = 0;
+        continuarCarrera = false;
+
+        //ocultamos el canvas de resultados anterior 
+        if (canvasResultados != null)
+            canvasResultados.gameObject.SetActive(false);
+
+        ConfigurarQuickPlay();//generamos las 30 preguntas 
+
+        juegoActivo = true;
+
+        while (colaPreguntas.Count > 0)
+        {
+            //tomamos la pregunta de una cola 
+            PreguntaRonda pregunta = colaPreguntas.Dequeue();
+            GameObject prefab = ObtenerPrefab(pregunta.tipo);
+            //instaciamos el prefab del nivel 
+            nivelInstanciado = Instantiate(prefab);
+            ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
+            controlador.InicializarPregunta(pregunta.idPatologia);
+
+            yield return new WaitUntil(() => controlador.finished); //esperamos a que el jugador termine 
+
+            Destroy(nivelInstanciado);
+        }
+        //mostramos resultados 
+        TotalIntentos++;
+        juegoActivo = false;
+
+        MostrarResultadosQuickPlay();
+        //esperemos a que el jugador apachurre el continuar 
+        continuarCarrera = false;
+        yield return new WaitUntil(() => continuarCarrera);
+    }
+
+    private void ConfigurarQuickPlay()
+    {
+        PrepararIDs();//mezclamos los ids de patologias 
+        colaPreguntas.Clear();
+
+        //niveles disponibles 
+        TipoPregunta[] tiposDisponibles = {
+            TipoPregunta.Trivia,
+            TipoPregunta.Arbol,
+            TipoPregunta.Conceptos,
+            TipoPregunta.AdivinaQuien
+        };
+
+        //generamos las 30 preguntas 
+        for (int i = 0; i < 30; i++)
+        {
+            TipoPregunta tipoAleatorio = tiposDisponibles[Random.Range(0, tiposDisponibles.Length)];//elegimos un nivel aleatorio 
+            int idPat = ObtenerID();//le agregamos una patologia aleatoria 
+
+            if (idPat == -1)//si se acaban los ids recargamos la lista 
+            {
+                PrepararIDs();
+                idPat = ObtenerID();
+            }
+            //agregamos la pregunta a la cola 
+            colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = idPat, tipo = tipoAleatorio });
+        }
+    }
+
     private IEnumerator LoopPrincipalJuego()
     {
         while (modoActual == ModoJuego.Carrera && nivelActual < 4)
         {
-            // 1. Resetear métricas del nivel actual
             TotalAciertos = 0;
             TotalFallos = 0;
             continuarCarrera = false;
-            
-            if (canvasResultados != null) 
+
+            if (canvasResultados != null)
                 canvasResultados.gameObject.SetActive(false);
 
-            // 2. Configurar preguntas e iniciar tutorial
             ConfigurarCarrera(nivelActual);
             yield return StartCoroutine(MostrarTutorialNivel(nivelActual));
 
             juegoActivo = true;
 
-            // 3. Resolver cola de preguntas
             while (colaPreguntas.Count > 0)
             {
                 PreguntaRonda pregunta = colaPreguntas.Dequeue();
@@ -154,8 +232,6 @@ public class GameManager : MonoBehaviour
                 Destroy(nivelInstanciado);
             }
 
-            // 4. Evaluar fin de nivel y guardar progreso
-           
             if (PuedePasar())
             {
                 switch (nivelActual)
@@ -164,7 +240,7 @@ public class GameManager : MonoBehaviour
                     case 2: ActualizarProgreso(true, true, false); break;
                     case 3: ActualizarProgreso(true, true, true); break;
                 }
-                
+
                 if (ControladorGuardarDatos.Instance != null)
                 {
                     ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(Dificultad, lv1Completado, lv2Completado, lv3Completado));
@@ -174,16 +250,11 @@ public class GameManager : MonoBehaviour
             TotalIntentos++;
             juegoActivo = false;
 
-            // 5. Mostrar UI de resultados y esperar acción del usuario
             MostrarResultados();
 
-            
-
-            // Aseguramos que la bandera empiece en false antes de la espera
             continuarCarrera = false;
             yield return new WaitUntil(() => continuarCarrera);
 
-            // Si aprobó, avanzar de nivel. Si no, volverá a repetir el nivelActual en la siguiente vuelta.
             if (PuedePasar() && nivelActual >= 4)
             {
                 nivelActual = 4;
@@ -196,9 +267,31 @@ public class GameManager : MonoBehaviour
         continuarCarrera = true;
     }
 
+    // #cambiar pantalla de resultados por una propia de los resultados del quickplay
+    private void MostrarResultadosQuickPlay()
+    {
+        if (lvPass != null)
+        {
+            lvPass.MostrarPass(3);
+        }
+
+        if (canvasResultados != null)
+        {
+            canvasResultados.gameObject.SetActive(true);
+            if (textoAciertos != null) textoAciertos.text = "Aciertos: " + TotalAciertos;
+            if (textoFallos != null) textoFallos.text = "Fallos: " + TotalFallos;
+
+            int minutos = Mathf.FloorToInt(TiempoJuego / 60);
+            int segundos = Mathf.FloorToInt(TiempoJuego % 60);
+            if (textoTiempo != null) textoTiempo.text = "Tiempo: " + minutos.ToString("00") + ":" + segundos.ToString("00");
+
+            if (textoIntentos != null) textoIntentos.text = "Partidas: " + TotalIntentos;
+            if (textoReinicios != null) textoReinicios.text = "Reinicios: " + TotalReinicios;
+        }
+    }
+
     private void MostrarResultados()
     {
-        // Validación de seguridad para evitar Crash en Android si falta la referencia
         if (lvPass != null)
         {
             if (PuedePasar())
@@ -216,11 +309,11 @@ public class GameManager : MonoBehaviour
             canvasResultados.gameObject.SetActive(true);
             if (textoAciertos != null) textoAciertos.text = "Aciertos: " + TotalAciertos;
             if (textoFallos != null) textoFallos.text = "Fallos: " + TotalFallos;
-            
+
             int minutos = Mathf.FloorToInt(TiempoJuego / 60);
             int segundos = Mathf.FloorToInt(TiempoJuego % 60);
             if (textoTiempo != null) textoTiempo.text = "Tiempo: " + minutos.ToString("00") + ":" + segundos.ToString("00");
-            
+
             if (textoIntentos != null) textoIntentos.text = "Intentos: " + TotalIntentos;
             if (textoReinicios != null) textoReinicios.text = "Reinicios: " + TotalReinicios;
         }
@@ -265,7 +358,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        yield return null; // Esperar 1 frame para la UI
+        yield return null;
 
         tutorial.ActivarTutorial();
 
@@ -397,7 +490,10 @@ public class GameManager : MonoBehaviour
         colaPreguntas.Clear();
         idsDisponibles.Clear();
 
-        StartCoroutine(LoopPrincipalJuego());
+        if (modoActual == ModoJuego.QuickPlay)
+            StartCoroutine(LoopQuickPlay());
+        else
+            StartCoroutine(LoopPrincipalJuego());
     }
 
     private float ObtenerPorcentajeRequerido()
