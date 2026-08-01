@@ -67,30 +67,36 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Debug.Log($"Nivel actual inicial: {nivelActual}");
-        if (ControladorGuardarDatos.Instance != null && ControladorGuardarDatos.Instance.ExistePartida())
+
+        nivelActual = 1;
+        lv1Completado = false;
+        lv2Completado = false;
+        lv3Completado = false;
+
+        bool hayPartida = ControladorGuardarDatos.Instance != null && ControladorGuardarDatos.Instance.ExistePartida();
+
+        if (hayPartida)
         {
             var partida = ControladorGuardarDatos.Instance.CargarPartida();
-            ActualizarProgreso(partida.Lv1Completado, partida.Lv2Completado, partida.Lv3Completado);
-        }
-        else
-        {
-            nivelActual = 1;
+            if (partida != null)
+            {
+                ActualizarProgreso(partida.Lv1Completado, partida.Lv2Completado, partida.Lv3Completado);
+            }
         }
 
         if (nivelActual >= 4)
         {
-            Debug.Log("[GameManager] El juego ya estaba completado. Reiniciando desde nivel 1...");
-
             if (ControladorGuardarDatos.Instance != null)
             {
                 ControladorGuardarDatos.Instance.EliminarPartida();
             }
-
             nivelActual = 1;
             lv1Completado = false;
             lv2Completado = false;
             lv3Completado = false;
+            hayPartida = false;
         }
+
         TiempoJuego = 0;
         modoActual = ConfiguracionPartida.Modo;
         Dificultad = ConfiguracionPartida.Dificultad;
@@ -108,7 +114,14 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                IniciarModoCarrera();
+                if (hayPartida)
+                {
+                    IniciarModoCarrera(false);
+                }
+                else
+                {
+                    IniciarModoCarrera(true);
+                }
             }
         }
     }
@@ -119,8 +132,22 @@ public class GameManager : MonoBehaviour
             TiempoJuego += Time.deltaTime;
     }
 
-    public void IniciarModoCarrera()
+    public void IniciarModoCarrera(bool reiniciar = false)
     {
+
+        if (reiniciar)
+        {
+            nivelActual = 1;
+            lv1Completado = false;
+            lv2Completado = false;
+            lv3Completado = false;
+
+            if (ControladorGuardarDatos.Instance != null)
+            {
+                ControladorGuardarDatos.Instance.EliminarPartida();
+            }
+        }
+
         modoActual = ModoJuego.Carrera;
         StopAllCoroutines();
         StartCoroutine(LoopPrincipalJuego());
@@ -457,7 +484,7 @@ public class GameManager : MonoBehaviour
 
     private Partida CrearPartidaData(string dificulta, bool lv1, bool lv2, bool lv3)
     {
-        return new Partida(dificulta, lv1, lv2, lv3);
+        return new Partida(dificulta,modoActual.ToString() ,lv1, lv2, lv3);
     }
 
     public void PausarJuego()

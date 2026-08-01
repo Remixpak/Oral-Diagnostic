@@ -18,6 +18,10 @@ public class Inicio : MonoBehaviour
     [Header("BntConfirmacion")]
     [SerializeField] private Button btnConfirmar;
 
+    [Header("Continuar")]
+    [SerializeField] private TMP_Text textoAvisoSinPartida; // Texto del panel 
+    [SerializeField] private GameObject panelAvisoSinPartida; // Panel que se muestra si no hay partida
+
     private bool pasoCuentaRegresiva = false;
     private Coroutine corrutinaCuentaRegresiva;
 
@@ -145,6 +149,57 @@ public class Inicio : MonoBehaviour
             textoBorrado.text = "No existe partida";
         ControladorGuardarDatos.Instance.EliminarPartida();
         StartCoroutine(PanelBorrado());
+    }
+
+    //metodo para continuar partida, si no hay partida guardada se muestra un panel con un texto personalizado
+    public void ContinuarPartida() 
+    {
+        ControladorSonido.Instance?.ReproducirClick();
+
+        if (ControladorGuardarDatos.Instance != null && ControladorGuardarDatos.Instance.ExistePartida())
+        {
+            Partida partidaGuardada = ControladorGuardarDatos.Instance.CargarPartida();
+
+            if (partidaGuardada != null)
+            {
+                ConfiguracionPartida.Dificultad = partidaGuardada.Dificultad;
+                ConfiguracionPartida.EsContinuacion = true;
+
+                if (System.Enum.TryParse(partidaGuardada.ModoJuego, out GameManager.ModoJuego modoCargado))
+                {
+                    ConfiguracionPartida.Modo = modoCargado;
+                }
+                else
+                {
+                    ConfiguracionPartida.Modo = GameManager.ModoJuego.Carrera;
+                }
+
+                SceneManager.LoadScene("MainSecene");
+            }
+        }
+        else
+        {
+            if (panelAvisoSinPartida != null)
+            {
+                if (textoAvisoSinPartida != null)
+                {
+                    textoAvisoSinPartida.text = "No hay partida guardada";
+                }
+
+                panelAvisoSinPartida.SetActive(true);
+
+                StartCoroutine(OcultarPanelAviso());
+            }
+        }
+    }
+
+    private IEnumerator OcultarPanelAviso()
+    {
+        yield return new WaitForSeconds(1f);
+        if (panelAvisoSinPartida != null)
+        {
+            panelAvisoSinPartida.SetActive(false);
+        }
     }
 
     private IEnumerator CuentaRegresivaConfirmacion()

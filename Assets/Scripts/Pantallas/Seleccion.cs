@@ -131,6 +131,7 @@ public class Seleccion : MonoBehaviour
 
     public void IrAJuego()
     {
+        ControladorGuardarDatos.Instance.EliminarPartida();//eliminamos la partida actual al seleccionar cualquier modo de juego
         SceneManager.LoadScene("MainSecene");
     }
 }
