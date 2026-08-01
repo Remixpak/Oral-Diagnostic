@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8964567092060887254}
   - component: {fileID: 8175284048275516561}
   m_Layer: 5
-  m_Name: pato1
+  m_Name: lesion1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -797,7 +797,7 @@ GameObject:
   - component: {fileID: 7095319012144845310}
   - component: {fileID: 4175144193121880119}
   m_Layer: 5
-  m_Name: etio1
+  m_Name: fam1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -916,7 +916,7 @@ GameObject:
   - component: {fileID: 1537344966127839479}
   - component: {fileID: 3095200674186102898}
   m_Layer: 5
-  m_Name: FilaEtiologias
+  m_Name: FilaFamilias
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -982,7 +982,7 @@ GameObject:
   - component: {fileID: 2034669927643599643}
   - component: {fileID: 1303744435692651804}
   m_Layer: 5
-  m_Name: pato3
+  m_Name: lesion3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1377,7 +1377,7 @@ GameObject:
   - component: {fileID: 6288876105374879337}
   - component: {fileID: 2082746297475143974}
   m_Layer: 5
-  m_Name: etio2
+  m_Name: fam2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1754,7 +1754,7 @@ GameObject:
   - component: {fileID: 5707958151074469416}
   - component: {fileID: 7118557122120269167}
   m_Layer: 5
-  m_Name: FilaFamilias
+  m_Name: FilaEtiologia
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2008,7 +2008,7 @@ GameObject:
   - component: {fileID: 529971937277250960}
   - component: {fileID: 6126395707423358810}
   m_Layer: 5
-  m_Name: pato2
+  m_Name: lesion2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2127,7 +2127,7 @@ GameObject:
   - component: {fileID: 796883423018566164}
   - component: {fileID: 3358477766038167106}
   m_Layer: 5
-  m_Name: FilaPatologias
+  m_Name: FilaLesion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2235,23 +2235,23 @@ MonoBehaviour:
   colorNormal: {r: 1, g: 1, b: 1, a: 1}
   colorSeleccionado: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   botonPausa: {fileID: 3664457425277529726}
-  botonesLesiones:
+  botonesPatologias:
   - {fileID: 2412357916088481996}
-  idLesionesBotones: 
-  botonesFamilias:
+  idPatologiasBotones: 
+  botonesEtiologias:
   - {fileID: 7691628105658878052}
   - {fileID: 8264463305644028685}
   - {fileID: 8559119707011493870}
-  idFamiliasBotones: 
-  botonesEtiologias:
+  idEtiologiasBotones: 
+  botonesFamilias:
   - {fileID: 4175144193121880119}
   - {fileID: 2082746297475143974}
-  idEtiologiasBotones: 
-  botonesPatologias:
+  idFamiliasBotones: 
+  botonesLesiones:
   - {fileID: 8175284048275516561}
   - {fileID: 6126395707423358810}
   - {fileID: 1303744435692651804}
-  idPatologiasBotones: 
+  idLesionesBotones: 
   lineaConectora: {fileID: 9135503576608787393}
   textoResultado: {fileID: 4325237235130391460}
   textoRespuesta: {fileID: 8949806975483148463}
@@ -2542,7 +2542,7 @@ GameObject:
   - component: {fileID: 936357575676544844}
   - component: {fileID: 2412357916088481996}
   m_Layer: 5
-  m_Name: lesion
+  m_Name: patologia
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2877,7 +2877,7 @@ GameObject:
   - component: {fileID: 8067135074435121033}
   - component: {fileID: 7691628105658878052}
   m_Layer: 5
-  m_Name: fam1
+  m_Name: etio1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3132,7 +3132,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7601096892311799725}
   m_Layer: 5
-  m_Name: FilaLesion
+  m_Name: FilaPatologia
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3308,7 +3308,7 @@ GameObject:
   - component: {fileID: 1978271312870719500}
   - component: {fileID: 8559119707011493870}
   m_Layer: 5
-  m_Name: fam3
+  m_Name: etio3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3429,7 +3429,7 @@ GameObject:
   - component: {fileID: 4961620950860688070}
   - component: {fileID: 8264463305644028685}
   m_Layer: 5
-  m_Name: fam2
+  m_Name: etio2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
