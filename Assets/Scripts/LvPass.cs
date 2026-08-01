@@ -34,7 +34,19 @@ public class LvPass : MonoBehaviour
     public void Reintentar()
     {
         Debug.Log("Btn Reintentar presionado");
-        GameManager.Instance.ContinuarCarrera(); // Desbloquea la espera del WaitUntil para repetir el nivel
+        switch(GameManager.Instance.modoActual)
+        {
+            case GameManager.ModoJuego.Carrera:
+                GameManager.Instance.ContinuarCarrera(); // Desbloquea la espera del WaitUntil para repetir el nivel
+                break;
+            case GameManager.ModoJuego.QuickPlay:
+                GameManager.Instance.IniciarModoQuickPlay();
+                break;
+            case GameManager.ModoJuego.Custom:
+                GameManager.Instance.IniciarModoCustom();
+                break;
+        }
+        
     }
 
     public void Salir()

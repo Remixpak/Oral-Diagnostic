@@ -108,21 +108,30 @@ public class GameManager : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == "MainSecene")
         {
-            if (modoActual == ModoJuego.QuickPlay)
+            switch(modoActual)
             {
-                IniciarModoQuickPlay();
+                case ModoJuego.Carrera:
+                    if (hayPartida)
+                    {
+                        IniciarModoCarrera(false);
+                    }
+                    else
+                    {
+                        IniciarModoCarrera(true);
+                    }
+                    break;
+                case ModoJuego.QuickPlay:
+                    IniciarModoQuickPlay();
+                    break;
+                case ModoJuego.Custom:
+                    IniciarModoCustom();
+                    break;
+                default:
+                    IniciarModoCarrera();
+                    break;
             }
-            else
-            {
-                if (hayPartida)
-                {
-                    IniciarModoCarrera(false);
-                }
-                else
-                {
-                    IniciarModoCarrera(true);
-                }
-            }
+
+            
         }
     }
 
@@ -158,47 +167,16 @@ public class GameManager : MonoBehaviour
     {
         modoActual = ModoJuego.QuickPlay;
         StopAllCoroutines();
-        StartCoroutine(LoopQuickPlay());
+        StartCoroutine(LoopPrincipalJuego());
     }
 
-    private IEnumerator LoopQuickPlay()
+    public void IniciarModoCustom()
     {
-        //reiniciamos las metricas 
-        TotalAciertos = 0;
-        TotalFallos = 0;
-        continuarCarrera = false;
-
-        //ocultamos el canvas de resultados anterior 
-        if (canvasResultados != null)
-            canvasResultados.gameObject.SetActive(false);
-
-        ConfigurarQuickPlay();//generamos las 30 preguntas 
-
-        juegoActivo = true;
-
-        while (colaPreguntas.Count > 0)
-        {
-            //tomamos la pregunta de una cola 
-            PreguntaRonda pregunta = colaPreguntas.Dequeue();
-            GameObject prefab = ObtenerPrefab(pregunta.tipo);
-            //instaciamos el prefab del nivel 
-            nivelInstanciado = Instantiate(prefab);
-            ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
-            controlador.InicializarPregunta(pregunta.idPatologia);
-
-            yield return new WaitUntil(() => controlador.finished); //esperamos a que el jugador termine 
-
-            Destroy(nivelInstanciado);
-        }
-        //mostramos resultados 
-        TotalIntentos++;
-        juegoActivo = false;
-
-        MostrarResultadosQuickPlay();
-        //esperemos a que el jugador apachurre el continuar 
-        continuarCarrera = false;
-        yield return new WaitUntil(() => continuarCarrera);
+        modoActual = ModoJuego.Custom;
+        StopAllCoroutines();
+        StartCoroutine(LoopPrincipalJuego());
     }
+    
 
     private void ConfigurarQuickPlay()
     {
@@ -229,7 +207,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator LoopPrincipalJuego()
+    /*private IEnumerator LoopPrincipalJuego()
     {
         while (modoActual == ModoJuego.Carrera && nivelActual < 4)
         {
@@ -287,8 +265,137 @@ public class GameManager : MonoBehaviour
                 nivelActual = 4;
             }
         }
+    }*/
+    private IEnumerator LoopPrincipalJuego()
+    {
+        while (!ModoFinalizado())
+        {
+            IniciarRonda();
+
+            yield return EjecutarPreguntas();
+
+            FinalizarRonda();
+
+            Debug.Log($"RESULTADOS -> A:{TotalAciertos} F:{TotalFallos}");
+
+            MostrarResultados();
+
+            if (modoActual == ModoJuego.Carrera)
+            {
+                continuarCarrera = false;
+                yield return new WaitUntil(() => continuarCarrera);
+            }
+            else
+            {
+                // En QuickPlay y Custom termina la partida después de mostrar resultados.
+                break;
+            }
+        }
+    }
+    private void IniciarRonda()
+    {
+        TotalAciertos = 0;
+        TotalFallos = 0;
+        Debug.Log("poniendo variables en 0");
+        juegoActivo = true;
+
+        if (canvasResultados != null)
+            canvasResultados.gameObject.SetActive(false);
+
+        switch (modoActual)
+        {
+            case ModoJuego.Carrera:
+                ConfigurarCarrera(nivelActual);
+                MostrarTutorialNivel(nivelActual);
+                break;
+
+            case ModoJuego.QuickPlay:
+                ConfigurarQuickPlay();
+                break;
+
+            case ModoJuego.Custom:
+                ConfigurarCustom();
+                break;
+        }
+    }
+    private IEnumerator EjecutarPreguntas()
+    {
+        while (colaPreguntas.Count > 0)
+            {
+                PreguntaRonda pregunta = colaPreguntas.Dequeue();
+                GameObject prefab = ObtenerPrefab(pregunta.tipo);
+
+                nivelInstanciado = Instantiate(prefab);
+                ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
+                controlador.InicializarPregunta(pregunta.idPatologia);
+
+                Debug.Log($"Comienza pregunta. A:{TotalAciertos} F:{TotalFallos}");
+
+                yield return new WaitUntil(() => controlador.finished);
+
+                Debug.Log($"Termina pregunta. A:{TotalAciertos} F:{TotalFallos}");
+
+                Destroy(nivelInstanciado);
+            }
     }
 
+    private void FinalizarRonda()
+    {
+        TotalIntentos++;
+
+        juegoActivo = false;
+
+        switch (modoActual)
+        {
+            case ModoJuego.Carrera:
+
+                if (PuedePasar())
+                {
+                    switch (nivelActual)
+                    {
+                        case 1:
+                            ActualizarProgreso(true,false,false);
+                            break;
+
+                        case 2:
+                            ActualizarProgreso(true,true,false);
+                            break;
+
+                        case 3:
+                            ActualizarProgreso(true,true,true);
+                            break;
+                    }
+
+                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(Dificultad, lv1Completado, lv2Completado, lv3Completado));
+                        
+                }
+
+                break;
+
+            case ModoJuego.QuickPlay:
+                break;
+
+            case ModoJuego.Custom:
+                break;
+        }
+    }
+
+    private bool ModoFinalizado()
+    {
+        switch(modoActual)
+        {
+            case ModoJuego.Carrera:
+                return nivelActual >= 4;
+
+            case ModoJuego.QuickPlay:
+                return TotalIntentos >= 1;
+
+            case ModoJuego.Custom:
+                return TotalIntentos >= 1;
+        }
+
+        return true;
+    }
     public void ContinuarCarrera()
     {
         continuarCarrera = true;
@@ -328,7 +435,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("¡Atención! La referencia a LvPass es NULL en el GameManager.");
+            Debug.LogError("La referencia a LvPass es NULL en el GameManager.");
         }
 
         if (canvasResultados != null)
@@ -423,6 +530,57 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    private void ConfigurarCustom()
+    {
+        PrepararIDs();
+        colaPreguntas.Clear();
+
+        List<TipoPregunta> tiposDisponibles = new List<TipoPregunta>();
+
+        if (ConfiguracionPartida.Lesiones)
+        {
+            tiposDisponibles.Add(TipoPregunta.Trivia);
+        }
+
+        if (ConfiguracionPartida.FamiliasEtiopatogenias)
+        {
+            tiposDisponibles.Add(TipoPregunta.Arbol);
+        }
+
+        if (ConfiguracionPartida.Diagnosticos)
+        {
+            tiposDisponibles.Add(TipoPregunta.Conceptos);
+            tiposDisponibles.Add(TipoPregunta.AdivinaQuien);
+        }
+
+        // Seguridad, aunque el botón ya debería impedir llegar aquí.
+        if (tiposDisponibles.Count == 0)
+        {
+            Debug.LogError("No hay tipos de preguntas seleccionados.");
+            return;
+        }
+
+        for (int i = 0; i < ConfiguracionPartida.CantidadPreguntas; i++)
+        {
+            TipoPregunta tipo =
+                tiposDisponibles[Random.Range(0, tiposDisponibles.Count)];
+
+            int idPat = ObtenerID();
+
+            if (idPat == -1)
+            {
+                PrepararIDs();
+                idPat = ObtenerID();
+            }
+
+            colaPreguntas.Enqueue(new PreguntaRonda
+            {
+                idPatologia = idPat,
+                tipo = tipo
+            });
+        }
+    }
     private void PrepararIDs()
     {
         List<int> ids = new List<int>();
@@ -517,10 +675,8 @@ public class GameManager : MonoBehaviour
         colaPreguntas.Clear();
         idsDisponibles.Clear();
 
-        if (modoActual == ModoJuego.QuickPlay)
-            StartCoroutine(LoopQuickPlay());
-        else
-            StartCoroutine(LoopPrincipalJuego());
+        
+        StartCoroutine(LoopPrincipalJuego());
     }
 
     private float ObtenerPorcentajeRequerido()

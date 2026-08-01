@@ -11,6 +11,8 @@ public class Seleccion : MonoBehaviour
     [SerializeField] private Canvas canvasModo;
     [SerializeField] private Canvas canvasDificultad;
 
+    [SerializeField] private Canvas canvasCustom;
+
     [SerializeField] private string modoSeleccionado;
     [SerializeField] private string dificultadSeleccionada;
     [Header("Textos")]
@@ -131,7 +133,23 @@ public class Seleccion : MonoBehaviour
 
     public void IrAJuego()
     {
+
         ControladorGuardarDatos.Instance.EliminarPartida();//eliminamos la partida actual al seleccionar cualquier modo de juego
         SceneManager.LoadScene("MainSecene");
     }
+    public void irACustom()
+    {
+        canvasModo.gameObject.SetActive(false);
+        canvasCustom.gameObject.SetActive(true);
+    }
+    
+    public void Bifurcacion()
+    {
+        if(modoSeleccionado == "Custom")
+            irACustom();
+        else
+            PasarADificultad();
+    }
+
+    
 }
