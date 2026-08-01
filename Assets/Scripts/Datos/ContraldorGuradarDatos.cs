@@ -7,7 +7,7 @@ public class ControladorGuardarDatos : MonoBehaviour
     private string rutaPartida;
     private string rutaUsuario;
     public static ControladorGuardarDatos Instance;
-
+    private bool intentandoSincronizar = false; // booleano para evitar múltiples intentos de sincronización al mismo tiempo
     private void Awake()
     {
         rutaPartida = Path.Combine(Application.persistentDataPath, "partida.json");
@@ -20,7 +20,7 @@ public class ControladorGuardarDatos : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        StartCoroutine(VerificarYSincronizarUsuarioPendiente()); // inicimos una corrutina para verificar si hay un usuario pendiente de sincronizar con Firebase
     }
 
     // Update is called once per frame
@@ -29,6 +29,43 @@ public class ControladorGuardarDatos : MonoBehaviour
         
     }
 
+    // Corrutina para verificar si hay un usuario pendiente de sincronizar con Firebase
+    private IEnumerator VerificarYSincronizarUsuarioPendiente()
+    {
+        // Esperamos a que Firebase esté listo
+        while (!FirebaseInit.IsReady)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+
+        // Si ya tenemos usuario creado y su número es 0 (fue creado offline), procedemos a registrarlo en Firestore
+        if (ExisteUsuario() && !intentandoSincronizar)
+        {
+            Usuario usuarioLocal = CargarUsuario();
+            if (usuarioLocal != null && usuarioLocal.NumeroJugador == 0)
+            {
+                intentandoSincronizar = true;
+                Debug.Log("Internet detectado: Sincronizando usuario offline temporal con Firestore...");
+
+                ConexionFirestore.Instance.ReservarNumeroJugador(numeroJugadorReal =>
+                {
+                    usuarioLocal.NumeroJugador = numeroJugadorReal;
+
+                    ConexionFirestore.Instance.RegistrarData(
+                        usuarioLocal,
+                        "usuarios",
+                        idFirestore =>
+                        {
+                            GuardarUsuario(usuarioLocal);
+                            Debug.Log($"¡Usuario sincronizado exitosamente con Firestore! Nuevo ID Jugador: {numeroJugadorReal}");
+                            intentandoSincronizar = false;
+                        });
+                });
+            }
+        }
+    }
+
+    // Corrutina para crear un usuario cuando Firebase esté listo
     public IEnumerator CrearUsuarioCuandoFirebaseEsteListo(string nick)
     {
         if (ExisteUsuario())
@@ -39,7 +76,23 @@ public class ControladorGuardarDatos : MonoBehaviour
 
         Debug.Log("Firebase listo? " + FirebaseInit.IsReady);
 
-        yield return new WaitUntil(() => FirebaseInit.IsReady);
+        float tiempoEspera = 0f;
+        float limiteEspera = 4f;
+
+        while (!FirebaseInit.IsReady && tiempoEspera < limiteEspera)
+        {
+            tiempoEspera += Time.deltaTime;
+            yield return null;
+        }
+        if (!FirebaseInit.IsReady)
+        {
+            Usuario usuarioVacio = new Usuario();
+            usuarioVacio.NumeroJugador = 0; 
+            usuarioVacio.Nick = !string.IsNullOrWhiteSpace(nick) ? nick : "Invitado";
+            GuardarUsuario(usuarioVacio);
+            yield break;
+        }
+            yield return new WaitUntil(() => FirebaseInit.IsReady);
 
         Debug.Log("Firebase ya está listo");
         CrearUsuario(nick);
@@ -52,6 +105,17 @@ public class ControladorGuardarDatos : MonoBehaviour
             Debug.Log("Existe usuario retornando desde el crear");
             return;
         }
+
+        if (!FirebaseInit.IsReady)
+        {
+            Debug.Log("Sin internet al intentar crear usuario. Guardando local offline.");
+            Usuario usuarioVacio = new Usuario();
+            usuarioVacio.NumeroJugador = 0;
+            usuarioVacio.Nick = !string.IsNullOrWhiteSpace(nick) ? nick : "Invitado";
+            GuardarUsuario(usuarioVacio);
+            return;
+        }
+
         ConexionFirestore.Instance.ReservarNumeroJugador(numeroJugador =>
         {
             Usuario usuario = new Usuario();
@@ -149,6 +213,14 @@ public class ControladorGuardarDatos : MonoBehaviour
     }
     public void GuardarMetricas(string nivel)
     {
+        Usuario usuarioActual = CargarUsuario();// Cargamos el usuario actual desde el archivo local
+        if (usuarioActual == null || usuarioActual.NumeroJugador == 0) // Si el usuario no está sincronizado con Firestore (NumeroJugador = 0), no podemos enviar métricas
+        {
+            Debug.Log("El usuario actual no está sincronizado con Firestore (NumeroJugador = 0)");
+            return;
+        }
+
+
         Metricas metricas = new Metricas();
 
         metricas.Id = Guid.NewGuid().ToString();
@@ -168,6 +240,13 @@ public class ControladorGuardarDatos : MonoBehaviour
         metricas.TotalAciertos = GameManager.Instance.TotalAciertos;
 
         metricas.TotalFallos = GameManager.Instance.TotalFallos;
+
+
+        if(!FirebaseInit.IsReady)
+        {
+            Debug.Log("no hay internet");
+            return;
+        }
 
         ConexionFirestore.Instance.RegistrarData(
             metricas,

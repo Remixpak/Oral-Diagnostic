@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
 using System.Collections;
+
 public class ConexionFirestore : MonoBehaviour
 {
     private static ConexionFirestore _instance;
@@ -44,7 +45,7 @@ public class ConexionFirestore : MonoBehaviour
         {
             db = FirebaseInit.Db;
             isReady = true;
-            Debug.Log("✅ ConexionFirestore lista");
+            Debug.Log("ConexionFirestore lista");
         }
         else
         {
@@ -91,16 +92,13 @@ public class ConexionFirestore : MonoBehaviour
         {
             if (task.IsFaulted)
             {
-                Debug.LogError($"Error guardando partida: {task.Exception}");
             }
             else
             {
-                Debug.Log($"Partida guardada para {FirebaseInit.GetUserName()}");
                 ActualizarEstadisticasUsuario();
             }
         });
     }
-
 
     private void ActualizarEstadisticasUsuario()
     {
@@ -125,11 +123,11 @@ public class ConexionFirestore : MonoBehaviour
               }
 
               var stats = new Dictionary<string, object>()
-            {
-                { "total_partidas", total },
-                { "partidas_completadas", completadas },
-                { "ultima_actualizacion", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }
-            };
+              {
+                  { "total_partidas", total },
+                  { "partidas_completadas", completadas },
+                  { "ultima_actualizacion", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }
+              };
 
               db.Collection("usuarios").Document(userId).UpdateAsync(stats);
           });
@@ -137,15 +135,15 @@ public class ConexionFirestore : MonoBehaviour
 
     public void GuardarError(string nivel, string tipo, int indiceSeleccionado, string seleccionado, string correcto, int erroresAcumulados)
     {
-
         Debug.Log($"Error registrado: {tipo} - {seleccionado} (correcto: {correcto})");
     }
 
-    private bool VerificarConexion()
+    private bool VerificarConexion() // Verifica si FirebaseInit está listo y si la base de datos está inicializada
     {
         if (!FirebaseInit.IsReady)
         {
-            Debug.LogError("Firebase no está listo");
+            // Silenciamos el error rojo intrusivo si es por modo offline intencional
+            Debug.Log("Firebase no está listo (Modo Offline o sin conexión).");
             return false;
         }
         if (db == null)
@@ -153,7 +151,6 @@ public class ConexionFirestore : MonoBehaviour
             db = FirebaseInit.Db;
             if (db == null)
             {
-                Debug.LogError("Firestore no inicializado");
                 return false;
             }
         }
@@ -167,8 +164,20 @@ public class ConexionFirestore : MonoBehaviour
 
     private IEnumerator EsperarYReservarNumeroJugador(Action<int> callback)
     {
-        // Espera hasta que Firebase realmente esté listo
-        yield return new WaitUntil(() => FirebaseInit.IsReady);
+        float tiempoEspera = 0f;// tiempo minimo que esperamos la conexion
+        float limiteEspera = 4f; // tiempo maximo que esperamos la conexion
+
+        // esperamos hasta que FirebaseInit esté listo o se alcance el límite de espera
+        while (!FirebaseInit.IsReady && tiempoEspera < limiteEspera)
+        {
+            tiempoEspera += Time.deltaTime;
+            yield return null;
+        }
+
+        if (!FirebaseInit.IsReady)
+        {
+            yield break;
+        }
 
         if (db == null)
         {
@@ -177,7 +186,6 @@ public class ConexionFirestore : MonoBehaviour
 
         if (db == null)
         {
-            Debug.LogError("Error crítico: Firestore no pudo inicializarse correctamente.");
             yield break;
         }
 
@@ -204,13 +212,13 @@ public class ConexionFirestore : MonoBehaviour
         {
             if (task.IsFaulted)
             {
-                Debug.LogError($"Error en la transacción de Firestore: {task.Exception}");
                 return;
             }
 
             callback?.Invoke(task.Result);
         });
     }
+
     public void RegistrarData(IFirestoreData data, string collection, Action<string> onSuccess = null)
     {
         if (!VerificarConexion())
