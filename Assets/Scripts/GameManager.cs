@@ -270,7 +270,7 @@ public class GameManager : MonoBehaviour
     {
         while (!ModoFinalizado())
         {
-            IniciarRonda();
+            yield return StartCoroutine(IniciarRonda()); // se debe usar StartCoroutine para esperar a que IniciarRonda termine antes de continuar
 
             yield return EjecutarPreguntas();
 
@@ -292,7 +292,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    private void IniciarRonda()
+    private IEnumerator IniciarRonda() //debe ser un enumerator si o si ya que si no se ejecuta de manera asincrona y no se puede esperar a que termine antes de continuar con el resto del loop
     {
         TotalAciertos = 0;
         TotalFallos = 0;
@@ -306,7 +306,7 @@ public class GameManager : MonoBehaviour
         {
             case ModoJuego.Carrera:
                 ConfigurarCarrera(nivelActual);
-                MostrarTutorialNivel(nivelActual);
+             yield return StartCoroutine(MostrarTutorialNivel(nivelActual)); // se debe usar StartCoroutine para esperar a que MostrarTutorialNivel termine antes de continuar
                 break;
 
             case ModoJuego.QuickPlay:

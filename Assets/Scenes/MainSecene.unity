@@ -156,10 +156,10 @@ MonoBehaviour:
   TotalReinicios: 0
   TotalAciertos: 0
   TotalFallos: 0
-  prefabTrivia: {fileID: 5179271380761848784, guid: c15545bb3caff65459806f86ea18e88e, type: 3}
+  prefabTrivia: {fileID: 6497719214539273604, guid: 496f8ec9d0ea54344899441d085c7f31, type: 3}
   prefabArbolDeciciones: {fileID: 5179271380761848784, guid: c15545bb3caff65459806f86ea18e88e, type: 3}
-  prefabNv4Conceptos: {fileID: 5179271380761848784, guid: c15545bb3caff65459806f86ea18e88e, type: 3}
-  prefabAdivinaQuien: {fileID: 5179271380761848784, guid: c15545bb3caff65459806f86ea18e88e, type: 3}
+  prefabNv4Conceptos: {fileID: 1883780828410608334, guid: bd99bf8ce4171fb4aa920ac9d394a3fb, type: 3}
+  prefabAdivinaQuien: {fileID: 4756381046916451345, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
   canvasResultados: {fileID: 258850311}
   textoAciertos: {fileID: 1696278156}
   textoFallos: {fileID: 1118843107}
