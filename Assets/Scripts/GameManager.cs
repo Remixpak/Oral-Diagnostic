@@ -178,7 +178,7 @@ public class GameManager : MonoBehaviour
         if (juegoActivo)
             TiempoJuego += Time.deltaTime;
 
-        Debug.Log("nivel actual: " + nivelActual);
+        
     }
 
     public void IniciarModoCarrera(bool reiniciar = false)

@@ -211,4 +211,17 @@ public class CsvManager : MonoBehaviour
         Debug.LogError("No se encontró la imagen con el código: " + codigo);
         return null;
     }
+
+
+
+    public List<Patologia> ObtenerPatologiasPorLesion(int lesionId)
+    {
+        return patologias.Where(p => p.lesionID == lesionId).ToList();
+    }
+
+    public Sprite ObtenerSpritePorPatologiaId(int patologiaId)
+    {
+        Patologia p = ObtenerPatologiaPorId(patologiaId);
+        return p != null ? spritePorCodigo(p.codigoImagen) : null;
+    }
 }
