@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 839e49d46ac7636479b1e5b603176f9a
+guid: 8afe5c8ce43cf11429aa7caf77d355cf
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2910077509975238944
-    second: Recuadro_0
+      213: 7081175595010155982
+    second: boton salir 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Recuadro_0
+      name: boton salir 1_0
       rect:
         serializedVersion: 2
-        x: 113
-        y: 90
-        width: 720
-        height: 167
+        x: 18
+        y: 74
+        width: 866
+        height: 190
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0e692154ce35d97d0800000000000000
-      internalID: -2910077509975238944
+      spriteID: ec5eebc9fa3654260800000000000000
+      internalID: 7081175595010155982
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Recuadro_0: -2910077509975238944
+      boton salir 1_0: 7081175595010155982
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

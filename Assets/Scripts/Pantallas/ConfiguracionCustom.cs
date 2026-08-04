@@ -20,6 +20,7 @@ public class ConfiguracionCustom : MonoBehaviour
     [Header("btn continuar")]
 
     [SerializeField] private Button btnContinuar;
+    [SerializeField] private Button btnContinuar_alt;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
 {
@@ -41,10 +42,10 @@ public class ConfiguracionCustom : MonoBehaviour
 
     private void ActualizarBoton()
     {
-        btnContinuar.interactable =
-            toggleLesiones.isOn ||
-            toggleFamilias.isOn ||
-            toggleDiagnosticos.isOn;
+        bool activo = toggleLesiones.isOn || toggleFamilias.isOn || toggleDiagnosticos.isOn;
+
+        btnContinuar.interactable = activo;
+        btnContinuar_alt.interactable = activo; //agregamos el boton alt para el modo zurdo
     }
 
     public void sumar()

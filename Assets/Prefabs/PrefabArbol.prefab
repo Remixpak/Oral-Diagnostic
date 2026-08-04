@@ -318,7 +318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1254902, g: 0.6980392, b: 0.6666667, a: 0.79607844}
+  m_Color: {r: 0.1254902, g: 0.6980392, b: 0.6666667, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -398,7 +398,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.282353, g: 0.8196079, b: 0.8000001, a: 1}
+  m_Color: {r: 0.36078432, g: 0.7019608, b: 0.75686276, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2232,6 +2232,9 @@ MonoBehaviour:
   canvasJuego: {fileID: 2975462550673832644}
   canvasRetroalimentacion: {fileID: 8165119822788749281}
   patologiaIDTarget: 1
+  etiologiaSeleccionadaTexto: Ninguna
+  familiaSeleccionadaTexto: Ninguna
+  lesionSeleccionadaTexto: Ninguna
   colorNormal: {r: 1, g: 1, b: 1, a: 1}
   colorSeleccionado: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   botonPausa: {fileID: 3664457425277529726}
@@ -2847,7 +2850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.282353, g: 0.8196079, b: 0.8000001, a: 0.5803922}
+  m_Color: {r: 0.36078432, g: 0.7019608, b: 0.75686276, a: 0.5803922}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3741,7 +3744,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -6696784038445164978, guid: 1420db1b1aafa194cbe52bd6168a5bf6, type: 3}
+  m_Sprite: {fileID: 5179448993183982278, guid: 1420db1b1aafa194cbe52bd6168a5bf6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
