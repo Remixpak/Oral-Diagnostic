@@ -450,14 +450,19 @@ public class ControladorAdivina : ControladorPreguntas
         if (respuestaCorrectaDescartada)
         {
             textoResultado.text = "Has fallado";
-            textoRespuesta.text = "La palabra correcta era:" + patologiaCorrecta;
+            textoRespuesta.text = " ";
         }
 
         else if(ValidarRespuesta(patologiaSeleccionada))
+        {
             textoResultado.text = "Respuesta correcta";
+            textoRespuesta.text = "La respuesta es: " + patologiaCorrecta;
+        }
         else    
+        {
             textoResultado.text = "Respuesta incorrecta";
-        textoRespuesta.text = "La respuesta es: " + patologiaCorrecta;
+            textoRespuesta.text = " ";
+        }
         canvasRetroalimentacion.GetComponentInChildren<Button>().onClick.AddListener(() => finished = true);
         canvasRetroalimentacion.gameObject.SetActive(true);
 

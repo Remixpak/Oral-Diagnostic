@@ -407,6 +407,7 @@ public class GameManager : MonoBehaviour
                     }
 
                     ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(Dificultad, lv1Completado, lv2Completado, lv3Completado));
+                    ControladorGuardarDatos.Instance.ActualizarUsuario("XXXX", lv3Completado);
                         
                 }
 
@@ -553,21 +554,24 @@ public class GameManager : MonoBehaviour
                 tutorial.ConfigurarTutorial(
                     "Bienvenido al nivel 1, El objetivo del nivel es que aprendas a reconocer lesiones de la mucosa oral",
                     "Se mostrará una imagen y 4 alternativas, entre ellas deberás seleccionar una de ellas",
-                    "Solo hay una respuesta correcta, suerte."
+                    "Solo hay una respuesta correcta, suerte.",
+                    "Objetivo: reconocer las lesiones de la mucosa oral."
                 );
                 break;
             case 2:
                 tutorial.ConfigurarTutorial(
                     "En el nivel anterior ya has aprendido a reconocer lesiones, así que vamos un paso más allá",
                     "Ahora usarás el árbol de decisiones, donde deberás enlazar la lesión con su familia, la etiopatogenia y su imagen",
-                    "Crea el camino correcto hasta dar con la respuesta."
+                    "Crea el camino correcto hasta dar con la respuesta.",
+                    "Objetivo: Asociar una manifestación clínica con su lesión básica, familia y etiopatogenia."
                 );
                 break;
             case 3:
                 tutorial.ConfigurarTutorial(
                     "Finalmente has sabido relacionar cada lesión con su familia y etiopatogenia, por lo que ya estas listo para poder diagnosticar pacientes.",
                     "Aquí aparecerán distintos tipos de preguntas, en una de ellas tendrás la familia, etiopatogenia, lesión e imagen y un monton de letras con las cuales deberás escribir el diagnostico.",
-                    "En el segundo habrán distintos diagnosticos y en base preguntas podrás deberás ir descartando las opciones que NO sean la correcta, tendrás una libreta donde podrás ver las respuestas que hayas optenido."
+                    "En el segundo habrán distintos diagnosticos y en base preguntas podrás deberás ir descartando las opciones que NO sean la correcta, tendrás una libreta donde podrás ver las respuestas que hayas optenido.",
+                    "Objetivo: Diagnosticar lesiones de la mucosa oral."
                 );
                 break;
         }
@@ -593,15 +597,15 @@ public class GameManager : MonoBehaviour
         switch (nivel)
         {
             case 1:
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 1; i++)
                     colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Trivia });
                 break;
             case 2:
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 1; i++)
                     colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Arbol });
                 break;
             case 3:
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     TipoPregunta tipoRandom = Random.value > 0.5f ? TipoPregunta.Conceptos : TipoPregunta.AdivinaQuien;
                     colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = tipoRandom });
@@ -764,9 +768,9 @@ public class GameManager : MonoBehaviour
         string dif = Dificultad != null ? Dificultad.Trim().ToLower() : "";
         switch (dif)
         {
-            case "practicante": return 0.70f;//70% modo facil
-            case "asistente": return 0.80f;//80% modo medio
-            case "experto": return 0.90f;//90% modo dificil
+            case "Fácil": return 0.70f;//70% modo facil
+            case "Medio": return 0.80f;//80% modo medio
+            case "Difícil": return 0.90f;//90% modo dificil
             default: return 0.80f;
         }
     }

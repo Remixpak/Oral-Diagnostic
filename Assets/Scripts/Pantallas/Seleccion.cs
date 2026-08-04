@@ -35,6 +35,10 @@ public class Seleccion : MonoBehaviour
 
     [SerializeField] private float velocidadEscritura = 0.03f;
 
+    [Header("Btnes modos de juego")]
+    [SerializeField] private Button Quick;
+    [SerializeField] private Button Custom;
+
     private Coroutine escrituraActual;
 
     void Start()
@@ -43,6 +47,20 @@ public class Seleccion : MonoBehaviour
         siguienteM_alt.interactable = false;
         sigueinteD.interactable = false;
         sigueinteD_alt.interactable = false;
+        if(ControladorGuardarDatos.Instance.ExisteUsuario())
+        {
+            Usuario u = ControladorGuardarDatos.Instance.CargarUsuario();
+            if(!u.PartidaTerminada)
+            {
+                Quick.interactable = false;
+                Custom.interactable = false;
+            }
+            else
+            {
+                Quick.interactable = true;
+                Custom.interactable = true;
+            }
+        }
     }
 
     public void MostrarDescripcion(TMP_Text textoUI, string mensaje)
@@ -112,15 +130,15 @@ public class Seleccion : MonoBehaviour
 
         switch (dificultadSeleccionada)
         {
-            case "Practicante":
+            case "Fácil":
                 MostrarDescripcion(descripcionD, descripcionFacil);
                 break;
 
-            case "Asistente":
+            case "Medio":
                 MostrarDescripcion(descripcionD, descripcionMedia);
                 break;
 
-            case "Experto":
+            case "Difícil":
                 MostrarDescripcion(descripcionD, descripcionDificil);
                 break;
         }
@@ -147,6 +165,8 @@ public class Seleccion : MonoBehaviour
     {
         if(modoSeleccionado == "Custom")
             irACustom();
+        else if(modoSeleccionado == "QuickPlay")
+            IrAJuego();
         else
             PasarADificultad();
     }

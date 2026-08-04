@@ -675,7 +675,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             if (!familiaCorrectaSeleccionada) erroresTexto += "- Familia incorrecta\n";
             if (!etiologiaCorrectaSeleccionada) erroresTexto += "- Etiologia incorrecta\n";
             if (!patologiaCorrectaSeleccionada) erroresTexto += "- Patologia incorrecta\n";
-            textoRespuesta.text = "Errores encontrados:\n" + erroresTexto;
+            textoRespuesta.text = " ";
         }
 
         if (canvasRetroalimentacion != null)

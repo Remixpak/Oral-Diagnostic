@@ -122,6 +122,10 @@ public class ControladorGuardarDatos : MonoBehaviour
 
             usuario.NumeroJugador = numeroJugador;
             usuario.Nick = nick;
+            if(ExistePartida())
+                usuario.PartidaTerminada = CargarPartida().Lv3Completado;
+            else
+                usuario.PartidaTerminada = false;
 
             ConexionFirestore.Instance.RegistrarData(
                 usuario,
@@ -139,6 +143,14 @@ public class ControladorGuardarDatos : MonoBehaviour
                     // Aquí puedes guardar el usuario en tu JSON local
                 });
         });
+    }
+
+    public void ActualizarUsuario(string nick, bool partida)
+    {
+        Usuario u = CargarUsuario();
+        u.Nick = nick;
+        u.PartidaTerminada = partida;
+        GuardarUsuario(u);
     }
     public void GuardarUsuario(Usuario usuario)
     {

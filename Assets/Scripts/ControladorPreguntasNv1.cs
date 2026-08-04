@@ -117,13 +117,15 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         if (ComprobarRespuesta(respuesta, respuestaCorrecta))
         {
             textoResultado.text = "¡Respuesta Correcta!";
+            textoRespuesta.text = "La respuesta correcta es: " + respuestaCorrecta;
         }
         else
         {
             textoResultado.text = "Respuesta Incorrecta";
+            textoRespuesta.text = " ";
         }
 
-        textoRespuesta.text = "La respuesta correcta es: " + respuestaCorrecta;
+        
         canvasRetroalimentacion.GetComponentInChildren<Button>().onClick.RemoveAllListeners();
         canvasRetroalimentacion.GetComponentInChildren<Button>().onClick.AddListener(() => finished = true);
         canvasRetroalimentacion.gameObject.SetActive(true);

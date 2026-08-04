@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Tutorial : MonoBehaviour
@@ -15,6 +16,9 @@ public class Tutorial : MonoBehaviour
     [SerializeField] private float tiempoEntreLetras = 0.05f;
     [SerializeField] private float esperaEntreMensajes = 2f;
     [SerializeField] private float esperaFinal = 2f;
+
+    [Header("Objetivos")]
+    [SerializeField] private TMP_Text Objetivo;
 
     public bool Finalizado { get; private set; }
 
@@ -85,10 +89,11 @@ public class Tutorial : MonoBehaviour
         Finalizado = true;
     }
 
-    public void ConfigurarTutorial(string txt1, string txt2, string txt3)
+    public void ConfigurarTutorial(string txt1, string txt2, string txt3, string obj)
     {
         texto1 = txt1;
         texto2 = txt2;
         texto3 = txt3;
+        Objetivo.text = obj;
     }
 }

@@ -1104,7 +1104,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Asistente
+  m_text: 'Medio
 
 '
   m_isRightToLeft: 0
@@ -2439,9 +2439,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Experto
-
-'
+  m_text: "Dif\xEDcil"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 681a24e450f250347831d6fd1bd39bcd, type: 2}
   m_sharedMaterial: {fileID: 6954325078690559886, guid: 681a24e450f250347831d6fd1bd39bcd, type: 2}
@@ -2998,10 +2996,12 @@ MonoBehaviour:
   descripcionQuickPlay: "Partida r\xE1pida en la que responder\xE1s preguntas aleatorias
     de cualquier dificultad."
   descripcionCustom: Personaliza tu partida.
-  descripcionFacil: "Modo f\xE1cil"
-  descripcionMedia: Dificultad intermedia
-  descripcionDificil: "Demuestra que eres un gran profesional en el modo m\xE1s desafiante."
+  descripcionFacil: "Necesitar\xE1s un 70% de preguntas correctas para aprobar"
+  descripcionMedia: "Necesitar\xE1s un 80% de preguntas correctas para aprobar"
+  descripcionDificil: "Necesitar\xE1s un 90% de preguntas correctas para aprobar"
   velocidadEscritura: 0.03
+  Quick: {fileID: 186835641}
+  Custom: {fileID: 1365832915}
 --- !u!4 &1051838492
 Transform:
   m_ObjectHideFlags: 0
@@ -6743,9 +6743,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Practicante
-
-'
+  m_text: "F\xE1cil"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 681a24e450f250347831d6fd1bd39bcd, type: 2}
   m_sharedMaterial: {fileID: 6954325078690559886, guid: 681a24e450f250347831d6fd1bd39bcd, type: 2}

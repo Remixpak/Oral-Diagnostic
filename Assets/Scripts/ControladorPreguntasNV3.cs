@@ -342,7 +342,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         {
             textoResultado.text = "Respuesta Incorrecta";
             textoResultado.color = Color.white;
-            textoRespuesta.text = "La respuesta correcta era: " + palabraCorrecta;
+            textoRespuesta.text = " ";
         }
 
         if (canvasRetroalimentacion != null)
