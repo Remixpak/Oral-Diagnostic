@@ -191,9 +191,17 @@ public class ControladorAdivina : ControladorPreguntas
     {
         patologiaSeleccionada = Seleccionado.GetComponentInChildren<TMP_Text>().text;
         if(ValidarRespuesta(patologiaSeleccionada))
+        {
+            GameManager.Instance.Aciertos++;
             GameManager.Instance.TotalAciertos++;
-        else   
+        }
+        else
+        {
+            
+        
+            GameManager.Instance.Fallos++;
             GameManager.Instance.TotalFallos++;
+        }
         StartCoroutine(FinalizarPregunta());
 
 

@@ -483,11 +483,11 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         {
             if (lesionCorrectaSeleccionada)
             {
-                GameManager.Instance.TotalAciertos++;
+                GameManager.Instance.Aciertos++;
             }
             else
             {
-                GameManager.Instance.TotalFallos++;
+                GameManager.Instance.Fallos++;
                 erroresNivel++;
             }
         }
@@ -519,10 +519,12 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         {
             if (familiaCorrectaSeleccionada)
             {
+                GameManager.Instance.Aciertos++;
                 GameManager.Instance.TotalAciertos++;
             }
             else
             {
+                GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
                 erroresNivel++;
             }
@@ -553,10 +555,12 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         {
             if (etiologiaCorrectaSeleccionada)
             {
+                GameManager.Instance.Aciertos++;
                 GameManager.Instance.TotalAciertos++;
             }
             else
             {
+                GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
                 erroresNivel++;
             }
@@ -587,10 +591,12 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         {
             if (patologiaCorrectaSeleccionada)
             {
+                GameManager.Instance.Aciertos++;
                 GameManager.Instance.TotalAciertos++;
             }
             else
             {
+                GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
                 erroresNivel++;
             }

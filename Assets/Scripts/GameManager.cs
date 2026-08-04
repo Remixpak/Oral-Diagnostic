@@ -5,6 +5,24 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+public enum ClasificacionRango
+{
+    SinClasificar,
+    Estudiante,     // < 60%
+    Interno,        // 60% - 74%
+    Residente,      // 75% - 84%
+    Doctor,         // 85% - 94%
+    Especialista    // 95% - 100%
+}
+
+public struct ResultadoClasificacion
+{
+    public ClasificacionRango rango;
+    public string titulo;
+    public float puntajeFinal;
+    public float porcentajeEfectividad;
+}
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -19,8 +37,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] public float TiempoJuego;
     [SerializeField] public int TotalIntentos = 0;
     [SerializeField] public int TotalReinicios = 0;
-    [SerializeField] public int TotalAciertos = 0;
-    [SerializeField] public int TotalFallos = 0;
+    [SerializeField] public int Aciertos = 0;
+    [SerializeField] public int Fallos = 0;
+
+    public int TotalAciertos; public int TotalFallos;
 
     [Header("Prefabs de Niveles")]
     [SerializeField] private GameObject prefabTrivia;
@@ -28,8 +48,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject prefabNv4Conceptos;
     [SerializeField] private GameObject prefabAdivinaQuien;
 
-    [Header("Resultados")]
+    [Header("Canvas")]
     [SerializeField] public Canvas canvasResultados;
+    [SerializeField] private Canvas canvasVictoria;
 
     [Header("Textos de resultados")]
     [SerializeField] public TMP_Text textoAciertos;
@@ -37,6 +58,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] public TMP_Text textoTiempo;
     [SerializeField] public TMP_Text textoIntentos;
     [SerializeField] public TMP_Text textoReinicios;
+
+    [Header("Textos victoria")]
+    [SerializeField] private TMP_Text textoTotalAciertos;
+    [SerializeField] private TMP_Text textoTotalFallos;
+
+    [SerializeField] private TMP_Text rango;
 
     [Header("Tutorial")]
     [SerializeField] private GameObject prefabTutorial;
@@ -53,6 +80,15 @@ public class GameManager : MonoBehaviour
     private GameObject tutorialInstanciado;
     private bool continuarCarrera = false;
     [SerializeField] private LvPass lvPass;
+
+    [Header("Configuración de Calificación")]
+    [SerializeField] private float tiempoEsperadoPorPregunta = 15f; // Segundos razonables por pregunta
+    [SerializeField] private float puntosPorAcierto = 100f;
+    [SerializeField] private float puntosPorFallo = 30f;
+    [SerializeField] private float penalizacionPorReinicio = 50f;
+    [SerializeField] private float penalizacionPorSegundoExtra = 2f;
+
+    [SerializeField] public TMP_Text textoClasificacion;
 
     void Awake()
     {
@@ -72,6 +108,8 @@ public class GameManager : MonoBehaviour
         lv1Completado = false;
         lv2Completado = false;
         lv3Completado = false;
+        TotalAciertos = 0;
+        TotalFallos = 0;
 
         bool hayPartida = ControladorGuardarDatos.Instance != null && ControladorGuardarDatos.Instance.ExistePartida();
 
@@ -139,6 +177,8 @@ public class GameManager : MonoBehaviour
     {
         if (juegoActivo)
             TiempoJuego += Time.deltaTime;
+
+        Debug.Log("nivel actual: " + nivelActual);
     }
 
     public void IniciarModoCarrera(bool reiniciar = false)
@@ -276,7 +316,7 @@ public class GameManager : MonoBehaviour
 
             FinalizarRonda();
 
-            Debug.Log($"RESULTADOS -> A:{TotalAciertos} F:{TotalFallos}");
+            Debug.Log($"RESULTADOS -> A:{Aciertos} F:{Fallos}");
 
             MostrarResultados();
 
@@ -294,8 +334,8 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator IniciarRonda() //debe ser un enumerator si o si ya que si no se ejecuta de manera asincrona y no se puede esperar a que termine antes de continuar con el resto del loop
     {
-        TotalAciertos = 0;
-        TotalFallos = 0;
+        Aciertos = 0;
+        Fallos = 0;
         Debug.Log("poniendo variables en 0");
         juegoActivo = true;
 
@@ -329,11 +369,11 @@ public class GameManager : MonoBehaviour
                 ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
                 controlador.InicializarPregunta(pregunta.idPatologia);
 
-                Debug.Log($"Comienza pregunta. A:{TotalAciertos} F:{TotalFallos}");
+                Debug.Log($"Comienza pregunta. A:{Aciertos} F:{Fallos}");
 
                 yield return new WaitUntil(() => controlador.finished);
 
-                Debug.Log($"Termina pregunta. A:{TotalAciertos} F:{TotalFallos}");
+                Debug.Log($"Termina pregunta. A:{Aciertos} F:{Fallos}");
 
                 Destroy(nivelInstanciado);
             }
@@ -412,8 +452,8 @@ public class GameManager : MonoBehaviour
         if (canvasResultados != null)
         {
             canvasResultados.gameObject.SetActive(true);
-            if (textoAciertos != null) textoAciertos.text = "Aciertos: " + TotalAciertos;
-            if (textoFallos != null) textoFallos.text = "Fallos: " + TotalFallos;
+            if (textoAciertos != null) textoAciertos.text = "Aciertos: " + Aciertos;
+            if (textoFallos != null) textoFallos.text = "Fallos: " + Fallos;
 
             int minutos = Mathf.FloorToInt(TiempoJuego / 60);
             int segundos = Mathf.FloorToInt(TiempoJuego % 60);
@@ -426,37 +466,77 @@ public class GameManager : MonoBehaviour
 
     private void MostrarResultados()
     {
-        if (lvPass != null)
+        if (modoActual == ModoJuego.Carrera)
         {
-            if (PuedePasar())
-                lvPass.MostrarPass(nivelActual);
+            // 1. Caso Victoria Final (Completó el Nivel 3 y supera el porcentaje)
+            if (nivelActual == 4 && PuedePasar())
+            {
+                if (lvPass != null)
+                {
+                    // Se asume que el avance a nivel 4 indica victoria global
+                    ActualizarProgreso(true, true, true); 
+                }
+                MostrarPantallaVictoria();
+                return; // Salimos para evitar activar el canvasResultados
+            }
+
+            // 2. Transición o Reintento de Niveles Intermedios (Nivel 1, 2 o Fallo en Nivel 3)
+            if (lvPass != null)
+            {
+                if (PuedePasar())
+                {
+                    lvPass.MostrarPass(nivelActual);
+                }
+                else
+                {
+                    lvPass.MostrarReintento();
+                }
+            }
             else
-                lvPass.MostrarReintento();
+            {
+                Debug.LogError("La referencia a LvPass es NULL en el GameManager.");
+            }
+
+            // 3. Activar Canvas de Resultados Parciales
+            if (canvasResultados != null)
+            {
+                canvasResultados.gameObject.SetActive(true);
+                if (textoAciertos != null) textoAciertos.text = "Aciertos: " + Aciertos;
+                if (textoFallos != null) textoFallos.text = "Fallos: " + Fallos;
+
+                int minutos = Mathf.FloorToInt(TiempoJuego / 60);
+                int segundos = Mathf.FloorToInt(TiempoJuego % 60);
+                if (textoTiempo != null) textoTiempo.text = "Tiempo: " + minutos.ToString("00") + ":" + segundos.ToString("00");
+
+                if (textoIntentos != null) textoIntentos.text = "Intentos: " + TotalIntentos;
+                if (textoReinicios != null) textoReinicios.text = "Reinicios: " + TotalReinicios;
+            }
+
+            // Guardar Métricas
+            if (ControladorGuardarDatos.Instance != null)
+            {
+                string claveNivel = nivelActual < 4 ? nivelActual.ToString() : "Carrera completada";
+                ControladorGuardarDatos.Instance.GuardarMetricas(claveNivel);
+            }
         }
         else
         {
-            Debug.LogError("La referencia a LvPass es NULL en el GameManager.");
+            // Modos QuickPlay o Custom
+            MostrarPantallaVictoria();
         }
+    }
 
-        if (canvasResultados != null)
-        {
-            canvasResultados.gameObject.SetActive(true);
-            if (textoAciertos != null) textoAciertos.text = "Aciertos: " + TotalAciertos;
-            if (textoFallos != null) textoFallos.text = "Fallos: " + TotalFallos;
+    private void MostrarPantallaVictoria()
+    {
+        canvasResultados.gameObject.SetActive(false);
+        canvasVictoria.gameObject.SetActive(true);
+        textoTotalAciertos.text = $"Aciertos de la ronda: {TotalAciertos}";
+        textoTotalFallos.text = $"Fallos de la ronda: {TotalFallos}";
 
-            int minutos = Mathf.FloorToInt(TiempoJuego / 60);
-            int segundos = Mathf.FloorToInt(TiempoJuego % 60);
-            if (textoTiempo != null) textoTiempo.text = "Tiempo: " + minutos.ToString("00") + ":" + segundos.ToString("00");
+        ResultadoClasificacion Rc = CalcularClasificacion();
 
-            if (textoIntentos != null) textoIntentos.text = "Intentos: " + TotalIntentos;
-            if (textoReinicios != null) textoReinicios.text = "Reinicios: " + TotalReinicios;
-        }
+        rango.text = $"Rango: {Rc.rango} \nTítulo: {Rc.titulo} \nPuntaje: {Rc.puntajeFinal} \nPorcentaje de efectividad: {Rc.porcentajeEfectividad}";
 
-        if (ControladorGuardarDatos.Instance != null)
-        {
-            string claveNivel = nivelActual < 4 ? nivelActual.ToString() : "Carrera completada";
-            ControladorGuardarDatos.Instance.GuardarMetricas(claveNivel);
-        }
     }
 
     private IEnumerator MostrarTutorialNivel(int nivel)
@@ -669,8 +749,8 @@ public class GameManager : MonoBehaviour
         TiempoJuego = 0;
         TotalIntentos = 0;
         TotalReinicios++;
-        TotalAciertos = 0;
-        TotalFallos = 0;
+        Aciertos = 0;
+        Fallos = 0;
 
         colaPreguntas.Clear();
         idsDisponibles.Clear();
@@ -693,8 +773,92 @@ public class GameManager : MonoBehaviour
 
     private bool PuedePasar()
     {
-        int totalRespuestas = TotalAciertos + TotalFallos;
-        float porcentajeAciertos = totalRespuestas > 0 ? (float)TotalAciertos / totalRespuestas : 0f;
+        int totalRespuestas = Aciertos + Fallos;
+        float porcentajeAciertos = totalRespuestas > 0 ? (float)Aciertos / totalRespuestas : 0f;
         return porcentajeAciertos >= ObtenerPorcentajeRequerido();
+    }
+
+    
+
+
+    
+
+    public ResultadoClasificacion CalcularClasificacion()
+    {
+        int totalPreguntas = Aciertos + Fallos;
+
+        if (totalPreguntas == 0)
+        {
+            return new ResultadoClasificacion 
+            { 
+                rango = ClasificacionRango.SinClasificar, 
+                titulo = "Sin Datos", 
+                puntajeFinal = 0f, 
+                porcentajeEfectividad = 0f 
+            };
+        }
+
+        // 1. Puntaje Máximo Teórico posible (100% de aciertos sin penalizaciones)
+        float puntajeMaximo = totalPreguntas * puntosPorAcierto;
+
+        // 2. Puntaje Base (Aciertos - Fallos)
+        float puntajeObtenido = (Aciertos * puntosPorAcierto) - (Fallos * puntosPorFallo);
+
+        // 3. Penalización por Reinicios
+        float deduccionReinicios = TotalReinicios * penalizacionPorReinicio;
+        puntajeObtenido -= deduccionReinicios;
+
+        // 4. Penalización por Tiempo Excesivo
+        float tiempoObjetivo = totalPreguntas * tiempoEsperadoPorPregunta;
+        if (TiempoJuego > tiempoObjetivo)
+        {
+            float segundosExceso = TiempoJuego - tiempoObjetivo;
+            float deduccionTiempo = segundosExceso * penalizacionPorSegundoExtra;
+            puntajeObtenido -= deduccionTiempo;
+        }
+
+        // Aseguramos que el puntaje no sea menor a cero
+        puntajeObtenido = Mathf.Max(0f, puntajeObtenido);
+
+        // 5. Calculamos el porcentaje de efectividad respecto al puntaje máximo
+        float porcentajeEfectividad = (puntajeObtenido / puntajeMaximo) * 100f;
+
+        // 6. Asignación de Rango según el porcentaje resultante
+        ClasificacionRango rangoObtenido;
+        string tituloTexto;
+
+        if (porcentajeEfectividad >= 95f)
+        {
+            rangoObtenido = ClasificacionRango.Especialista;
+            tituloTexto = "Especialista Sobresaliente";
+        }
+        else if (porcentajeEfectividad >= 85f)
+        {
+            rangoObtenido = ClasificacionRango.Doctor;
+            tituloTexto = "Doctor Titulado";
+        }
+        else if (porcentajeEfectividad >= 75f)
+        {
+            rangoObtenido = ClasificacionRango.Residente;
+            tituloTexto = "Residente Senior";
+        }
+        else if (porcentajeEfectividad >= 60f)
+        {
+            rangoObtenido = ClasificacionRango.Interno;
+            tituloTexto = "Interno en Práctica";
+        }
+        else
+        {
+            rangoObtenido = ClasificacionRango.Estudiante;
+            tituloTexto = "Estudiante de Odontología";
+        }
+
+        return new ResultadoClasificacion
+        {
+            rango = rangoObtenido,
+            titulo = tituloTexto,
+            puntajeFinal = puntajeObtenido,
+            porcentajeEfectividad = porcentajeEfectividad
+        };
     }
 }

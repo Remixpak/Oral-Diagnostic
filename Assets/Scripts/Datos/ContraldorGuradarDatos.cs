@@ -237,9 +237,9 @@ public class ControladorGuardarDatos : MonoBehaviour
 
         metricas.TotalReinicios = GameManager.Instance.TotalReinicios;
 
-        metricas.TotalAciertos = GameManager.Instance.TotalAciertos;
+        metricas.TotalAciertos = GameManager.Instance.Aciertos;
 
-        metricas.TotalFallos = GameManager.Instance.TotalFallos;
+        metricas.TotalFallos = GameManager.Instance.Fallos;
 
 
         if(!FirebaseInit.IsReady)

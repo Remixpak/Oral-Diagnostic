@@ -70,11 +70,13 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         if (ComprobarRespuesta(respuesta, respuestaCorrecta))
         {
             boton.GetComponent<Image>().color = Color.green;
+            GameManager.Instance.Aciertos++;
             GameManager.Instance.TotalAciertos++;
         }
         else
         {
             boton.GetComponent<Image>().color = Color.red;
+            GameManager.Instance.Fallos++;
             GameManager.Instance.TotalFallos++;
         }
 

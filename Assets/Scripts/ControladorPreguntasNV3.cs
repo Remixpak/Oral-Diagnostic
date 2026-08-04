@@ -11,13 +11,13 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     [Header("Pausa")]
     [SerializeField]private Button botonPausa;
 
-    [Header("Configuración del Juego")]
+    [Header("Configuraciï¿½n del Juego")]
 
     [SerializeField] private int patologiaIDTarget = 1; //ID de la patologia que se quiere mostrar
     [SerializeField] private string palabraCorrecta = "ULCERA"; //Objetivo a formar
     [SerializeField] private int cantidadLetrasTeclado = 12;// letras totaless
 
-    [Header("Configuración del Juego")]
+    [Header("Configuraciï¿½n del Juego")]
 
     [SerializeField] private Transform containerEspacios;
     [SerializeField] private Transform containerTeclado;
@@ -103,7 +103,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
                 }
                 else
                 {
-                    Debug.LogError("No se encontró la imagen en: Assets/Resources/Imagenes/" + nombreImagenLimpio);
+                    Debug.LogError("No se encontrï¿½ la imagen en: Assets/Resources/Imagenes/" + nombreImagenLimpio);
                 }
             }
         }
@@ -113,7 +113,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     private void ConfigurarPanelPistas()
     {
         if (uiImagePista != null && imagenPistaSprite != null) uiImagePista.sprite = imagenPistaSprite;
-        if (uiTextoLesion != null) uiTextoLesion.text = "Lesión: " + NombreLesion;
+        if (uiTextoLesion != null) uiTextoLesion.text = "Lesiï¿½n: " + NombreLesion;
         if (uiTextoFamilia != null) uiTextoFamilia.text = "Familia: " + NombreFamilia;
         if (uiTextoEtiopatogenia != null) uiTextoEtiopatogenia.text = "Etiopatogenia: " + DescripcionEtiopatogenia;
     }
@@ -121,13 +121,13 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
     //metodo para generarr las teclas en pantalla
     private void GenerarLetrasTeclado()
     {
-        for (int i = 0; i < palabraCorrecta.Length; i++)//añade solamente las letras de la palabra correcta
+        for (int i = 0; i < palabraCorrecta.Length; i++)//aï¿½ade solamente las letras de la palabra correcta
         {
             if (palabraCorrecta[i] == ' ') continue;
             letrasTeclado.Add(palabraCorrecta[i].ToString());
         }
 
-        //añade con palabras extras hasta formar la cantidad total de palabras
+        //aï¿½ade con palabras extras hasta formar la cantidad total de palabras
         string abecedario = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (letrasTeclado.Count < cantidadLetrasTeclado)
         {
@@ -279,7 +279,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         if (palabraFormada == palabraCorrecta)
         {
             nivelCompletado = true;
-            Debug.Log("<color=green>¡Correcto! Has descubierto el diagnóstico clínico.</color>");
+            Debug.Log("<color=green>ï¿½Correcto! Has descubierto el diagnï¿½stico clï¿½nico.</color>");
             foreach (Button btn in botonesEspaciosUI)
             {
                 btn.GetComponent<Image>().color = Color.green;
@@ -287,6 +287,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
 
             if (GameManager.Instance != null)
             {
+                GameManager.Instance.Aciertos++;
                 GameManager.Instance.TotalAciertos++;
             }
 
@@ -304,6 +305,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
 
             if (GameManager.Instance != null)
             {
+                GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
             }
 
