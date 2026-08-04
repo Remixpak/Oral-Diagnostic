@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a1300e52a0f19e848b3b50d8210fe12e
+guid: b00d56a827e2e9e469109d6915e71f06
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8365025808250756130
-    second: boton continuar_0
+      213: -6624683637455947632
+    second: Recuadro blanco_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: boton continuar_0
+      name: Recuadro blanco_0
       rect:
         serializedVersion: 2
-        x: 18
-        y: 74
-        width: 866
-        height: 190
+        x: 113
+        y: 90
+        width: 720
+        height: 167
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 22cd2cd17aa861470800000000000000
-      internalID: 8365025808250756130
+      spriteID: 0987810b4556014a0800000000000000
+      internalID: -6624683637455947632
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      boton continuar_0: 8365025808250756130
+      Recuadro blanco_0: -6624683637455947632
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

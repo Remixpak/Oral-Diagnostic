@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 399d49e9f8024b448b40aef3da86023c
+guid: 11494553264faae47b134881b102a49f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4454215630510235754
-    second: boton reiniciar_0
+      213: 8801864636411750179
+    second: Boton Jugar 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: boton reiniciar_0
+      name: Boton Jugar 1_0
       rect:
         serializedVersion: 2
         x: 18
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a602e89348d80dd30800000000000000
-      internalID: 4454215630510235754
+      spriteID: 3272566a041862a70800000000000000
+      internalID: 8801864636411750179
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      boton reiniciar_0: 4454215630510235754
+      Boton Jugar 1_0: 8801864636411750179
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
