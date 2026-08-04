@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
@@ -197,6 +197,40 @@ public class ControladorPreguntasNv1 : ControladorPreguntas
         {
             botonPausa.gameObject.SetActive(true);
             Debug.Log("[PausaDebug] El GameObject del botonPausa estaba inactivo, se activó.");
+        }
+    }
+}*/
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+
+
+public class PreguntaLesionPorImagen : ControladorPreguntaBase
+{
+    protected override void ConfigurarPreguntaYRespuestas(int idPatologiaAsignada, out List<string> opciones, out List<Sprite> spritesOpciones)
+    {
+        spritesOpciones = null;
+        opciones = new List<string>();
+
+        Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologiaAsignada);
+        if (imagenPregunta != null) 
+            imagenPregunta.sprite = CsvManager.Instance.spritePorCodigo(p.codigoImagen);
+
+        if (textoPregunta != null) 
+            textoPregunta.text = "¿A qué lesión básica corresponde la manifestación clínica observada en la imagen?";
+
+        Lesion lCorrecta = CsvManager.Instance.ObtenerLesionPorId(p.lesionID);
+        respuestaCorrecta = lCorrecta.nombre;
+        opciones.Add(respuestaCorrecta);
+
+        // Distractores
+        List<Lesion> restoLesiones = CsvManager.Instance.lesiones.Where(l => l.id != lCorrecta.id).ToList();
+
+        while (opciones.Count < botonesAlternativas.Count && restoLesiones.Count > 0)
+        {
+            int idx = Random.Range(0, restoLesiones.Count);
+            opciones.Add(restoLesiones[idx].nombre);
+            restoLesiones.RemoveAt(idx);
         }
     }
 }
