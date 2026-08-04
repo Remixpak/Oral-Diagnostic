@@ -764,9 +764,9 @@ public class GameManager : MonoBehaviour
         string dif = Dificultad != null ? Dificultad.Trim().ToLower() : "";
         switch (dif)
         {
-            case "practicante": return 0.80f;
-            case "asistente": return 0.85f;
-            case "experto": return 0.90f;
+            case "practicante": return 0.70f;//70% modo facil
+            case "asistente": return 0.80f;//80% modo medio
+            case "experto": return 0.90f;//90% modo dificil
             default: return 0.80f;
         }
     }
