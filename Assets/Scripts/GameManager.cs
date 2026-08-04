@@ -607,8 +607,8 @@ public class GameManager : MonoBehaviour
             case 3:
                 for (int i = 0; i < 1; i++)
                 {
-                    TipoPregunta tipoRandom = Random.value > 0.5f ? TipoPregunta.Conceptos : TipoPregunta.AdivinaQuien;
-                    colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = tipoRandom });
+        
+                    colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.AdivinaQuien });
                 }
                 break;
         }
