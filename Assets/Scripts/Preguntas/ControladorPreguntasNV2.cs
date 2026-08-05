@@ -11,9 +11,9 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 {
     [Header("Configuracion del Juego")]
     [SerializeField] private int patologiaIDTarget = 1; // Id de la patologia que se debe seleccionar correctamente
-    [SerializeField] private string etiologiaSeleccionadaTexto = "Ninguna";
-    [SerializeField] private string familiaSeleccionadaTexto = "Ninguna";
     [SerializeField] private string lesionSeleccionadaTexto = "Ninguna";
+    [SerializeField] private string familiaSeleccionadaTexto = "Ninguna";
+    [SerializeField] private string etiologiaSeleccionadaTexto = "Ninguna";
     [SerializeField] private Color colorNormal = Color.white; // Color por defecto de los botones
     [SerializeField] private Color colorSeleccionado = Color.yellow;// Color cuando un boton esta seleccionado
     [SerializeField] private Button botonPausa;// asignar boton pausa en el inspector
@@ -280,6 +280,15 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     //metodo para configurar la interactividad de los botones del arbol de decisiones
     private void ConfigurarInteractividadArbol()
     {
+        for (int i = 0; i < botonesPatologias.Length; i++)
+        {
+            int index = i;
+            if (botonesPatologias[index] != null)
+            {
+                botonesPatologias[index].onClick.AddListener(() => ValidarSeleccionPatologia(index));
+            }
+        }
+
         for (int i = 0; i < botonesLesiones.Length; i++)
         {
             int index = i;
@@ -306,23 +315,14 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
                 botonesEtiologias[index].onClick.AddListener(() => ValidarSeleccionEtiologia(index));
             }
         }
-
-        for (int i = 0; i < botonesPatologias.Length; i++)
-        {
-            int index = i;
-            if (botonesPatologias[index] != null)
-            {
-                botonesPatologias[index].onClick.AddListener(() => ValidarSeleccionPatologia(index));
-            }
-        }
     }
 
     //metodo para actualizar la interactividad de los bloques de botones segun las selecciones realizadas
     private void ActualizarInteractividadBloques()
     {
-        SetBloqueInteractable(botonesEtiologias, indicePatologiaSeleccionada != -1);
-        SetBloqueInteractable(botonesFamilias, indicePatologiaSeleccionada != -1 && indiceEtiologiaSeleccionada != -1);
-        SetBloqueInteractable(botonesLesiones, indicePatologiaSeleccionada != -1 && indiceEtiologiaSeleccionada != -1 && indiceFamiliaSeleccionada != -1);
+        SetBloqueInteractable(botonesLesiones, indicePatologiaSeleccionada != -1);
+        SetBloqueInteractable(botonesFamilias, indicePatologiaSeleccionada != -1 && indiceLesionSeleccionada != -1);
+        SetBloqueInteractable(botonesEtiologias, indicePatologiaSeleccionada != -1 && indiceLesionSeleccionada != -1 && indiceFamiliaSeleccionada != -1);
     }
 
     //metodo para establecer la interactividad de un bloque de botones y cambiar su color segun el estado
@@ -350,44 +350,44 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
         lineaConectora.LimpiarLineas();
 
-        // Linea 1: patologia → etiologia
-        if (indicePatologiaSeleccionada != -1 && indiceEtiologiaSeleccionada != -1)
+        // Linea 1: patologia → lesion
+        if (indicePatologiaSeleccionada != -1 && indiceLesionSeleccionada != -1)
         {
             Button origen = botonesPatologias[indicePatologiaSeleccionada];
-            Button destino = botonesEtiologias[indiceEtiologiaSeleccionada];
+            Button destino = botonesLesiones[indiceLesionSeleccionada];
             Color color = lineaConectora.GetColorSeleccion();
             lineaConectora.CrearLinea(origen, destino, color);
         }
 
-        // linea 2: etiologia → familia
-        if (indiceEtiologiaSeleccionada != -1 && indiceFamiliaSeleccionada != -1)
+        // linea 2: lesion → familia
+        if (indiceLesionSeleccionada != -1 && indiceFamiliaSeleccionada != -1)
         {
-            Button origen = botonesEtiologias[indiceEtiologiaSeleccionada];
+            Button origen = botonesLesiones[indiceLesionSeleccionada];
             Button destino = botonesFamilias[indiceFamiliaSeleccionada];
             Color color = lineaConectora.GetColorSeleccion();
             lineaConectora.CrearLinea(origen, destino, color);
         }
 
-        // linea 3: familia → lesion
-        if (indiceFamiliaSeleccionada != -1 && indiceLesionSeleccionada != -1)
+        // linea 3: familia → etiologia
+        if (indiceFamiliaSeleccionada != -1 && indiceEtiologiaSeleccionada != -1)
         {
             Button origen = botonesFamilias[indiceFamiliaSeleccionada];
-            Button destino = botonesLesiones[indiceLesionSeleccionada];
+            Button destino = botonesEtiologias[indiceEtiologiaSeleccionada];
             Color color = lineaConectora.GetColorSeleccion();
             lineaConectora.CrearLinea(origen, destino, color);
         }
 
         if (lineaConectora.HayLineas() &&
             indicePatologiaSeleccionada != -1 &&
-            indiceEtiologiaSeleccionada != -1 &&
+            indiceLesionSeleccionada != -1 &&
             indiceFamiliaSeleccionada != -1 &&
-            indiceLesionSeleccionada != -1)
+            indiceEtiologiaSeleccionada != -1)
         {
             int idx = 0;
 
             if (lineaConectora.CantidadLineas() > idx)
             {
-                Color color = (patologiaCorrectaSeleccionada && etiologiaCorrectaSeleccionada)
+                Color color = (patologiaCorrectaSeleccionada && lesionCorrectaSeleccionada)
                     ? lineaConectora.GetColorCorrecta()
                     : lineaConectora.GetColorIncorrecta();
                 lineaConectora.CambiarColorLinea(idx, color);
@@ -396,7 +396,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
             if (lineaConectora.CantidadLineas() > idx)
             {
-                Color color = (etiologiaCorrectaSeleccionada && familiaCorrectaSeleccionada)
+                Color color = (lesionCorrectaSeleccionada && familiaCorrectaSeleccionada)
                     ? lineaConectora.GetColorCorrecta()
                     : lineaConectora.GetColorIncorrecta();
                 lineaConectora.CambiarColorLinea(idx, color);
@@ -405,14 +405,14 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
             if (lineaConectora.CantidadLineas() > idx)
             {
-                Color color = (familiaCorrectaSeleccionada && lesionCorrectaSeleccionada)
+                Color color = (familiaCorrectaSeleccionada && etiologiaCorrectaSeleccionada)
                     ? lineaConectora.GetColorCorrecta()
                     : lineaConectora.GetColorIncorrecta();
                 lineaConectora.CambiarColorLinea(idx, color);
             }
 
-            if (!patologiaCorrectaSeleccionada || !etiologiaCorrectaSeleccionada ||
-                !familiaCorrectaSeleccionada || !lesionCorrectaSeleccionada)
+            if (!patologiaCorrectaSeleccionada || !lesionCorrectaSeleccionada ||
+                !familiaCorrectaSeleccionada || !etiologiaCorrectaSeleccionada)
             {
                 if (!finished)
                 {
@@ -421,16 +421,25 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             }
         }
     }
-
     //metodos para limpiar las selecciones posteriores a la seleccion de lesion, familia y etiologia
+    private void LimpiarSeleccionesPosterioresAPatologia()
+    {
+        indiceLesionSeleccionada = -1;
+        lesionCorrectaSeleccionada = false;
+        indiceFamiliaSeleccionada = -1;
+        familiaCorrectaSeleccionada = false;
+        indiceEtiologiaSeleccionada = -1;
+        etiologiaCorrectaSeleccionada = false;
+        RestablecerColoresTodosLosBloques();
+        ActualizarLineas();
+    }
+
     private void LimpiarSeleccionesPosterioresALesion()
     {
         indiceFamiliaSeleccionada = -1;
         familiaCorrectaSeleccionada = false;
         indiceEtiologiaSeleccionada = -1;
         etiologiaCorrectaSeleccionada = false;
-        indicePatologiaSeleccionada = -1;
-        patologiaCorrectaSeleccionada = false;
         RestablecerColoresTodosLosBloques();
         ActualizarLineas();
     }
@@ -439,16 +448,6 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     {
         indiceEtiologiaSeleccionada = -1;
         etiologiaCorrectaSeleccionada = false;
-        indicePatologiaSeleccionada = -1;
-        patologiaCorrectaSeleccionada = false;
-        RestablecerColoresTodosLosBloques();
-        ActualizarLineas();
-    }
-
-    private void LimpiarSeleccionesPosterioresAEtiologia()
-    {
-        indicePatologiaSeleccionada = -1;
-        patologiaCorrectaSeleccionada = false;
         RestablecerColoresTodosLosBloques();
         ActualizarLineas();
     }
@@ -456,10 +455,10 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     //metodo para restablecer los colores de todos los bloques de botones segun la seleccion actual
     private void RestablecerColoresTodosLosBloques()
     {
+        RestablecerColorBloque(botonesPatologias, indicePatologiaSeleccionada);
         RestablecerColorBloque(botonesLesiones, indiceLesionSeleccionada);
         RestablecerColorBloque(botonesFamilias, indiceFamiliaSeleccionada);
         RestablecerColorBloque(botonesEtiologias, indiceEtiologiaSeleccionada);
-        RestablecerColorBloque(botonesPatologias, indicePatologiaSeleccionada);
     }
 
     //metodos para validar la seleccion de lesion, familia, etiologia y patologia
@@ -493,7 +492,6 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         }
 
         RestablecerColoresTodosLosBloques();
-        PintarCaminoFinal();
         ActualizarLineas();
         ActualizarInteractividadBloques();
         VerificarProgresoArbol();
@@ -542,9 +540,9 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             botonesEtiologias[indice].GetComponent<Image>().color = colorNormal;
             indiceEtiologiaSeleccionada = -1;
             etiologiaCorrectaSeleccionada = false;
-            LimpiarSeleccionesPosterioresAEtiologia();
-            ActualizarInteractividadBloques();
+            RestablecerColoresTodosLosBloques();
             ActualizarLineas();
+            ActualizarInteractividadBloques();
             return;
         }
 
@@ -567,10 +565,11 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         }
 
         RestablecerColoresTodosLosBloques();
+        PintarCaminoFinal();
         ActualizarLineas();
         ActualizarInteractividadBloques();
+        VerificarProgresoArbol();
     }
-
     private void ValidarSeleccionPatologia(int indice)
     {
         if (indicePatologiaSeleccionada == indice)
@@ -578,9 +577,9 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             botonesPatologias[indice].GetComponent<Image>().color = colorNormal;
             indicePatologiaSeleccionada = -1;
             patologiaCorrectaSeleccionada = false;
-            RestablecerColoresTodosLosBloques();
-            ActualizarLineas();
+            LimpiarSeleccionesPosterioresAPatologia();
             ActualizarInteractividadBloques();
+            ActualizarLineas();
             return;
         }
 
@@ -605,12 +604,16 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         RestablecerColoresTodosLosBloques();
         ActualizarLineas();
         ActualizarInteractividadBloques();
-
     }
 
     //metodo para pintar el camino final de seleccion de lesion, familia, etiologia y patologia con colores verde o rojo segun si la seleccion es correcta o incorrecta
     private void PintarCaminoFinal()
     {
+        if (indicePatologiaSeleccionada != -1)
+        {
+            botonesPatologias[indicePatologiaSeleccionada].GetComponent<Image>().color = patologiaCorrectaSeleccionada ? Color.green : Color.red;
+        }
+
         if (indiceLesionSeleccionada != -1)
         {
             botonesLesiones[indiceLesionSeleccionada].GetComponent<Image>().color = lesionCorrectaSeleccionada ? Color.green : Color.red;
@@ -624,11 +627,6 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         if (indiceEtiologiaSeleccionada != -1)
         {
             botonesEtiologias[indiceEtiologiaSeleccionada].GetComponent<Image>().color = etiologiaCorrectaSeleccionada ? Color.green : Color.red;
-        }
-
-        if (indicePatologiaSeleccionada != -1)
-        {
-            botonesPatologias[indicePatologiaSeleccionada].GetComponent<Image>().color = patologiaCorrectaSeleccionada ? Color.green : Color.red;
         }
     }
 
@@ -653,13 +651,13 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
     public override void EntregarRetroalimentacion()
     {
-        if(botonPausa != null)
+        if (botonPausa != null)
         {
-            botonPausa.gameObject.SetActive(false);// desactivamos el boton de pausa en la pantalal de retroalimentacion para evitar acoplamiento
+            botonPausa.gameObject.SetActive(false);
         }
 
-        if (lesionCorrectaSeleccionada && familiaCorrectaSeleccionada &&
-            etiologiaCorrectaSeleccionada && patologiaCorrectaSeleccionada)
+        if (patologiaCorrectaSeleccionada && lesionCorrectaSeleccionada &&
+            familiaCorrectaSeleccionada && etiologiaCorrectaSeleccionada)
         {
             textoResultado.text = "¡Respuesta Correcta!";
             textoResultado.color = Color.white;
@@ -671,10 +669,10 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             textoResultado.color = Color.white;
 
             string erroresTexto = "";
+            if (!patologiaCorrectaSeleccionada) erroresTexto += "- Patologia incorrecta\n";
             if (!lesionCorrectaSeleccionada) erroresTexto += "- Lesion incorrecta\n";
             if (!familiaCorrectaSeleccionada) erroresTexto += "- Familia incorrecta\n";
             if (!etiologiaCorrectaSeleccionada) erroresTexto += "- Etiologia incorrecta\n";
-            if (!patologiaCorrectaSeleccionada) erroresTexto += "- Patologia incorrecta\n";
             textoRespuesta.text = " ";
         }
 
@@ -699,13 +697,9 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     //metodo para verificar si el usuario ha completado correctamente el arbol de decisiones y marcar el nivel como terminado
     private void VerificarProgresoArbol()
     {
-        if (lesionCorrectaSeleccionada && familiaCorrectaSeleccionada &&
-            etiologiaCorrectaSeleccionada && patologiaCorrectaSeleccionada)
+        if (patologiaCorrectaSeleccionada && lesionCorrectaSeleccionada &&
+            familiaCorrectaSeleccionada && etiologiaCorrectaSeleccionada)
         {
-           
-            Debug.Log("<color=green>¡Nivel Completado!</color>");
-            
-
             EntregarRetroalimentacion();
         }
         else
