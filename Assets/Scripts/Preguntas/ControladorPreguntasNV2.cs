@@ -226,7 +226,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         if (txt != null)
         {
             Lesion l = CsvManager.Instance.ObtenerLesionPorId(idLesionesBotones[indice]);
-            if (l != null) txt.text = l.nombre;
+            txt.text = "Lesión: " + (l != null ? l.nombre : "Desconocida");
         }
     }
 
@@ -237,7 +237,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         if (txt != null)
         {
             Familia f = CsvManager.Instance.ObtenerFamiliaPorId(idFamiliasBotones[indice]);
-            if (f != null) txt.text = f.nombre;
+            txt.text = "Familia: " + (f != null ? f.nombre : "Desconocida");
         }
     }
 
@@ -248,7 +248,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         if (txt != null)
         {
             Etiologia e = CsvManager.Instance.ObtenerEtiologiaPorId(idEtiologiasBotones[indice]);
-            if (e != null) txt.text = e.nombre;
+            txt.text = "Etiología: " + (e != null ? e.nombre : "Desconocida");
         }
     }
 
