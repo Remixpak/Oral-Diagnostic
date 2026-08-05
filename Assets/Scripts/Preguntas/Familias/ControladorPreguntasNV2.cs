@@ -488,6 +488,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             else
             {
                 GameManager.Instance.Fallos++;
+                GameManager.Instance.FFamilias++;
                 erroresNivel++;
             }
         }
@@ -526,6 +527,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             {
                 GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
+                GameManager.Instance.FFamilias++;
                 erroresNivel++;
             }
         }
@@ -562,6 +564,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             {
                 GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
+                GameManager.Instance.FFamilias++;
                 erroresNivel++;
             }
         }
@@ -598,6 +601,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             {
                 GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
+                GameManager.Instance.FFamilias++;
                 erroresNivel++;
             }
         }

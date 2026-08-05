@@ -2,6 +2,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Collections;
+using System.Reflection;
 public class ControladorGuardarDatos : MonoBehaviour
 {
     private string rutaPartida;
@@ -237,7 +238,7 @@ public class ControladorGuardarDatos : MonoBehaviour
 
         metricas.Id = Guid.NewGuid().ToString();
 
-        metricas.Nivel = nivel;
+        metricas.TipoNivel = nivel;
 
         metricas.ModoJuego = GameManager.Instance.modoActual;
 
@@ -253,6 +254,12 @@ public class ControladorGuardarDatos : MonoBehaviour
 
         metricas.TotalFallos = GameManager.Instance.Fallos;
 
+        /*metricas.FalloLesiones = GameManager.Instance.FLesiones;
+
+        metricas.FalloFamilias = GameManager.Instance.FFamilias;
+
+        metricas.FalloDiagnosticos = GameManager.Instance.FDiagnosticos;*/
+        //Debug.Log($"Guardando metrica con Lesiones: {metricas.FalloLesiones} del manager: {GameManager.Instance.FLesiones} Familias: {metricas.FalloFamilias} del manager: {GameManager.Instance.FFamilias} diagnosticos: {metricas.FalloDiagnosticos} del manager: {GameManager.Instance.FDiagnosticos}");
 
         if(!FirebaseInit.IsReady)
         {

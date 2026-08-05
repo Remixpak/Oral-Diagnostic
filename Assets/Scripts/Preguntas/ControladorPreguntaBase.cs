@@ -23,6 +23,8 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
     protected string respuestaSeleccionada;
     protected bool yaRespondio = false;
 
+    protected string tipoMateria;
+
     // Métodos abstractos que cada tipo de pregunta implementará a su manera
     protected abstract void ConfigurarPreguntaYRespuestas(int idPatologiaAsignada, out List<string> opciones, out List<Sprite> spritesOpciones);
 
@@ -118,6 +120,7 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
             {
                 GameManager.Instance.Aciertos++;
                 GameManager.Instance.TotalAciertos++;
+                
             }
         }
         else
@@ -127,6 +130,10 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
             {
                 GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
+                if(tipoMateria == "lesion")
+                    GameManager.Instance.FLesiones++;
+                else if(tipoMateria == "familia")
+                    GameManager.Instance.FFamilias++;
             }
         }
 

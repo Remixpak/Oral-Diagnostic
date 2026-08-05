@@ -307,6 +307,7 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
             {
                 GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
+                GameManager.Instance.FDiagnosticos++;
             }
 
             StartCoroutine(RestaurarColoresEspacios());
