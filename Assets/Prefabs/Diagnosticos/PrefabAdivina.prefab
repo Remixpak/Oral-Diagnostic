@@ -733,8 +733,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 8, y: 35}
-  m_SizeDelta: {x: 1108, y: 1692.88}
+  m_AnchoredPosition: {x: -0.0000070546944, y: 8}
+  m_SizeDelta: {x: 1108, y: 1609.9174}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &5376367761125414344
 CanvasRenderer:
@@ -1957,7 +1957,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.00001602485, y: -31}
+  m_AnchoredPosition: {x: -0.0000070546944, y: 0.0000076293945}
   m_SizeDelta: {x: 1108, y: 2010.4521}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7971624453024453528
@@ -3838,9 +3838,6 @@ MonoBehaviour:
   patologiaSeleccionada: 
   panelSnackbar: {fileID: 8249306437849625007}
   textoSnackbar: {fileID: 2150328218015044307}
-  libretaCanvas: {fileID: 0}
-  textoNota: {fileID: 0}
-  panelNota: {fileID: 0}
   textoDiag: {fileID: 2663494696108206695}
   canvasSeleccion: {fileID: 8958097853750127205}
   Seleccionado: {fileID: 0}
@@ -4543,8 +4540,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.2379, y: 20.117}
-  m_SizeDelta: {x: 110.9128, y: 105.3153}
+  m_AnchoredPosition: {x: 0.00069475, y: 23.2322}
+  m_SizeDelta: {x: 121.05, y: 105.2095}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3900880486608884900
 CanvasRenderer:
@@ -6368,8 +6365,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: -0.000030517578}
-  m_SizeDelta: {x: 122, y: 152}
+  m_AnchoredPosition: {x: 0.00014567, y: 1.5337}
+  m_SizeDelta: {x: 142.45, y: 150.1951}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &5127542099454737904
 CanvasRenderer:
@@ -6465,7 +6462,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -9.645676, y: 108.85192, z: -7.9434967, w: 0}
+  m_margin: {x: 0.7522812, y: 108.85192, z: 0.61950684, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -6585,8 +6582,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 4.0369, y: -184.62189}
-  m_SizeDelta: {x: 920.06, y: 187.9069}
+  m_AnchoredPosition: {x: 0, y: -164}
+  m_SizeDelta: {x: 920.06, y: 70.158}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7098336052473687425
 CanvasRenderer:
@@ -6609,7 +6606,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.5019608, b: 0.5019608, a: 1}
+  m_Color: {r: 0, g: 0.5019608, b: 0.5019608, a: 0.5882353}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7052,7 +7049,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2538361153026993473, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 1950.4467
+      value: 2045.6725
       objectReference: {fileID: 0}
     - target: {fileID: 2538361153026993473, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -7060,7 +7057,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2538361153026993473, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -91.52763
+      value: -139.12431
+      objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1405.2078
+      objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -61.099243
       objectReference: {fileID: 0}
     - target: {fileID: 4419934513849947234, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_IsActive

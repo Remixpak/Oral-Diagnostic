@@ -1024,8 +1024,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2.422, y: 0.0010223}
-  m_SizeDelta: {x: 461.69, y: 493.07}
+  m_AnchoredPosition: {x: 0.17307, y: 3.7271}
+  m_SizeDelta: {x: 456.5, y: 485.617}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7455358265152218687
 CanvasRenderer:
@@ -1474,10 +1474,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1080, y: 1920}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1571,7 +1571,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -944189529354747981, guid: c98356cc8f9c09d42906287a32cdf7ab, type: 3}
+  m_Sprite: {fileID: 5581372884850608034, guid: ae651ea7ee9da014e9837eccc3a093e2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1702,7 +1702,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 3529569473858704608}
         m_TargetAssemblyTypeName: Pausa, Assembly-CSharp
         m_MethodName: AbrirPanelPausa
         m_Mode: 1
@@ -1947,8 +1947,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000015258789, y: 0.0012054443}
-  m_SizeDelta: {x: 459.16, y: 493.07}
+  m_AnchoredPosition: {x: 0.43269348, y: 2.6629944}
+  m_SizeDelta: {x: 449.6398, y: 487.7465}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3712408111382263456
 CanvasRenderer:
@@ -2099,8 +2099,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000015259, y: 0.00019836}
-  m_SizeDelta: {x: 459.16, y: 497.16}
+  m_AnchoredPosition: {x: -0, y: -0.00058876}
+  m_SizeDelta: {x: 450.5053, y: 497.16}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5937833135512178920
 CanvasRenderer:
@@ -2166,7 +2166,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7805587015057092347}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
@@ -2577,7 +2577,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.282353, g: 0.8196079, b: 0.8000001, a: 1}
+  m_Color: {r: 0.36078432, g: 0.7019608, b: 0.75686276, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2887,8 +2887,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2.715, y: 0.00011444}
-  m_SizeDelta: {x: 470.21, y: 497.16}
+  m_AnchoredPosition: {x: -0.0000038146973, y: 0.000048847}
+  m_SizeDelta: {x: 464.78, y: 497.16}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8593639232660955666
 CanvasRenderer:
@@ -2964,6 +2964,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -159.3797
       objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1355.8601
+      objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -119.04358
+      objectReference: {fileID: 0}
     - target: {fileID: 4419934513849947234, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -3012,6 +3020,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5307102111972172905, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6812482372847996720, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_Name
       value: ManejadorPausa
@@ -3030,6 +3042,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4419934513849947234, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
   m_PrefabInstance: {fileID: 3165501620814989008}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3529569473858704608 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1951626884621062704, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+  m_PrefabInstance: {fileID: 3165501620814989008}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947a84540b093bc47ae7ded5e98cfebd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ajustes
 --- !u!1 &3613795020177708321 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1857974124427432945, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
