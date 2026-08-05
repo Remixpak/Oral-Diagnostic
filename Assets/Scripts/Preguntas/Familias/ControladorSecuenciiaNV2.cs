@@ -268,6 +268,7 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
             {
                 GameManager.Instance.Fallos++;
                 GameManager.Instance.TotalFallos++;
+                GameManager.Instance.FFamilias++;
                 erroresNivel++;
             }
         }

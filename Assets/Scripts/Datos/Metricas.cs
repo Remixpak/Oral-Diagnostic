@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class Metricas : IFirestoreData
 {
     public string Id;
-    public string Nivel;
+    public string TipoNivel;
     public GameManager.ModoJuego ModoJuego;
     public int NumeroJugador;
     public float TiempoJuego;
@@ -14,12 +14,16 @@ public class Metricas : IFirestoreData
     public int TotalAciertos;
     public int TotalFallos;
 
+    //public int FalloLesiones;
+    //public int FalloFamilias;
+    //public int FalloDiagnosticos;
+
     public Dictionary<string, object> ToFirestore()
     {
         return new Dictionary<string, object>()
         {
             { "id", Id },
-            { "nivel", Nivel },
+            { "nivel", TipoNivel },
             { "modoJuego", ModoJuego.ToString() },
             { "numeroJugador", NumeroJugador },
             { "tiempoJuego", TiempoJuego },
@@ -27,6 +31,9 @@ public class Metricas : IFirestoreData
             { "totalReinicios", TotalReinicios },
             { "totalAciertos", TotalAciertos },
             { "totalFallos", TotalFallos }
+            /*{"falloLesiones", FalloLesiones},
+            {"falloFamilias", FalloFamilias},
+            {"falloDiagnosticos", FalloDiagnosticos}*/
         };
     }
 }

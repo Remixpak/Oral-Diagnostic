@@ -207,6 +207,10 @@ using System.Linq;
 
 public class PreguntaLesionPorImagen : ControladorPreguntaBase
 {
+    void Start()
+    {
+        tipoMateria = "lesion";
+    }
     protected override void ConfigurarPreguntaYRespuestas(int idPatologiaAsignada, out List<string> opciones, out List<Sprite> spritesOpciones)
     {
         spritesOpciones = null;

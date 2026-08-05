@@ -40,13 +40,28 @@ public class GameManager : MonoBehaviour
     [SerializeField] public int Aciertos = 0;
     [SerializeField] public int Fallos = 0;
 
+    [SerializeField] public int FLesiones;
+    [SerializeField] public int FFamilias;
+    [SerializeField] public int FDiagnosticos;
+
     public int TotalAciertos; public int TotalFallos;
 
-    [Header("Prefabs de Niveles")]
-    [SerializeField] private GameObject prefabTrivia;
-    [SerializeField] private GameObject prefabArbolDeciciones;
-    [SerializeField] private GameObject prefabNv4Conceptos;
-    [SerializeField] private GameObject prefabAdivinaQuien;
+    [Header("Prefabs Lesiones")]
+    [SerializeField] private GameObject prefabDescripciones;
+    [SerializeField] private GameObject prefabLesion;
+    [SerializeField] private GameObject prefabManifestaciones;
+
+    [Header("Prefabs familias")]
+    [SerializeField] private GameObject prefabRelacionCorrecta;
+    [SerializeField] private GameObject prefabFamiliaCorrespondiente;
+    [SerializeField] private GameObject prefabEtiopatogeniaCorrespondiente;
+    [SerializeField] private GameObject prefabEnlazeManifestacion;
+    [SerializeField] private GameObject prefabAsociarSecuenciaConManifestacion;
+    [Header("Prefabs diagnosticos")]
+    [SerializeField] private GameObject prefabAdivina2Preguntas;
+    [SerializeField] private GameObject prefabAdivina4Preguntas;
+    [SerializeField] private GameObject prefabAdivina6Preguntas;
+    [SerializeField] private GameObject prefab4Conceptos;
 
     [Header("Canvas")]
     [SerializeField] public Canvas canvasResultados;
@@ -220,92 +235,24 @@ public class GameManager : MonoBehaviour
 
     private void ConfigurarQuickPlay()
     {
-        PrepararIDs();//mezclamos los ids de patologias 
+        PrepararIDs();
         colaPreguntas.Clear();
 
-        //niveles disponibles 
-        TipoPregunta[] tiposDisponibles = {
-            TipoPregunta.Trivia,
-            TipoPregunta.Arbol,
-            TipoPregunta.Conceptos,
-            TipoPregunta.AdivinaQuien
-        };
+        // Arreglo con todos los tipos de pregunta/prefabs disponibles
+        TipoPregunta[] todosLosTipos = (TipoPregunta[])System.Enum.GetValues(typeof(TipoPregunta));
 
-        //generamos las 30 preguntas 
-        for (int i = 0; i < 30; i++)
+        // Opción A: Agregar todos los prefabs ordenados
+        foreach (TipoPregunta tipo in todosLosTipos)
         {
-            TipoPregunta tipoAleatorio = tiposDisponibles[Random.Range(0, tiposDisponibles.Length)];//elegimos un nivel aleatorio 
-            int idPat = ObtenerID();//le agregamos una patologia aleatoria 
-
-            if (idPat == -1)//si se acaban los ids recargamos la lista 
-            {
-                PrepararIDs();
-                idPat = ObtenerID();
-            }
-            //agregamos la pregunta a la cola 
-            colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = idPat, tipo = tipoAleatorio });
+            colaPreguntas.Enqueue(new PreguntaRonda 
+            { 
+                idPatologia = ObtenerID(), 
+                tipo = tipo 
+            });
         }
     }
 
-    /*private IEnumerator LoopPrincipalJuego()
-    {
-        while (modoActual == ModoJuego.Carrera && nivelActual < 4)
-        {
-            TotalAciertos = 0;
-            TotalFallos = 0;
-            continuarCarrera = false;
-
-            if (canvasResultados != null)
-                canvasResultados.gameObject.SetActive(false);
-
-            ConfigurarCarrera(nivelActual);
-            yield return StartCoroutine(MostrarTutorialNivel(nivelActual));
-
-            juegoActivo = true;
-
-            while (colaPreguntas.Count > 0)
-            {
-                PreguntaRonda pregunta = colaPreguntas.Dequeue();
-                GameObject prefab = ObtenerPrefab(pregunta.tipo);
-
-                nivelInstanciado = Instantiate(prefab);
-                ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
-                controlador.InicializarPregunta(pregunta.idPatologia);
-
-                yield return new WaitUntil(() => controlador.finished);
-
-                Destroy(nivelInstanciado);
-            }
-
-            if (PuedePasar())
-            {
-                switch (nivelActual)
-                {
-                    case 1: ActualizarProgreso(true, false, false); break;
-                    case 2: ActualizarProgreso(true, true, false); break;
-                    case 3: ActualizarProgreso(true, true, true); break;
-                }
-
-                if (ControladorGuardarDatos.Instance != null)
-                {
-                    ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(Dificultad, lv1Completado, lv2Completado, lv3Completado));
-                }
-            }
-
-            TotalIntentos++;
-            juegoActivo = false;
-
-            MostrarResultados();
-
-            continuarCarrera = false;
-            yield return new WaitUntil(() => continuarCarrera);
-
-            if (PuedePasar() && nivelActual >= 4)
-            {
-                nivelActual = 4;
-            }
-        }
-    }*/
+    
     private IEnumerator LoopPrincipalJuego()
     {
         while (!ModoFinalizado())
@@ -516,7 +463,23 @@ public class GameManager : MonoBehaviour
             // Guardar Métricas
             if (ControladorGuardarDatos.Instance != null)
             {
-                string claveNivel = nivelActual < 4 ? nivelActual.ToString() : "Carrera completada";
+                //string claveNivel = nivelActual < 4 ? nivelActual.ToString() : "Carrera completada";
+                string claveNivel;
+                switch(nivelActual)
+                {
+                    case 1:
+                        claveNivel = "Lesiones"; 
+                        break;
+                    case 2:
+                        claveNivel = "Familias/Etiopatogenias";
+                        break;
+                    case 3:
+                        claveNivel = "Diagnosticos";
+                        break;
+                    default:
+                        claveNivel = "Carrera completada";
+                        break;
+                }
                 ControladorGuardarDatos.Instance.GuardarMetricas(claveNivel);
             }
         }
@@ -596,20 +559,25 @@ public class GameManager : MonoBehaviour
 
         switch (nivel)
         {
-            case 1:
-                for (int i = 0; i < 1; i++)
-                    colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Trivia });
+            case 1: // Nivel 1: Lesiones (3 sub-niveles)
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Descripciones }); // O el enum correspondiente para prefabDescripciones
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Lesion }); // prefabLesion
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Manifestaciones }); // prefabManifestaciones
                 break;
-            case 2:
-                for (int i = 0; i < 1; i++)
-                    colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Arbol });
+
+            case 2: // Nivel 2: Familias y Etiopatogenia (5 sub-niveles)
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.RelacionCorrecta }); // prefabRelacionCorrecta
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.FamiliaCorrespondiente }); // prefabFamiliaCorrespondiente
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.EtiopatogeniaCorrespondiente }); // prefabEtiopatogeniaCorrespondiente
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.EnlazeManifestacion }); // prefabEnlazeManifestacion
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.AsociarSecuenciaConManifestacion }); // prefabAsociarSecuenciaConManifestacion
                 break;
-            case 3:
-                for (int i = 0; i < 1; i++)
-                {
-        
-                    colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.AdivinaQuien });
-                }
+
+            case 3: // Nivel 3: Diagnósticos (4 sub-niveles)
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Adivina2Preguntas }); // prefabAdivina2Preguntas
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Adivina4Preguntas }); // prefabAdivina4Preguntas
+                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Adivina6Preguntas }); // prefabAdivina6Preguntas
+                //colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.CuatroConceptos });     // prefab4Conceptos
                 break;
         }
     }
@@ -624,18 +592,28 @@ public class GameManager : MonoBehaviour
 
         if (ConfiguracionPartida.Lesiones)
         {
-            tiposDisponibles.Add(TipoPregunta.Trivia);
+            tiposDisponibles.Add(TipoPregunta.Descripciones);
+            tiposDisponibles.Add(TipoPregunta.Lesion);
+            tiposDisponibles.Add(TipoPregunta.Manifestaciones);
         }
 
         if (ConfiguracionPartida.FamiliasEtiopatogenias)
         {
-            tiposDisponibles.Add(TipoPregunta.Arbol);
+            tiposDisponibles.Add(TipoPregunta.RelacionCorrecta);
+            tiposDisponibles.Add(TipoPregunta.FamiliaCorrespondiente);
+            tiposDisponibles.Add(TipoPregunta.EtiopatogeniaCorrespondiente);
+            tiposDisponibles.Add(TipoPregunta.EnlazeManifestacion);
+            tiposDisponibles.Add(TipoPregunta.AsociarSecuenciaConManifestacion);
+
         }
 
         if (ConfiguracionPartida.Diagnosticos)
         {
-            tiposDisponibles.Add(TipoPregunta.Conceptos);
-            tiposDisponibles.Add(TipoPregunta.AdivinaQuien);
+            tiposDisponibles.Add(TipoPregunta.Adivina2Preguntas);
+            tiposDisponibles.Add(TipoPregunta.Adivina4Preguntas);
+            tiposDisponibles.Add(TipoPregunta.Adivina6Preguntas);
+            tiposDisponibles.Add(TipoPregunta.CuatroConceptos);
+
         }
 
         // Seguridad, aunque el botón ya debería impedir llegar aquí.
@@ -698,12 +676,28 @@ public class GameManager : MonoBehaviour
     {
         switch (tipo)
         {
-            case TipoPregunta.Trivia: return prefabTrivia;
-            case TipoPregunta.Arbol: return prefabArbolDeciciones;
-            case TipoPregunta.Conceptos: return prefabNv4Conceptos;
-            case TipoPregunta.AdivinaQuien: return prefabAdivinaQuien;
+            // Nivel 1
+            case TipoPregunta.Descripciones: return prefabDescripciones;
+            case TipoPregunta.Lesion: return prefabLesion;
+            case TipoPregunta.Manifestaciones: return prefabManifestaciones;
+
+            // Nivel 2
+            case TipoPregunta.RelacionCorrecta: return prefabRelacionCorrecta;
+            case TipoPregunta.FamiliaCorrespondiente: return prefabFamiliaCorrespondiente;
+            case TipoPregunta.EtiopatogeniaCorrespondiente: return prefabEtiopatogeniaCorrespondiente;
+            case TipoPregunta.EnlazeManifestacion: return prefabEnlazeManifestacion;
+            case TipoPregunta.AsociarSecuenciaConManifestacion: return prefabAsociarSecuenciaConManifestacion;
+
+            // Nivel 3
+            case TipoPregunta.Adivina2Preguntas: return prefabAdivina2Preguntas;
+            case TipoPregunta.Adivina4Preguntas: return prefabAdivina4Preguntas;
+            case TipoPregunta.Adivina6Preguntas: return prefabAdivina6Preguntas;
+            case TipoPregunta.CuatroConceptos: return prefab4Conceptos;
+
+            default:
+                Debug.LogError($"Tipo de pregunta no mapeado: {tipo}");
+                return null;
         }
-        return null;
     }
 
     private void ActualizarProgreso(bool lv1, bool lv2, bool lv3)
