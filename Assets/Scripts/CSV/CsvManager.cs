@@ -224,4 +224,11 @@ public class CsvManager : MonoBehaviour
         Patologia p = ObtenerPatologiaPorId(patologiaId);
         return p != null ? spritePorCodigo(p.codigoImagen) : null;
     }
+    public Sprite ObtenerSpriteDePatologia(Patologia patologia)
+{
+    if (patologia == null) return null;
+    
+    
+    return Resources.Load<Sprite>($"Imagenes/{patologia.codigoImagen}"); 
+}
 }

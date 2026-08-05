@@ -158,7 +158,7 @@ MonoBehaviour:
   Fallos: 0
   TotalAciertos: 0
   TotalFallos: 0
-  prefabTrivia: {fileID: 1004038243964686011, guid: 10799ad4425d6e9479d3181fabb3d020, type: 3}
+  prefabTrivia: {fileID: 4396750530708920905, guid: 3772ab72575257343a7b524d2a2bceca, type: 3}
   prefabArbolDeciciones: {fileID: 5179271380761848784, guid: c15545bb3caff65459806f86ea18e88e, type: 3}
   prefabNv4Conceptos: {fileID: 1883780828410608334, guid: bd99bf8ce4171fb4aa920ac9d394a3fb, type: 3}
   prefabAdivinaQuien: {fileID: 4756381046916451345, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
