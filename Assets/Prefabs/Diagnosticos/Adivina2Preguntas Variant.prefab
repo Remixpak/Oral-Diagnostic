@@ -28,6 +28,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -496
       objectReference: {fileID: 0}
+    - target: {fileID: 601472864264518693, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1890438093484851779, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
       propertyPath: m_LocalScale.x
       value: 5.727125
@@ -48,9 +52,29 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 495
       objectReference: {fileID: 0}
+    - target: {fileID: 3755963806798590649, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.0000081594235
+      objectReference: {fileID: 0}
     - target: {fileID: 4756381046916451345, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
       propertyPath: m_Name
       value: Adivina2Preguntas Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 5192368809251900611, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.00000254013
+      objectReference: {fileID: 0}
+    - target: {fileID: 6376411092069600101, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6376411092069600101, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6376411092069600101, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7323409122234441732, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
       propertyPath: m_LocalPosition.x
