@@ -231,28 +231,34 @@ public class GameManager : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(LoopPrincipalJuego());
     }
-    
 
-    private void ConfigurarQuickPlay()
+
+    private void ConfigurarQuickPlay() // # recordar configurar esta wea con la cantidad de preguntas que se quiera en el quickplay
     {
         PrepararIDs();
         colaPreguntas.Clear();
 
-        // Arreglo con todos los tipos de pregunta/prefabs disponibles
         TipoPregunta[] todosLosTipos = (TipoPregunta[])System.Enum.GetValues(typeof(TipoPregunta));
 
-        // Opción A: Agregar todos los prefabs ordenados
-        foreach (TipoPregunta tipo in todosLosTipos)
+        List<TipoPregunta> tiposMezclados = new List<TipoPregunta>(todosLosTipos);
+
+        for (int i = 0; i < tiposMezclados.Count; i++)
         {
-            colaPreguntas.Enqueue(new PreguntaRonda 
-            { 
-                idPatologia = ObtenerID(), 
-                tipo = tipo 
+            int j = Random.Range(0, tiposMezclados.Count);
+            (tiposMezclados[i], tiposMezclados[j]) = (tiposMezclados[j], tiposMezclados[i]);
+        }
+
+        foreach (TipoPregunta tipo in tiposMezclados)
+        {
+            colaPreguntas.Enqueue(new PreguntaRonda
+            {
+                idPatologia = ObtenerID(),
+                tipo = tipo
             });
         }
     }
 
-    
+
     private IEnumerator LoopPrincipalJuego()
     {
         while (!ModoFinalizado())

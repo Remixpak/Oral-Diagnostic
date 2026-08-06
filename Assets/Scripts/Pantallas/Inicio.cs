@@ -148,6 +148,11 @@ public class Inicio : MonoBehaviour
         else
             textoBorrado.text = "No existe partida";
         ControladorGuardarDatos.Instance.EliminarPartida();
+
+        if (panelAjustes != null) panelAjustes.SetActive(false);//cerramos el panel de ajustes
+        if (panelConfirmacion != null) panelConfirmacion.SetActive(false); // cerramos el panel de confirmacion
+        if (panelAvisoSinPartida != null) panelAvisoSinPartida.SetActive(false); // cerramos el panel de aviso de que no hay partida guardada
+
         StartCoroutine(PanelBorrado());
     }
 

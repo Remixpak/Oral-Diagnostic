@@ -293,8 +293,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 7.803833, y: -114.7218}
-  m_SizeDelta: {x: 805.3379, y: 245.5753}
+  m_AnchoredPosition: {x: 0, y: -184.61328}
+  m_SizeDelta: {x: 805.3379, y: 106.0979}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4989935153212359088
 CanvasRenderer:
@@ -571,7 +571,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 1.210083, y: 282.21753}
+  m_AnchoredPosition: {x: 0, y: 68}
   m_SizeDelta: {x: 938.26, y: 1015.4058}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1522669845697629781
@@ -674,7 +674,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.282353, g: 0.8196079, b: 0.8000001, a: 1}
+  m_Color: {r: 0.36078432, g: 0.7019608, b: 0.75686276, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1058,10 +1058,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6624283639585104782}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 43.852}
-  m_SizeDelta: {x: 0, y: 137.7}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0.00030088}
+  m_SizeDelta: {x: 806, y: 106.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7759799842808413177
 CanvasRenderer:
@@ -1237,10 +1237,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1080, y: 1920}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1422,7 +1422,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 33.349792, y: -46.177246}
+  m_AnchoredPosition: {x: 32, y: -35}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &2613716929738563772
@@ -1507,7 +1507,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 7907293620892283545}
         m_TargetAssemblyTypeName: Pausa, Assembly-CSharp
         m_MethodName: AbrirPanelPausa
         m_Mode: 1
@@ -1812,7 +1812,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 486.13928}
+  m_AnchoredPosition: {x: 0, y: 430}
   m_SizeDelta: {x: 923.643, y: 622.4032}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6976388083464080263
@@ -2812,6 +2812,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -159.3797
       objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1472.9822
+      objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -121.64282
+      objectReference: {fileID: 0}
     - target: {fileID: 4419934513849947234, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -2883,6 +2891,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4419934513849947234, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
   m_PrefabInstance: {fileID: 8550589568994238633}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7907293620892283545 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1951626884621062704, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+  m_PrefabInstance: {fileID: 8550589568994238633}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947a84540b093bc47ae7ded5e98cfebd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ajustes
 --- !u!1 &8025716316219552600 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1857974124427432945, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
