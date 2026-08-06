@@ -74,6 +74,7 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
 {
     [Header("Configuración Múltiple Selección")]
     [SerializeField] private TMP_Text textoSeleccionMultiple;
+    [SerializeField] private string segundaRespuestaCorrecta = "";
 
     private List<string> respuestasCorrectasLista = new List<string>();
     private List<string> respuestasSeleccionadasLista = new List<string>();
@@ -162,6 +163,16 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
             respuestaCorrecta = respuestasCorrectasLista[0];
         }
 
+        if (respuestasCorrectasLista.Count > 1)
+        {
+            segundaRespuestaCorrecta = respuestasCorrectasLista[1];
+        }
+
+        else
+        {
+            segundaRespuestaCorrecta = ""; 
+        }
+
         // 5. Activar indicador visual de Selección Múltiple si hay > 1 descripción correcta
         if (textoSeleccionMultiple != null)
         {
@@ -179,17 +190,51 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
             opciones.Add(resp);
         }
 
-        // 7. Cargar distractores válidos (descripciones que no pertenezcan a ninguna de estas lesiones)
+        // filtramos solo las descripciones validas
         List<Descripcion> restoDescripciones = CsvManager.Instance.descripciones
-            .Where(d => !idsDescripcionesCorrectas.Contains(d.id) && !respuestasCorrectasLista.Contains(d.texto))
+            .Where(d => !idsDescripcionesCorrectas.Contains(d.id)
+                        && !respuestasCorrectasLista.Contains(d.texto)
+                        && !string.IsNullOrWhiteSpace(d.texto)) // ← FILTRO CLAVE
             .ToList();
 
-        while (opciones.Count < botonesAlternativas.Count && restoDescripciones.Count > 0)
+        // mezclamos los distractores
+        restoDescripciones = restoDescripciones.OrderBy(x => Random.value).ToList();
+
+        int contadorSeguridad = 0;
+        int maxIntentos = 100;
+
+        while (opciones.Count < botonesAlternativas.Count && contadorSeguridad < maxIntentos)
         {
-            int idx = Random.Range(0, restoDescripciones.Count);
-            opciones.Add(restoDescripciones[idx].texto);
-            restoDescripciones.RemoveAt(idx);
+            contadorSeguridad++;
+
+            if (restoDescripciones.Count > 0)
+            {
+                Descripcion dDist = restoDescripciones[0];
+                restoDescripciones.RemoveAt(0);
+
+                // verificamos que el texto no este vacio 
+                if (!string.IsNullOrWhiteSpace(dDist.texto))
+                {
+                    opciones.Add(dDist.texto);
+                }
+                //si el texto esta vacio sigue con el siguiente
+            }
+            else
+            {
+                // si no hay mas distractores válidos, agregamos una opción falsa 
+                string distractorFalso = $"Definición falsa {opciones.Count + 1}";
+                opciones.Add(distractorFalso);
+            }
         }
+
+        // si faltan opciones se rellenan con alternativas por defecto 
+        while (opciones.Count < botonesAlternativas.Count)
+        {
+            opciones.Add($"Definición {opciones.Count + 1}");
+        }
+
+        // mezclamos las opciones finales
+        opciones = opciones.OrderBy(x => Random.value).ToList();
     }
 
     protected override void SeleccionarAlternativa(Button boton, string valorSeleccionado)

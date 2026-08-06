@@ -168,7 +168,7 @@ MonoBehaviour:
   prefabFamiliaCorrespondiente: {fileID: 347269366345914026, guid: bde644aa23667694886222f5cf564613, type: 3}
   prefabEtiopatogeniaCorrespondiente: {fileID: 1004038243964686011, guid: 10799ad4425d6e9479d3181fabb3d020, type: 3}
   prefabEnlazeManifestacion: {fileID: 5179271380761848784, guid: c15545bb3caff65459806f86ea18e88e, type: 3}
-  prefabAsociarSecuenciaConManifestacion: {fileID: 5179271380761848784, guid: c15545bb3caff65459806f86ea18e88e, type: 3}
+  prefabAsociarSecuenciaConManifestacion: {fileID: 5179271380761848784, guid: 7324ce46c6516af40a25d6f0330cbd32, type: 3}
   prefabAdivina2Preguntas: {fileID: 8178925132141203327, guid: f78832d40e133cd43bc2cbff2d9d87a2, type: 3}
   prefabAdivina4Preguntas: {fileID: 4396750530708920905, guid: 3772ab72575257343a7b524d2a2bceca, type: 3}
   prefabAdivina6Preguntas: {fileID: 4756381046916451345, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
