@@ -752,7 +752,7 @@ public class ControladorAdivina : ControladorPreguntas
     {
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         Etiologia e = CsvManager.Instance.ObtenerEtiologiaPorId(p.etiologiaID);
-        string pista = $"La Etiologia es: {e.nombre}";
+        string pista = $"La Etiopatogenia es: {e.nombre}";
         MostrarPista(pista);
         
     }
