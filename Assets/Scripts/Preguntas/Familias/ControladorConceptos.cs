@@ -93,34 +93,4 @@ public class ControladorConceptos : ControladorPreguntaBase
             opciones.Add(distractoresDisponibles[i]);
         }
     }
-void Start()
-    {
-        if (botonPausa != null)
-        {
-            botonPausa.onClick.RemoveAllListeners();
-            botonPausa.onClick.AddListener(() =>
-            {
-                if (GameManager.Instance != null)
-                {
-                    if (Time.timeScale == 1f)
-                        GameManager.Instance.PausarJuego();
-                    else
-                        GameManager.Instance.ReanudarJuego();
-                }
-                else
-                {
-                    Time.timeScale = Time.timeScale == 1 ? 0 : 1;
-                }
-            });
-            botonPausa.interactable = true;
-        }
-    }
-
-    void Update()
-    {
-        if (botonPausa != null && !botonPausa.interactable)
-        {
-            botonPausa.interactable = true;
-        }
-    }
 }
