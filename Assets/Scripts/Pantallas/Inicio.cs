@@ -228,7 +228,7 @@ public class Inicio : MonoBehaviour
     {
         
         panelBorrado.SetActive(true);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.5f);
         panelBorrado.gameObject.SetActive(false);
     }
 }
