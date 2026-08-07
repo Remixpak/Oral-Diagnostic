@@ -18,8 +18,8 @@ id,nombre,idLesiones
 17,Mácula/Papula,13;15
 18,Nódulo,14
 19,Nódulo/Tumor,14;19
-20,Papula,13
-21,Papula/Nódulo,13;14
+20,Papula,15
+21,Papula/Nódulo,15;14
 22,Placa,16
 23,Placa/Erosión,16;10
 24,Placa/Úlcera/Nódulo/Tumor,16;20;14;19
