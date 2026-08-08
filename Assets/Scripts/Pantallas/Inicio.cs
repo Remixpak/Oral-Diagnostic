@@ -28,8 +28,11 @@ public class Inicio : MonoBehaviour
     [Header("borrado")]
     [SerializeField] private GameObject panelBorrado;
     [SerializeField] private TMP_Text textoBorrado;
+
+    private ObjetivoIntro objetivoIntro;
     void Start()
     {
+        objetivoIntro = GetComponent<ObjetivoIntro>();
         if (toggleSonido != null && ControladorSonido.Instance != null)
         {
             toggleSonido.SetValue(ControladorSonido.Instance.SonidoActivado(), false);
@@ -84,9 +87,39 @@ public class Inicio : MonoBehaviour
     public void IrAJugar()
     {
         ControladorSonido.Instance?.ReproducirClick();
+        Debug.Log("pasando a jugar");
+        if (!ControladorGuardarDatos.Instance.ExistePartida())
+        {
+            // 1. Iniciamos el texto del objetivo/intro (cambia el string por tu mensaje real)
+            if (objetivoIntro != null)
+            {
+                objetivoIntro.IniciarMensaje();
+            }
+
+            // 2. Ahora sí iniciamos la corrutina que esperará a que termine
+            StartCoroutine(CargarEscenaSecuencia());
+            Debug.Log("Cargando corutina");
+        }
+        else
+        {
+            SceneManager.LoadScene("PantallaSeleccion");
+            Debug.Log("Pasando a la escena habia partida");
+        }
+        
+    }
+    
+
+
+    private IEnumerator CargarEscenaSecuencia()
+    {
+        // Si el script de texto existe y está ejecutando la animación, esperamos
+        if (objetivoIntro != null && objetivoIntro.Escribiendo)
+        {
+            yield return new WaitUntil(() => !objetivoIntro.Escribiendo);
+        }
+
         SceneManager.LoadScene("PantallaSeleccion");
     }
-
     public void AlternarModoZurdo(bool activado)
     {
         PlayerPrefs.SetInt("ModoZurdo", activado ? 1 : 0);
