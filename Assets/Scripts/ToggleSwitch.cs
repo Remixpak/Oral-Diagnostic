@@ -8,6 +8,7 @@ using UnityEngine.XR;
 public enum TipoToggle
 {
     Sonido,
+    Musica,
     ModoZurdo
 }
 
@@ -51,6 +52,11 @@ public class ToggleSwitch: MonoBehaviour
                         ControladorSonido.Instance.SonidoActivado();
                 break;
 
+            case TipoToggle.Musica: 
+                estado = ControladorSonido.Instance != null &&
+                        ControladorSonido.Instance.MusicaActivada();
+                break;
+
             case TipoToggle.ModoZurdo:
                 estado = PlayerPrefs.GetInt("ModoZurdo", 0) == 1;
                 break;
@@ -71,6 +77,10 @@ public class ToggleSwitch: MonoBehaviour
         {
             case TipoToggle.Sonido:
                 ControladorSonido.Instance?.SetSonidoActivado(prendio);
+                break;
+
+            case TipoToggle.Musica:  
+                ControladorSonido.Instance?.SetMusicaActivada(prendio);
                 break;
 
             case TipoToggle.ModoZurdo:

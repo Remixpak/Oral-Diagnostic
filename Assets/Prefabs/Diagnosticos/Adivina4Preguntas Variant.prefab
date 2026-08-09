@@ -8,6 +8,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1920666249987290716}
     m_Modifications:
+    - target: {fileID: 1857974124427432945, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809762713903998316, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 947.828
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809762713903998316, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 253.5378
+      objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1300.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.0069293976
+      objectReference: {fileID: 0}
+    - target: {fileID: 4419934513849947234, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4710141173113953731, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_LocalPosition.x
       value: 941.39874
@@ -48,9 +72,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5085152418097667933, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 947.828
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085152418097667933, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 253.5378
+      objectReference: {fileID: 0}
     - target: {fileID: 6812482372847996720, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_Name
       value: ManejadorPausa
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780148015564828799, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 947.828
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780148015564828799, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 253.5378
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -192,6 +232,10 @@ PrefabInstance:
     - target: {fileID: 5192368809251900611, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6265311391086277337, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6376411092069600101, guid: 9a410870b92788347b93b85eeb2c61af, type: 3}
       propertyPath: m_SizeDelta.x

@@ -107,6 +107,7 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
     protected virtual void SeleccionarAlternativa(Button boton, string valorSeleccionado)
     {
         if (yaRespondio) return;
+        ControladorSonido.Instance?.ReproducirClick();
         yaRespondio = true;
 
         foreach (Button btn in botonesAlternativas) btn.interactable = false;
@@ -146,11 +147,13 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
 
         if (respuestaSeleccionada == respuestaCorrecta)
         {
+            ControladorSonido.Instance?.ReproducirWin();
             textoResultado.text = "¡Respuesta Correcta!";
             textoRespuesta.text = "La respuesta correcta es: " + respuestaCorrecta;
         }
         else
         {
+            ControladorSonido.Instance?.ReproducirLoss();
             textoResultado.text = "Respuesta Incorrecta";
             textoRespuesta.text = " ";
         }
@@ -159,7 +162,10 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
         {
             Button btnContinuar = canvasRetroalimentacion.GetComponentInChildren<Button>();
             btnContinuar.onClick.RemoveAllListeners();
-            btnContinuar.onClick.AddListener(() => finished = true);
+            btnContinuar.onClick.AddListener(() => {
+                ControladorSonido.Instance?.ReproducirClick();
+                finished = true;
+            });
             canvasRetroalimentacion.gameObject.SetActive(true);
         }
     }

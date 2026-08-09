@@ -7,6 +7,8 @@ public class ControladorSonido : MonoBehaviour
     [Header("Clips de Audio")]
     [SerializeField] private AudioClip musicaInicio;
     [SerializeField] private AudioClip sonidoClick;
+    [SerializeField] private AudioClip sonidoWin;
+    [SerializeField] private AudioClip sonidoLoss;
 
     [Header("Volumenes")]
     [Range(0f, 1f)]
@@ -18,6 +20,7 @@ public class ControladorSonido : MonoBehaviour
     private AudioSource efectosSonido;
 
     private bool sonidoActivado = true;
+    private bool musicaActivada = true;
 
     void Awake()
     {
@@ -31,6 +34,7 @@ public class ControladorSonido : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         musicaFondo = gameObject.AddComponent<AudioSource>();
         musicaFondo.loop = true;
         musicaFondo.playOnAwake = false;
@@ -41,13 +45,9 @@ public class ControladorSonido : MonoBehaviour
         efectosSonido.playOnAwake = false;
         efectosSonido.volume = volumenEfectos;
 
-        if (!PlayerPrefs.HasKey("SonidoActivado"))
-        {
-            PlayerPrefs.SetInt("SonidoActivado", 1);
-            PlayerPrefs.Save();
-        }
-
         sonidoActivado = PlayerPrefs.GetInt("SonidoActivado", 1) == 1;
+        musicaActivada = PlayerPrefs.GetInt("MusicaActivada", 1) == 1;
+
     }
 
     void Start()
@@ -55,7 +55,10 @@ public class ControladorSonido : MonoBehaviour
         if (musicaInicio != null && musicaFondo != null)
         {
             musicaFondo.clip = musicaInicio;
-            musicaFondo.Play();
+            if (musicaActivada)
+            {
+                musicaFondo.Play();
+            }
         }
     }
 
@@ -65,19 +68,11 @@ public class ControladorSonido : MonoBehaviour
         PlayerPrefs.SetInt("SonidoActivado", activado ? 1 : 0);
         PlayerPrefs.Save();
 
-        if (musicaFondo != null)
-        {
-            musicaFondo.volume = activado ? volumenMusica : 0f;
-            if (activado && !musicaFondo.isPlaying && musicaFondo.clip != null)
-                musicaFondo.Play();
-            else if (!activado)
-                musicaFondo.Pause();
-        }
-
         if (efectosSonido != null)
         {
             efectosSonido.volume = activado ? volumenEfectos : 0f;
         }
+
     }
 
     public bool SonidoActivado()
@@ -85,16 +80,76 @@ public class ControladorSonido : MonoBehaviour
         return sonidoActivado;
     }
 
+    public void SetMusicaActivada(bool activado)
+    {
+        musicaActivada = activado;
+        PlayerPrefs.SetInt("MusicaActivada", activado ? 1 : 0);
+        PlayerPrefs.Save();
+
+        if (musicaFondo != null && musicaFondo.clip != null)
+        {
+            if (activado)
+            {
+                musicaFondo.volume = volumenMusica;
+                if (!musicaFondo.isPlaying)
+                {
+                    musicaFondo.Play();
+                }
+                else
+                {
+                    musicaFondo.UnPause();
+                }
+            }
+            else
+            {
+                musicaFondo.volume = 0f;
+                musicaFondo.Pause();
+            }
+        }
+
+    }
+
+    public bool MusicaActivada()
+    {
+        return musicaActivada;
+    }
+
     public void ReproducirClick()
     {
-        if (!sonidoActivado || efectosSonido == null || sonidoClick == null) return;
+        if (!sonidoActivado || efectosSonido == null || sonidoClick == null)
+        {
+            return;
+        }
         efectosSonido.PlayOneShot(sonidoClick, volumenEfectos);
+    }
+
+    public void ReproducirWin()
+    {
+        if (!sonidoActivado || efectosSonido == null || sonidoWin == null) return;
+        efectosSonido.PlayOneShot(sonidoWin, volumenEfectos);
+    }
+
+    public void ReproducirLoss()
+    {
+        if (!sonidoActivado || efectosSonido == null || sonidoLoss == null) return;
+        efectosSonido.PlayOneShot(sonidoLoss, volumenEfectos);
     }
 
     public void ReproducirMusica(AudioClip nuevaMusica)
     {
         if (musicaFondo == null || nuevaMusica == null) return;
         musicaFondo.clip = nuevaMusica;
-        if (sonidoActivado) musicaFondo.Play();
+        if (musicaActivada)
+        {
+            musicaFondo.Play();
+        }
+    }
+
+    public void ReproducirMusicaInicio()
+    {
+        if (musicaInicio != null)
+        {
+            ReproducirMusica(musicaInicio);
+        }
     }
 }

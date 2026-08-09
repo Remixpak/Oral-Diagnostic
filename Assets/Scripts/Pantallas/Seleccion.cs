@@ -86,18 +86,21 @@ public class Seleccion : MonoBehaviour
 
     public void PasarADificultad()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         canvasModo.gameObject.SetActive(false);
         canvasDificultad.gameObject.SetActive(true);
     }
 
     public void RegresarAModo()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         canvasDificultad.gameObject.SetActive(false);
         canvasModo.gameObject.SetActive(true);
     }
 
     public void seleccionarModo(Button boton)
     {
+        ControladorSonido.Instance?.ReproducirClick();
         modoSeleccionado = boton.GetComponentInChildren<TMP_Text>().text.Trim();
         siguienteM.interactable = true;
         siguienteM_alt.interactable = true;
@@ -123,6 +126,7 @@ public class Seleccion : MonoBehaviour
 
     public void SeleccionarDificultad(Button boton)
     {
+        ControladorSonido.Instance?.ReproducirClick();
         dificultadSeleccionada = boton.GetComponentInChildren<TMP_Text>().text.Trim();
         ConfiguracionPartida.Dificultad = dificultadSeleccionada;
         sigueinteD.interactable = true;
@@ -146,24 +150,27 @@ public class Seleccion : MonoBehaviour
 
     public void RegresarAInicio()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         SceneManager.LoadScene("PantallaInicio");
     }
 
     public void IrAJuego()
     {
-
+        ControladorSonido.Instance?.ReproducirClick();
         ControladorGuardarDatos.Instance.EliminarPartida();//eliminamos la partida actual al seleccionar cualquier modo de juego
         SceneManager.LoadScene("MainSecene");
     }
     public void irACustom()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         canvasModo.gameObject.SetActive(false);
         canvasCustom.gameObject.SetActive(true);
     }
     
     public void Bifurcacion()
     {
-        if(modoSeleccionado == "Custom")
+        ControladorSonido.Instance?.ReproducirClick();
+        if (modoSeleccionado == "Custom")
             irACustom();
         else if(modoSeleccionado == "QuickPlay")
             IrAJuego();

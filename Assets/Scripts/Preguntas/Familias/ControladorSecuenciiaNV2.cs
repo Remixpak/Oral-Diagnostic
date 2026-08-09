@@ -219,6 +219,8 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
 
     private void ValidarSeleccionPatologia(int indice)// validamos la seleccion de la patologia y actualizamos el color del boton seleccionado
     {
+
+        ControladorSonido.Instance?.ReproducirClick(); 
         if (indicesPatologiasSeleccionadas.Count > 0 && indicesPatologiasSeleccionadas[0] == indice)
         {
             botonesPatologias[indice].GetComponent<Image>().color = colorNormal;
@@ -337,12 +339,15 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
 
         if (secuenciaCorrectaSeleccionada)
         {
+            ControladorSonido.Instance?.ReproducirWin();
             textoResultado.text = "¡Respuesta Correcta!";
             textoResultado.color = Color.white;
             textoRespuesta.text = "¡Has conectado los bloques de patologías correctamente!";
         }
         else
         {
+            ControladorSonido.Instance?.ReproducirLoss();
+
             textoResultado.text = "Respuesta Incorrecta";
             textoResultado.color = Color.white;
             textoRespuesta.text = "Los bloques de patologías seleccionados no corresponden a la secuencia correcta.";
@@ -355,6 +360,7 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
             {
                 continuarBtn.onClick.RemoveAllListeners();
                 continuarBtn.onClick.AddListener(() => {
+                    ControladorSonido.Instance?.ReproducirClick();
                     finished = true;
                 });
             }

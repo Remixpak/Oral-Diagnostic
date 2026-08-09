@@ -358,6 +358,8 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
     {
         if (yaRespondio) return;
 
+        ControladorSonido.Instance?.ReproducirClick();
+
         if (respuestasCorrectasLista.Count <= 1)
         {
             base.SeleccionarAlternativa(boton, valorSeleccionado);
@@ -452,6 +454,7 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
 
         if (esRespuestaCorrecta)
         {
+            ControladorSonido.Instance?.ReproducirWin(); 
             textoResultado.text = "¡Respuesta Correcta!";
             if (respuestasCorrectasLista.Count > 1)
             {
@@ -464,6 +467,7 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
         }
         else
         {
+            ControladorSonido.Instance?.ReproducirLoss(); 
             textoResultado.text = "Respuesta Incorrecta";
             if (respuestasCorrectasLista.Count > 1)
             {
@@ -479,7 +483,10 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
         {
             Button btnContinuar = canvasRetroalimentacion.GetComponentInChildren<Button>();
             btnContinuar.onClick.RemoveAllListeners();
-            btnContinuar.onClick.AddListener(() => finished = true);
+            btnContinuar.onClick.AddListener(() => {
+                ControladorSonido.Instance?.ReproducirClick(); 
+                finished = true;
+            });
             canvasRetroalimentacion.gameObject.SetActive(true);
         }
     }

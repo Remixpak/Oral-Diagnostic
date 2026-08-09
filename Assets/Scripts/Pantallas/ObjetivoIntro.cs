@@ -52,4 +52,6 @@ public class ObjetivoIntro : MonoBehaviour
         Escribiendo = false; // Finalizó completamente la corrutina
         corrutinaTexto = null;
     }
-}
+
+    
+    }

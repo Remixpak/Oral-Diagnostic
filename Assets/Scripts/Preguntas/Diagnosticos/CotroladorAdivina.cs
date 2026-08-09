@@ -554,6 +554,7 @@ public class ControladorAdivina : ControladorPreguntas
 
     public void CerrarPanelSeleccion()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         canvasSeleccion.gameObject.SetActive(false);
         Seleccionado = null; 
     }
@@ -645,6 +646,7 @@ public class ControladorAdivina : ControladorPreguntas
 
     public void Seleccionar(Button boton)
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Seleccionado = boton;
         textoDiag.text = boton.GetComponentInChildren<TMP_Text>().text;
 
@@ -655,6 +657,7 @@ public class ControladorAdivina : ControladorPreguntas
 
     public void Descartar()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         if (Seleccionado == null) return;
         string diagnosticoSeleccionado = Seleccionado.GetComponentInChildren<TMP_Text>().text;
 
@@ -678,6 +681,7 @@ public class ControladorAdivina : ControladorPreguntas
 
     public void SeleccionarDiagnostico()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         patologiaSeleccionada = Seleccionado.GetComponentInChildren<TMP_Text>().text;
         if(ValidarRespuesta(patologiaSeleccionada))
         {
@@ -732,6 +736,7 @@ public class ControladorAdivina : ControladorPreguntas
 
     public void PreguntarLesion()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         Lesion l = CsvManager.Instance.ObtenerLesionPorId(p.lesionID);
         string pista = $"La lesión es: {l.nombre}";
@@ -741,6 +746,7 @@ public class ControladorAdivina : ControladorPreguntas
 
     public void PreguntarFamilia()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         Familia f = CsvManager.Instance.ObtenerFamiliaPorId(p.familiaID);
         string pista = $"La familia es: {f.nombre}";
@@ -750,6 +756,7 @@ public class ControladorAdivina : ControladorPreguntas
 
     public void PreguntarEtiologia()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         Etiologia e = CsvManager.Instance.ObtenerEtiologiaPorId(p.etiologiaID);
         string pista = $"La Etiopatogenia es: {e.nombre}";
@@ -759,6 +766,7 @@ public class ControladorAdivina : ControladorPreguntas
 
     public void PreguntarDescripcion()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologia);
         if (p == null) return;
 
@@ -917,20 +925,29 @@ public class ControladorAdivina : ControladorPreguntas
 
         if (respuestaCorrectaDescartada)
         {
+            ControladorSonido.Instance?.ReproducirLoss();
             textoResultado.text = "Has fallado";
             textoRespuesta.text = " ";
         }
-        else if(ValidarRespuesta(patologiaSeleccionada))
+        else if (ValidarRespuesta(patologiaSeleccionada))
         {
+            ControladorSonido.Instance?.ReproducirWin();
             textoResultado.text = "Respuesta correcta";
             textoRespuesta.text = "La respuesta es: " + patologiaCorrecta;
         }
-        else    
+        else
         {
+            ControladorSonido.Instance?.ReproducirLoss();
             textoResultado.text = "Respuesta incorrecta";
             textoRespuesta.text = " ";
         }
-        canvasRetroalimentacion.GetComponentInChildren<Button>().onClick.AddListener(() => finished = true);
+
+        Button btnContinuar = canvasRetroalimentacion.GetComponentInChildren<Button>();
+        btnContinuar.onClick.RemoveAllListeners();
+        btnContinuar.onClick.AddListener(() => {
+            ControladorSonido.Instance?.ReproducirClick();
+            finished = true;
+        });
         canvasRetroalimentacion.gameObject.SetActive(true);
     }
 

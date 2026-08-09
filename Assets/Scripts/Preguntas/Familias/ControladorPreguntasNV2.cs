@@ -464,6 +464,8 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     //metodos para validar la seleccion de lesion, familia, etiologia y patologia
     private void ValidarSeleccionLesion(int indice)
     {
+        ControladorSonido.Instance?.ReproducirClick(); 
+
         if (indiceLesionSeleccionada == indice)
         {
             botonesLesiones[indice].GetComponent<Image>().color = colorNormal;
@@ -500,6 +502,9 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
     private void ValidarSeleccionFamilia(int indice)
     {
+        ControladorSonido.Instance?.ReproducirClick();
+
+
         if (indiceFamiliaSeleccionada == indice)
         {
             botonesFamilias[indice].GetComponent<Image>().color = colorNormal;
@@ -537,6 +542,9 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
 
     private void ValidarSeleccionEtiologia(int indice)
     {
+        ControladorSonido.Instance?.ReproducirClick();
+
+
         if (indiceEtiologiaSeleccionada == indice)
         {
             botonesEtiologias[indice].GetComponent<Image>().color = colorNormal;
@@ -575,6 +583,9 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
     }
     private void ValidarSeleccionPatologia(int indice)
     {
+        ControladorSonido.Instance?.ReproducirClick();
+
+
         if (indicePatologiaSeleccionada == indice)
         {
             botonesPatologias[indice].GetComponent<Image>().color = colorNormal;
@@ -663,12 +674,14 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         if (patologiaCorrectaSeleccionada && lesionCorrectaSeleccionada &&
             familiaCorrectaSeleccionada && etiologiaCorrectaSeleccionada)
         {
+            ControladorSonido.Instance?.ReproducirWin();
             textoResultado.text = "¡Respuesta Correcta!";
             textoResultado.color = Color.white;
             textoRespuesta.text = "¡Todos los bloques son correctos!";
         }
         else
         {
+            ControladorSonido.Instance?.ReproducirLoss(); 
             textoResultado.text = "Respuesta Incorrecta";
             textoResultado.color = Color.white;
 
@@ -687,6 +700,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             {
                 continuarBtn.onClick.RemoveAllListeners();
                 continuarBtn.onClick.AddListener(() => {
+                    ControladorSonido.Instance?.ReproducirClick(); 
                     finished = true;
                 });
             }

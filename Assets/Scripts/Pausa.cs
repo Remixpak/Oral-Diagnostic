@@ -11,6 +11,7 @@ public class Pausa : MonoBehaviour
     
     public void AbrirPanelPausa()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         if (panelPausa != null)
         {
             panelPausa.SetActive(true);
@@ -21,6 +22,7 @@ public class Pausa : MonoBehaviour
 
     public void CerrarPanelPausa()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         if (panelPausa != null)
         {
             panelPausa.SetActive(false);
@@ -30,20 +32,25 @@ public class Pausa : MonoBehaviour
 
     public void ReiniciarNivel()
     {
-       GameManager.Instance.ReiniciarPartida();
+        ControladorSonido.Instance?.ReproducirClick();
+
+        GameManager.Instance.ReiniciarPartida();
     }
 
     public void activarConfirmacion()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         panelConfirmacion.SetActive(true);
     }
     public void cerrarConfirmacion()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         panelConfirmacion.SetActive(false);
     }
 
     public void Salir()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Time.timeScale = 1f;
         SceneManager.LoadScene("PantallaInicio");
     }

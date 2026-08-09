@@ -2812,13 +2812,29 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0.0030384
       objectReference: {fileID: 0}
+    - target: {fileID: 2809762713903998316, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 947.828
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809762713903998316, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 253.5378
+      objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1300.4
+      objectReference: {fileID: 0}
     - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 1472.9822
+      value: 4062.178
+      objectReference: {fileID: 0}
+    - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.09367
       objectReference: {fileID: 0}
     - target: {fileID: 3219217229717163805, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -121.64282
+      value: 56.046417
       objectReference: {fileID: 0}
     - target: {fileID: 4419934513849947234, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_IsActive
@@ -2868,6 +2884,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5085152418097667933, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 947.828
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085152418097667933, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 253.5378
+      objectReference: {fileID: 0}
     - target: {fileID: 6812482372847996720, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_Name
       value: ManejadorPausa
@@ -2875,6 +2899,26 @@ PrefabInstance:
     - target: {fileID: 6956622746914297724, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7365903131801955200, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7365903131801955200, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_Color.g
+      value: 0.81960785
+      objectReference: {fileID: 0}
+    - target: {fileID: 7365903131801955200, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_Color.r
+      value: 0.28235295
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780148015564828799, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 947.828
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780148015564828799, guid: 3c7d980a72845e347943e13fa902f201, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 253.5378
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

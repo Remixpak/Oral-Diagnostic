@@ -70,6 +70,8 @@ public class Tutorial : MonoBehaviour
     // Lo llamas desde el botón "Cerrar"
     public void CerrarTutorial()
     {
+        ControladorSonido.Instance?.ReproducirClick();
+
         if (Finalizado)
             return;
 

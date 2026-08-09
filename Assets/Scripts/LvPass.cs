@@ -27,12 +27,14 @@ public class LvPass : MonoBehaviour
 
     public void Continuar()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Debug.Log("Btn Continuar presionado");
         GameManager.Instance.ContinuarCarrera();
     }
 
     public void Reintentar()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Debug.Log("Btn Reintentar presionado");
         switch(GameManager.Instance.modoActual)
         {
@@ -51,6 +53,7 @@ public class LvPass : MonoBehaviour
 
     public void Salir()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         Time.timeScale = 1f;
         SceneManager.LoadScene("PantallaInicio");
     }

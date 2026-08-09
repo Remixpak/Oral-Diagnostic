@@ -13,6 +13,7 @@ public class Inicio : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private ToggleSwitch toggleSonido;
+    [SerializeField] private ToggleSwitch toggleMusica; 
     [SerializeField] private ToggleSwitch toggleModoZurdo;
 
     [Header("BntConfirmacion")]
@@ -33,22 +34,37 @@ public class Inicio : MonoBehaviour
     void Start()
     {
         objetivoIntro = GetComponent<ObjetivoIntro>();
+
         if (toggleSonido != null && ControladorSonido.Instance != null)
         {
+            toggleSonido.OnValueChanged.RemoveAllListeners(); 
             toggleSonido.SetValue(ControladorSonido.Instance.SonidoActivado(), false);
+            toggleSonido.OnValueChanged.AddListener(DesactivarSonido);
+        }
 
+        if (toggleMusica != null && ControladorSonido.Instance != null)
+        {
+            toggleMusica.OnValueChanged.RemoveAllListeners(); 
+            toggleMusica.SetValue(ControladorSonido.Instance.MusicaActivada(), false);
+            toggleMusica.OnValueChanged.AddListener(DesactivarMusica);
+        }
+
+        if (toggleModoZurdo != null)
+        {
+            toggleModoZurdo.OnValueChanged.RemoveAllListeners(); 
             bool zurdo = PlayerPrefs.GetInt("ModoZurdo", 0) == 1;
             toggleModoZurdo.SetValue(zurdo, false);
+            toggleModoZurdo.OnValueChanged.AddListener(AlternarModoZurdo);
         }
+
         Debug.Log("comprobando usuario");
-        if(!ControladorGuardarDatos.Instance.ExisteUsuario())
+        if (!ControladorGuardarDatos.Instance.ExisteUsuario())
         {
             Debug.Log("no existe usuario ");
             StartCoroutine(ControladorGuardarDatos.Instance.CrearUsuarioCuandoFirebaseEsteListo(" "));
         }
-        else    
+        else
             Debug.Log("si existe usuario");
-        //ConfigurarToggleModoZurdo();
     }
 
     void Update()
@@ -71,6 +87,16 @@ public class Inicio : MonoBehaviour
         toggleModoZurdo.onValueChanged.AddListener(AlternarModoZurdo);
 
     }*/
+
+    public void DesactivarMusica(bool activado)
+    {
+        if (ControladorSonido.Instance != null)
+        {
+            ControladorSonido.Instance.SetMusicaActivada(activado);
+        }
+        ControladorSonido.Instance?.ReproducirClick();
+    }
+
 
     public void ActivarAjustes()
     {
@@ -107,19 +133,22 @@ public class Inicio : MonoBehaviour
         }
         
     }
-    
+
 
 
     private IEnumerator CargarEscenaSecuencia()
     {
-        // Si el script de texto existe y está ejecutando la animación, esperamos
-        if (objetivoIntro != null && objetivoIntro.Escribiendo)
+
+        while (objetivoIntro != null && objetivoIntro.Escribiendo)
         {
-            yield return new WaitUntil(() => !objetivoIntro.Escribiendo);
+            yield return null; 
         }
+
+        yield return new WaitForSeconds(0.1f);
 
         SceneManager.LoadScene("PantallaSeleccion");
     }
+
     public void AlternarModoZurdo(bool activado)
     {
         PlayerPrefs.SetInt("ModoZurdo", activado ? 1 : 0);
@@ -148,6 +177,7 @@ public class Inicio : MonoBehaviour
 
     public void AbrirConfirmacion()
     {
+        ControladorSonido.Instance?.ReproducirClick();
         panelConfirmacion.SetActive(true);
         if(!pasoCuentaRegresiva)
         {
@@ -172,11 +202,13 @@ public class Inicio : MonoBehaviour
         }
 
         panelConfirmacion.SetActive(false);
+        ControladorSonido.Instance?.ReproducirClick();
+
     }
 
     public void BorrarPartida()
     {
-        if(ControladorGuardarDatos.Instance.ExistePartida())
+        if (ControladorGuardarDatos.Instance.ExistePartida())
             textoBorrado.text = "Partida eliminada con éxito";
         else
             textoBorrado.text = "No existe partida";
@@ -187,6 +219,7 @@ public class Inicio : MonoBehaviour
         if (panelAvisoSinPartida != null) panelAvisoSinPartida.SetActive(false); // cerramos el panel de aviso de que no hay partida guardada
 
         StartCoroutine(PanelBorrado());
+        ControladorSonido.Instance?.ReproducirClick();
     }
 
     //metodo para continuar partida, si no hay partida guardada se muestra un panel con un texto personalizado
