@@ -248,7 +248,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         if (txt != null)
         {
             Etiologia e = CsvManager.Instance.ObtenerEtiologiaPorId(idEtiologiasBotones[indice]);
-            txt.text = "Etiología: " + (e != null ? e.nombre : "Desconocida");
+            txt.text = "Etiopatogenia: " + (e != null ? e.nombre : "Desconocida");
         }
     }
 

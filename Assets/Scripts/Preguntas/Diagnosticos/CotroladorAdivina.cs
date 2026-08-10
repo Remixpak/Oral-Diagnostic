@@ -632,7 +632,8 @@ public class ControladorAdivina : ControladorPreguntas
                 if (spritePatologia != null)
                 {
                     imgHija.sprite = spritePatologia;
-                    imgHija.preserveAspect = true;
+                    //comentamos la linea de abajo ya que no nos intresa que las imagenes preserven su aspect ratio 
+                    //imgHija.preserveAspect = true;
                     imgHija.gameObject.SetActive(true);
                 }
                 else

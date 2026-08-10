@@ -122,8 +122,8 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
             if (txt != null)
             {
                 Etiologia e = CsvManager.Instance.ObtenerEtiologiaPorId(targetEtiologiaID);
-                string nombre = e != null ? e.nombre : "Etiología Desconocida";
-                txt.text = "Etiología: " + nombre;
+                string nombre = e != null ? e.nombre : "Etiopatogenia Desconocida";
+                txt.text = "Etiopatogenia: " + nombre;
             }
         }
     }
