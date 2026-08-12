@@ -23,16 +23,16 @@ public class ConfiguracionCustom : MonoBehaviour
     [SerializeField] private Button btnContinuar_alt;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
-{
-    CantidadPreguntas = 52;
+    {
+        CantidadPreguntas = 30;
 
-    toggleLesiones.onValueChanged.AddListener(delegate { ActualizarBoton(); });
-    toggleFamilias.onValueChanged.AddListener(delegate { ActualizarBoton(); });
-    toggleDiagnosticos.onValueChanged.AddListener(delegate { ActualizarBoton(); });
+        toggleLesiones.onValueChanged.AddListener(delegate { ActualizarBoton(); });
+        toggleFamilias.onValueChanged.AddListener(delegate { ActualizarBoton(); });
+        toggleDiagnosticos.onValueChanged.AddListener(delegate { ActualizarBoton(); });
 
-    // Comprobar el estado inicial
-    ActualizarBoton();
-}
+        // Comprobar el estado inicial
+        ActualizarBoton();
+    }
 
     // Update is called once per frame
     void Update()
@@ -50,7 +50,7 @@ public class ConfiguracionCustom : MonoBehaviour
 
     public void sumar()
     {
-        if(CantidadPreguntas < 52)
+        if(CantidadPreguntas < 30)
         {
             CantidadPreguntas++;
             textoCantidad.text = "Cantidad de preguntas: " + CantidadPreguntas;
@@ -58,7 +58,7 @@ public class ConfiguracionCustom : MonoBehaviour
             
         else
         {
-            CantidadPreguntas = 52;
+            CantidadPreguntas = 30;
             textoCantidad.text = "Cantidad de preguntas: " + CantidadPreguntas;
         }
             

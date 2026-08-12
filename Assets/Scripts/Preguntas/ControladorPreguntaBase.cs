@@ -30,6 +30,7 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
 
     public override void InicializarPregunta(int idPatologiaAsignada)
     {
+        
         ConfigurarBotonPausa();
         yaRespondio = false;
 

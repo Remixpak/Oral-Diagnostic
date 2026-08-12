@@ -1,4 +1,4 @@
-/*using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -63,8 +63,8 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
 
         opciones = opciones.OrderBy(x => Random.value).ToList();
     }
-}*/
-using UnityEngine;
+}
+/*using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
@@ -499,4 +499,4 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
         }
         return null;
     }
-}
+}*/

@@ -480,19 +480,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         indiceLesionSeleccionada = indice;
         lesionCorrectaSeleccionada = (indice < idLesionesBotones.Length && idLesionesBotones[indice] == targetLesionID);
 
-        if (GameManager.Instance != null)
-        {
-            if (lesionCorrectaSeleccionada)
-            {
-                GameManager.Instance.Aciertos++;
-            }
-            else
-            {
-                GameManager.Instance.Fallos++;
-                GameManager.Instance.FFamilias++;
-                erroresNivel++;
-            }
-        }
+        
 
         RestablecerColoresTodosLosBloques();
         ActualizarLineas();
@@ -519,21 +507,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         indiceFamiliaSeleccionada = indice;
         familiaCorrectaSeleccionada = (indice < idFamiliasBotones.Length && idFamiliasBotones[indice] == targetFamiliaID);
 
-        if (GameManager.Instance != null)
-        {
-            if (familiaCorrectaSeleccionada)
-            {
-                GameManager.Instance.Aciertos++;
-                GameManager.Instance.TotalAciertos++;
-            }
-            else
-            {
-                GameManager.Instance.Fallos++;
-                GameManager.Instance.TotalFallos++;
-                GameManager.Instance.FFamilias++;
-                erroresNivel++;
-            }
-        }
+        
 
         RestablecerColoresTodosLosBloques();
         ActualizarLineas();
@@ -559,21 +533,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         indiceEtiologiaSeleccionada = indice;
         etiologiaCorrectaSeleccionada = (indice < idEtiologiasBotones.Length && idEtiologiasBotones[indice] == targetEtiologiaID);
 
-        if (GameManager.Instance != null)
-        {
-            if (etiologiaCorrectaSeleccionada)
-            {
-                GameManager.Instance.Aciertos++;
-                GameManager.Instance.TotalAciertos++;
-            }
-            else
-            {
-                GameManager.Instance.Fallos++;
-                GameManager.Instance.TotalFallos++;
-                GameManager.Instance.FFamilias++;
-                erroresNivel++;
-            }
-        }
+        
 
         RestablecerColoresTodosLosBloques();
         PintarCaminoFinal();
@@ -600,21 +560,7 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
         indicePatologiaSeleccionada = indice;
         patologiaCorrectaSeleccionada = (indice < idPatologiasBotones.Length && idPatologiasBotones[indice] == targetPatologiaID);
 
-        if (GameManager.Instance != null)
-        {
-            if (patologiaCorrectaSeleccionada)
-            {
-                GameManager.Instance.Aciertos++;
-                GameManager.Instance.TotalAciertos++;
-            }
-            else
-            {
-                GameManager.Instance.Fallos++;
-                GameManager.Instance.TotalFallos++;
-                GameManager.Instance.FFamilias++;
-                erroresNivel++;
-            }
-        }
+        
 
         RestablecerColoresTodosLosBloques();
         ActualizarLineas();
@@ -678,9 +624,20 @@ public class ControladorPreguntasNV2 : ControladorPreguntas
             textoResultado.text = "¡Respuesta Correcta!";
             textoResultado.color = Color.white;
             textoRespuesta.text = "¡Todos los bloques son correctos!";
+
+            if(GameManager.Instance != null)
+            {
+                GameManager.Instance.Aciertos++;
+                GameManager.Instance.TotalAciertos++;
+            }
         }
         else
         {
+            if(GameManager.Instance != null)
+            {
+                GameManager.Instance.Fallos++;
+                GameManager.Instance.TotalFallos++;
+            }
             ControladorSonido.Instance?.ReproducirLoss(); 
             textoResultado.text = "Respuesta Incorrecta";
             textoResultado.color = Color.white;

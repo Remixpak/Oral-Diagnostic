@@ -114,26 +114,31 @@ public class Inicio : MonoBehaviour
     {
         ControladorSonido.Instance?.ReproducirClick();
         Debug.Log("pasando a jugar");
-        if (!ControladorGuardarDatos.Instance.ExistePartida())
+
+        bool usuario = ControladorGuardarDatos.Instance.CargarUsuario() != null;
+        bool partidaCompletada = usuario && ControladorGuardarDatos.Instance.CargarUsuario().PartidaTerminada;
+        
+
+        if (!partidaCompletada)
         {
-            // 1. Iniciamos el texto del objetivo/intro (cambia el string por tu mensaje real)
+            // CASO 1: No hay partida (es nueva/borrada) O existe pero NO la ha completado.
+            // Debe ver la intro/objetivo.
             if (objetivoIntro != null)
             {
                 objetivoIntro.IniciarMensaje();
             }
 
-            // 2. Ahora sí iniciamos la corrutina que esperará a que termine
             StartCoroutine(CargarEscenaSecuencia());
-            Debug.Log("Cargando corutina");
+            Debug.Log("Cargando corrutina intro");
         }
         else
         {
+            // CASO 2: Existe partida Y ademas ya la termino al menos una vez.
+            // Salta la intro y va directo a la seleccion de nivel/modo.
             SceneManager.LoadScene("PantallaSeleccion");
-            Debug.Log("Pasando a la escena habia partida");
+            Debug.Log("Partida existente y completada: Pasando a PantallaSeleccion");
         }
-        
     }
-
 
 
     private IEnumerator CargarEscenaSecuencia()

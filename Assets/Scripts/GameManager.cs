@@ -233,30 +233,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private void ConfigurarQuickPlay() // # recordar configurar esta wea con la cantidad de preguntas que se quiera en el quickplay
-    {
-        PrepararIDs();
-        colaPreguntas.Clear();
-
-        TipoPregunta[] todosLosTipos = (TipoPregunta[])System.Enum.GetValues(typeof(TipoPregunta));
-
-        List<TipoPregunta> tiposMezclados = new List<TipoPregunta>(todosLosTipos);
-
-        for (int i = 0; i < tiposMezclados.Count; i++)
-        {
-            int j = Random.Range(0, tiposMezclados.Count);
-            (tiposMezclados[i], tiposMezclados[j]) = (tiposMezclados[j], tiposMezclados[i]);
-        }
-
-        foreach (TipoPregunta tipo in tiposMezclados)
-        {
-            colaPreguntas.Enqueue(new PreguntaRonda
-            {
-                idPatologia = ObtenerID(),
-                tipo = tipo
-            });
-        }
-    }
+    
 
 
     private IEnumerator LoopPrincipalJuego()
@@ -395,28 +372,7 @@ public class GameManager : MonoBehaviour
         continuarCarrera = true;
     }
 
-    // #cambiar pantalla de resultados por una propia de los resultados del quickplay
-    private void MostrarResultadosQuickPlay()
-    {
-        if (lvPass != null)
-        {
-            lvPass.MostrarPass(3);
-        }
 
-        if (canvasResultados != null)
-        {
-            canvasResultados.gameObject.SetActive(true);
-            if (textoAciertos != null) textoAciertos.text = "Aciertos: " + Aciertos;
-            if (textoFallos != null) textoFallos.text = "Fallos: " + Fallos;
-
-            int minutos = Mathf.FloorToInt(TiempoJuego / 60);
-            int segundos = Mathf.FloorToInt(TiempoJuego % 60);
-            if (textoTiempo != null) textoTiempo.text = "Tiempo: " + minutos.ToString("00") + ":" + segundos.ToString("00");
-
-            if (textoIntentos != null) textoIntentos.text = "Partidas: " + TotalIntentos;
-            if (textoReinicios != null) textoReinicios.text = "Reinicios: " + TotalReinicios;
-        }
-    }
 
     private void MostrarResultados()
     {
@@ -522,7 +478,7 @@ public class GameManager : MonoBehaviour
             case 1:
                 tutorial.ConfigurarTutorial(
                     "Bienvenido al nivel 1, El objetivo del nivel es que aprendas a reconocer lesiones de la mucosa oral",
-                    "Se mostrará una imagen y 4 alternativas, entre ellas deberás seleccionar una de ellas",
+                    "Deberás conocer las descripciones, reconocer la lesión según manifestación clínica o en base a una lesión escoger una manifestación clínica",
                     "Solo hay una respuesta correcta, suerte.",
                     "Objetivo: reconocer las lesiones de la mucosa oral."
                 );
@@ -530,16 +486,16 @@ public class GameManager : MonoBehaviour
             case 2:
                 tutorial.ConfigurarTutorial(
                     "En el nivel anterior ya has aprendido a reconocer lesiones, así que vamos un paso más allá",
-                    "Ahora usarás el árbol de decisiones, donde deberás enlazar la lesión con su familia, la etiopatogenia y su imagen",
-                    "Crea el camino correcto hasta dar con la respuesta.",
+                    "Deberás sumar a tus conocimientos las familias y las etiopatogenias de las manifestaciones clínicas",
+                    "Deberás reconocer estos términos en preguntas de alternativas y enlazar conceptos para crear un camino partiendo de una manifestación clínica.",
                     "Objetivo: Asociar una manifestación clínica con su lesión básica, familia y etiopatogenia."
                 );
                 break;
             case 3:
                 tutorial.ConfigurarTutorial(
                     "Finalmente has sabido relacionar cada lesión con su familia y etiopatogenia, por lo que ya estas listo para poder diagnosticar pacientes.",
-                    "Aquí aparecerán distintos tipos de preguntas, en una de ellas tendrás la familia, etiopatogenia, lesión e imagen y un monton de letras con las cuales deberás escribir el diagnostico.",
-                    "En el segundo habrán distintos diagnosticos y en base preguntas podrás deberás ir descartando las opciones que NO sean la correcta, tendrás una libreta donde podrás ver las respuestas que hayas optenido.",
+                    "Aquí aparecerán distintos diagnosticos y en base a preguntar por los conceptos de lesión, familia y etiopatogenia deberás ir descartando opciones hasta dar con la correcta",
+                    "debes escoger con mucho cuidado para que no descartes el diagnostico correcto.",
                     "Objetivo: Diagnosticar lesiones de la mucosa oral."
                 );
                 break;
@@ -558,6 +514,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     private void ConfigurarCarrera(int nivel)
     {
         PrepararIDs();
@@ -565,29 +522,50 @@ public class GameManager : MonoBehaviour
 
         switch (nivel)
         {
-            case 1: // Nivel 1: Lesiones (3 sub-niveles)
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Descripciones }); // O el enum correspondiente para prefabDescripciones
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Lesion }); // prefabLesion
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Manifestaciones }); // prefabManifestaciones
+            case 1: // Total: 20 preguntas
+                AgregarPreguntasACola(TipoPregunta.Descripciones, 5);
+                AgregarPreguntasACola(TipoPregunta.Lesion, 8);
+                AgregarPreguntasACola(TipoPregunta.Manifestaciones, 7);
                 break;
 
-            case 2: // Nivel 2: Familias y Etiopatogenia (5 sub-niveles)
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.RelacionCorrecta }); // prefabRelacionCorrecta
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.FamiliaCorrespondiente }); // prefabFamiliaCorrespondiente
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.EtiopatogeniaCorrespondiente }); // prefabEtiopatogeniaCorrespondiente
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.EnlazeManifestacion }); // prefabEnlazeManifestacion
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.AsociarSecuenciaConManifestacion }); // prefabAsociarSecuenciaConManifestacion
+            case 2: // Total: 20 preguntas
+                AgregarPreguntasACola(TipoPregunta.RelacionCorrecta, 3);
+                AgregarPreguntasACola(TipoPregunta.FamiliaCorrespondiente, 4);
+                AgregarPreguntasACola(TipoPregunta.EtiopatogeniaCorrespondiente, 4);
+                AgregarPreguntasACola(TipoPregunta.EnlazeManifestacion, 5);
+                AgregarPreguntasACola(TipoPregunta.AsociarSecuenciaConManifestacion, 4);
                 break;
 
-            case 3: // Nivel 3: Diagnósticos (4 sub-niveles)
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Adivina2Preguntas }); // prefabAdivina2Preguntas
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Adivina4Preguntas }); // prefabAdivina4Preguntas
-                colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.Adivina6Preguntas }); // prefabAdivina6Preguntas
-                //colaPreguntas.Enqueue(new PreguntaRonda { idPatologia = ObtenerID(), tipo = TipoPregunta.CuatroConceptos });     // prefab4Conceptos
+            case 3: // Total: 20 preguntas
+                AgregarPreguntasACola(TipoPregunta.Adivina2Preguntas, 3);
+                AgregarPreguntasACola(TipoPregunta.Adivina4Preguntas, 5);
+                AgregarPreguntasACola(TipoPregunta.Adivina6Preguntas, 12);
                 break;
         }
     }
 
+    private void ConfigurarQuickPlay()
+    {
+        PrepararIDs();
+        colaPreguntas.Clear();
+
+        // Obtener todos los tipos disponibles del Enum
+        TipoPregunta[] todosLosTipos = (TipoPregunta[])System.Enum.GetValues(typeof(TipoPregunta));
+
+        // Generar 30 preguntas seleccionando tipos aleatorios
+        int totalPreguntasQuickPlay = 30;
+
+        for (int i = 0; i < totalPreguntasQuickPlay; i++)
+        {
+            TipoPregunta tipoAleatorio = todosLosTipos[UnityEngine.Random.Range(0, todosLosTipos.Length)];
+
+            colaPreguntas.Enqueue(new PreguntaRonda
+            {
+                idPatologia = ObtenerID(),
+                tipo = tipoAleatorio
+            });
+        }
+    }
 
     private void ConfigurarCustom()
     {
@@ -649,14 +627,35 @@ public class GameManager : MonoBehaviour
             });
         }
     }
+
+    private void AgregarPreguntasACola(TipoPregunta tipo, int cantidad)
+    {
+        for (int i = 0; i < cantidad; i++)
+        {
+            colaPreguntas.Enqueue(new PreguntaRonda
+            {
+                idPatologia = ObtenerID(),
+                tipo = tipo
+            });
+        }
+    }
     private void PrepararIDs()
     {
         List<int> ids = new List<int>();
+
+        // 1. Filtrar las patologías para incluir SOLO las que NO tienen '/' en el nombre de su lesión
         foreach (var p in CsvManager.Instance.patologias)
         {
-            ids.Add(p.id);
+            Lesion lesion = CsvManager.Instance.ObtenerLesionPorId(p.lesionID);
+
+            // Si la lesión existe y NO contiene '/' (es decir, es una sola lesion basica)
+            if (lesion != null && !lesion.nombre.Contains("/"))
+            {
+                ids.Add(p.id);
+            }
         }
 
+        // 2. Mezclar aleatoriamente las IDs válidas (Fisher-Yates)
         for (int i = 0; i < ids.Count; i++)
         {
             int random = Random.Range(i, ids.Count);
@@ -665,6 +664,7 @@ public class GameManager : MonoBehaviour
             ids[random] = temp;
         }
 
+        // 3. Encolar las IDs filtradas
         idsDisponibles.Clear();
         foreach (int id in ids)
         {
