@@ -4,12 +4,21 @@ using System.Collections.Generic;
 using System.Collections;
 using TMPro;
 
+/// <summary>
+/// Clase abstracta base que gestiona el ciclo de vida general, la interfaz de usuario, la selección de alternativas y la retroalimentación para cualquier tipo de pregunta en el juego.
+/// 
+/// Clases que utiliza y su finalidad:
+/// - ControladorPreguntas: Clase base de la que hereda, definiendo la firma general para los controladores de preguntas.
+/// - GameManager: Singleton (GameManager.Instance) utilizado para actualizar estadísticas del jugador (aciertos, fallos, fallos por materia) y pausar el juego.
+/// - ControladorSonido: Singleton (ControladorSonido.Instance) encargado de reproducir efectos de audio (clics, victoria, derrota).
+/// - TMP_Text / Image / Button / Canvas (UnityEngine.UI y TMPro): Componentes de la interfaz de usuario de Unity para renderizar enunciados, imágenes, alternativas interactuables y pantallas de retroalimentación.
+/// </summary>
 public abstract class ControladorPreguntaBase : ControladorPreguntas
 {
     [Header("UI General")]
     [SerializeField] protected TMP_Text textoPregunta;
-    [SerializeField] protected Image imagenPregunta; // Opcional según la pregunta
-    [SerializeField] protected TMP_Text textoNombreEntidad; // Para preguntas estilo "Definición de X"
+    [SerializeField] protected Image imagenPregunta;
+    [SerializeField] protected TMP_Text textoNombreEntidad;
 
     [Header("Botones y Opciones")]
     [SerializeField] protected List<Button> botonesAlternativas;
@@ -25,23 +34,29 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
 
     protected string tipoMateria;
 
-    // Métodos abstractos que cada tipo de pregunta implementará a su manera
+    /// <summary>
+    /// Método abstracto que deben implementar las clases hijas para configurar los textos, imágenes y generar las opciones (correctas y distractores) específicas según el tipo de pregunta.
+    /// </summary>
+    /// <param name="idPatologiaAsignada">Identificador único de la patología asignada a la pregunta.</param>
+    /// <param name="opciones">Lista de salida con los textos de las alternativas.</param>
+    /// <param name="spritesOpciones">Lista de salida con las imágenes/sprites de las alternativas (o null si la pregunta es solo de texto).</param>
     protected abstract void ConfigurarPreguntaYRespuestas(int idPatologiaAsignada, out List<string> opciones, out List<Sprite> spritesOpciones);
 
+    /// <summary>
+    /// Inicializa la pregunta restableciendo los botones de la UI, configurando el botón de pausa, obteniendo los datos desde la subclase y asignando las respuestas (texto o imagen) a los botones correspondientes.
+    /// </summary>
+    /// <param name="idPatologiaAsignada">Identificador único de la patología a evaluar.</param>
     public override void InicializarPregunta(int idPatologiaAsignada)
     {
-        
         ConfigurarBotonPausa();
         yaRespondio = false;
 
-        // Resetear visualmente botones
         foreach (Button btn in botonesAlternativas)
         {
             btn.interactable = true;
             btn.GetComponent<Image>().color = Color.white;
             btn.onClick.RemoveAllListeners();
             
-            // Limpiar imágenes de botones por si el prefab anterior usaba sprites
             Image childImg = GetImageInChild(btn);
             if (childImg != null) childImg.gameObject.SetActive(false);
             
@@ -49,16 +64,11 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
             if (childText != null) childText.gameObject.SetActive(true);
         }
 
-        // Obtener datos desde la subclase
         List<string> opcionesTexto;
         List<Sprite> opcionesSprite;
         ConfigurarPreguntaYRespuestas(idPatologiaAsignada, out opcionesTexto, out opcionesSprite);
 
-        // Mezclar alternativas en conjunto
         MezclarOpciones(opcionesTexto, opcionesSprite);
-
-        // Asignar alternativas a los botones UI
-        // Dentro de InicializarPregunta(...) en ControladorPreguntaBase.cs:
 
         for (int i = 0; i < botonesAlternativas.Count; i++)
         {
@@ -66,17 +76,15 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
 
             if (opcionesSprite != null && opcionesSprite.Count > i && opcionesSprite[i] != null)
             {
-                // 1. Ocultar el texto del botón
                 TMP_Text txt = btnActual.GetComponentInChildren<TMP_Text>(true);
                 if (txt != null) txt.gameObject.SetActive(false);
 
-                // 2. Buscar y asignar la imagen
                 Image imgChild = GetImageInChild(btnActual);
                 if (imgChild != null)
                 {
                     imgChild.gameObject.SetActive(true);
                     imgChild.sprite = opcionesSprite[i];
-                    imgChild.preserveAspect = true; // Mantener la proporción de la imagen médica
+                    imgChild.preserveAspect = true;
                 }
                 else
                 {
@@ -88,7 +96,6 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
             }
             else if (opcionesTexto != null && opcionesTexto.Count > i)
             {
-                // Ocultar imagen hija si es pregunta de texto
                 Image imgChild = GetImageInChild(btnActual);
                 if (imgChild != null) imgChild.gameObject.SetActive(false);
 
@@ -105,6 +112,11 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
         }
     }
 
+    /// <summary>
+    /// Maneja el evento de selección de una alternativa por parte del usuario, validando si es correcta o incorrecta, cambiando el color del botón, actualizando las estadísticas globales en GameManager y reproduciendo sonido.
+    /// </summary>
+    /// <param name="boton">Botón de la interfaz que fue presionado.</param>
+    /// <param name="valorSeleccionado">Valor de texto o identificador asociado a la alternativa seleccionada.</param>
     protected virtual void SeleccionarAlternativa(Button boton, string valorSeleccionado)
     {
         if (yaRespondio) return;
@@ -122,7 +134,6 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
             {
                 GameManager.Instance.Aciertos++;
                 GameManager.Instance.TotalAciertos++;
-                
             }
         }
         else
@@ -142,6 +153,9 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
         StartCoroutine(FinalizarPreguntaRoutine());
     }
 
+    /// <summary>
+    /// Muestra la interfaz de retroalimentación final indicando si el usuario acertó o falló, mostrando la respuesta correcta y configurando el botón para avanzar al siguiente estado.
+    /// </summary>
     public override void EntregarRetroalimentacion()
     {
         if (canvasJuego != null) canvasJuego.gameObject.SetActive(false);
@@ -171,12 +185,21 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
         }
     }
 
+    /// <summary>
+    /// Corrutina que introduce una pequeña pausa temporal tras responder antes de llamar a la pantalla de retroalimentación.
+    /// </summary>
+    /// <returns>IEnumerator para el control del flujo asíncrono de Unity.</returns>
     private IEnumerator FinalizarPreguntaRoutine()
     {
         yield return new WaitForSeconds(1.5f);
         EntregarRetroalimentacion();
     }
 
+    /// <summary>
+    /// Reordena aleatoriamente los elementos de la lista de textos y sincroniza dicho reordenamiento con la lista de sprites correspondientes.
+    /// </summary>
+    /// <param name="textos">Lista de textos de las opciones a mezclar.</param>
+    /// <param name="sprites">Lista de sprites de las opciones a mezclar de forma paritaria con los textos.</param>
     protected void MezclarOpciones(List<string> textos, List<Sprite> sprites)
     {
         for (int i = 0; i < textos.Count; i++)
@@ -190,9 +213,13 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
         }
     }
 
+    /// <summary>
+    /// Busca y retorna el primer componente Image que sea hijo del botón especificado (excluyendo la imagen principal del propio botón).
+    /// </summary>
+    /// <param name="btn">El botón en el cual buscar la imagen hija.</param>
+    /// <returns>El componente Image encontrado en los hijos, o null si no existe.</returns>
     private Image GetImageInChild(Button btn)
     {
-        // Pasar true para buscar también en GameObjects hijos desactivados
         foreach (Image img in btn.GetComponentsInChildren<Image>(true))
         {
             if (img.gameObject != btn.gameObject) return img;
@@ -200,6 +227,9 @@ public abstract class ControladorPreguntaBase : ControladorPreguntas
         return null;
     }
 
+    /// <summary>
+    /// Configura el listener y estado visual del botón de pausa en la interfaz de usuario.
+    /// </summary>
     private void ConfigurarBotonPausa()
     {
         if (botonPausa == null) return;

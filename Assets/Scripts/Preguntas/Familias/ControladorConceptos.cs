@@ -2,13 +2,22 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// Controlador para el modo de pregunta basado en conceptos. 
+/// Selecciona de forma aleatoria un enunciado médico y genera una lista de alternativas 
+/// con el concepto clave correcto y sus respectivos distractores para ser mostrados en la interfaz.
+/// 
+/// Clases de las que depende y su fin:
+/// - ControladorPreguntaBase: Clase base de la que hereda para la gestión general del ciclo de vida de la pregunta.
+/// - TextMeshProUGUI (TMPro): Componente de interfaz de usuario para desplegar el texto del enunciado seleccionado.
+/// - Sprite / Vector / Random (UnityEngine): Tipos e infraestructura de Unity para manejo de recursos visuales y aleatoriedad.
+/// </summary>
 public class ControladorConceptos : ControladorPreguntaBase
 {
     private struct EnunciadoConcepto
     {
         public string enunciado;
         public string conceptoClave;
-
 
         public EnunciadoConcepto(string enunciado, string conceptoClave)
         {
@@ -17,7 +26,6 @@ public class ControladorConceptos : ControladorPreguntaBase
         }
     }
 
-    //lista de enunciados con su concepto correspondiente 
     private readonly List<EnunciadoConcepto> listaEnunciados = new List<EnunciadoConcepto>()
     {
         new EnunciadoConcepto(
@@ -49,21 +57,25 @@ public class ControladorConceptos : ControladorPreguntaBase
             "Lesión básica")
     };
 
-    //lista de conceptos 
     private readonly List<string> todosLosConceptos = new List<string>()
     {
         "Familia", "Etiopatogenia", "Patología", "Etiología", "Diagnóstico", "Manifestación clínica", "Lesión básica"
     };
 
+    /// <summary>
+    /// Configura la pregunta seleccionando un enunciado al azar de la lista, asigna la respuesta correcta 
+    /// y construye la lista de alternativas distractoras sin repetir la opción correcta.
+    /// </summary>
+    /// <param name="idPatologiaAsignada">Identificador de la patología asignada (no utilizado en este tipo de pregunta).</param>
+    /// <param name="opciones">Lista de cadenas de texto de salida con las alternativas para los botones.</param>
+    /// <param name="spritesOpciones">Lista de sprites de salida (se establece en null ya que este modo es textual).</param>
     protected override void ConfigurarPreguntaYRespuestas(int idPatologiaAsignada, out List<string> opciones, out List<Sprite> spritesOpciones)
     {
         spritesOpciones = null; 
 
-        //elegimos de forma aleatoria un enunciado de la lista de enunciados
         int indiceAleatorio = Random.Range(0, listaEnunciados.Count);
         EnunciadoConcepto seleccionado = listaEnunciados[indiceAleatorio];
 
-        //asignamos el texto del enunciado a un TextMeshProUGUI para mostrarlo en la UI
         if (textoPregunta != null)
         {
             textoPregunta.text = "\"" + seleccionado.enunciado + "\"";
@@ -71,22 +83,18 @@ public class ControladorConceptos : ControladorPreguntaBase
 
         respuestaCorrecta = seleccionado.conceptoClave;
 
-        // generamos las alternativas de respuesta para los botones
         opciones = new List<string>();
-        opciones.Add(respuestaCorrecta); //agregamos la respuesta correcta :p
+        opciones.Add(respuestaCorrecta);
 
-        //seleccionamos de la lista las opciones distractoras para evitar repetir la respuesta correcta
         List<string> distractoresDisponibles = new List<string>(todosLosConceptos);
         distractoresDisponibles.Remove(respuestaCorrecta);
 
-        //mezclamos las alternativas
         for (int i = 0; i < distractoresDisponibles.Count; i++)
         {
             int j = Random.Range(0, distractoresDisponibles.Count);
             (distractoresDisponibles[i], distractoresDisponibles[j]) = (distractoresDisponibles[j], distractoresDisponibles[i]);
         }
 
-        //alternativas distractoras
         int cantidadBotones = botonesAlternativas != null ? botonesAlternativas.Count : 4;
         for (int i = 0; i < distractoresDisponibles.Count && opciones.Count < cantidadBotones; i++)
         {

@@ -4,6 +4,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Controla el nivel de preguntas NV2 basado en una secuencia de selección de patologías.
+/// Hereda de ControladorPreguntas y utiliza CsvManager para obtener los datos de patologías,
+/// lesiones, familias y etiologías, LineaConectora para representar las conexiones,
+/// ControladorSonido para los efectos de audio y GameManager para registrar los resultados.
+/// También utiliza componentes de Unity UI y TextMeshPro para gestionar la interfaz.
+/// </summary>
 public class ControladorSecuenciaNV2 : ControladorPreguntas
 {
     [Header("Configuracion del Nivel Secuencia")]
@@ -11,7 +18,6 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
     [SerializeField] private Color colorSeleccionado = Color.yellow;
     [SerializeField] private Button botonPausa;
     [SerializeField] private int idPatologiaCorrectaObjetivo = -1;
-
 
     [Header("Botones o Referencias Fijas para las Líneas Base")]
     [SerializeField] private Button botonLesionFijo;
@@ -32,13 +38,18 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
     private int targetLesionID;
     private int targetFamiliaID;
     private int targetEtiologiaID;
-    private List<int> targetPatologiasIDs = new List<int>(); // cargamos las 3 patologias como alternativas 
-
+    private List<int> targetPatologiasIDs = new List<int>(); 
 
     private List<int> indicesPatologiasSeleccionadas = new List<int>();
     private bool secuenciaCorrectaSeleccionada = false;
 
     private int erroresNivel = 0;
+
+    /// <summary>
+
+    /// Inicializa el comportamiento del botón de pausa y configura su interacción.
+
+    /// </summary>
 
     void Start()
     {
@@ -52,6 +63,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         }
     }
 
+    /// <summary>
+
+    /// Mantiene habilitado el botón de pausa durante la ejecución del nivel.
+
+    /// </summary>
+
     void Update()
     {
         if (botonPausa != null && !botonPausa.interactable)
@@ -59,7 +76,10 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
             botonPausa.interactable = true;
         }
     }
-    private void ConfigurarDatosAleatoriosSecuencia() // seleccionamos una patologia aleatoria y obtenemos sus ids de lesion, familia y etiologia
+    /// <summary>
+    /// Selecciona una patología aleatoria, obtiene sus relaciones de lesión, familia y etiología y reúne las patologías que comparten esa misma estructura.
+    /// </summary>
+    private void ConfigurarDatosAleatoriosSecuencia() 
     {
         if (CsvManager.Instance == null || CsvManager.Instance.patologias == null || CsvManager.Instance.patologias.Count == 0) return;
 
@@ -90,7 +110,13 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         MostrarTextosFijos();
     }
 
-    private void MostrarTextosFijos() //textos de los nombres de lesion, familia y etiologia en los botones fijos (cambian segun el id)
+    /// <summary>
+
+    /// Muestra en los botones fijos los nombres de la lesión, familia y etiología correspondientes a la secuencia actual.
+
+    /// </summary>
+
+    private void MostrarTextosFijos() 
     {
         if (CsvManager.Instance == null) return;
 
@@ -127,6 +153,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
             }
         }
     }
+
+    /// <summary>
+
+    /// Asigna las patologías correctas y falsas a los botones disponibles, las mezcla y actualiza sus imágenes.
+
+    /// </summary>
 
     private void AsignarPatologiasABotones()
     {
@@ -172,6 +204,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         return listaMapeada;
     }
 
+    /// <summary>
+
+    /// Obtiene un ID de patología que no pertenece al conjunto de patologías correctas de la secuencia.
+
+    /// </summary>
+
     private int ObtenerIdPatologiaFalsa()
     {
         List<int> idsValidos = new List<int>();
@@ -184,6 +222,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         }
         return idsValidos.Count > 0 ? idsValidos[Random.Range(0, idsValidos.Count)] : 0;
     }
+
+    /// <summary>
+
+    /// Actualiza la imagen y limpia el texto del botón de patología según el ID asignado.
+
+    /// </summary>
 
     private void ActualizarImagenBotonPatologia(int indice)
     {
@@ -204,7 +248,13 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         }
     }
 
-    private void ConfigurarInteractividadBotones() // configuramos los botones de patologias para que al hacer click se valide la seleccion
+    /// <summary>
+
+    /// Configura los eventos de clic de los botones de patologías para validar sus selecciones.
+
+    /// </summary>
+
+    private void ConfigurarInteractividadBotones() 
     {
         for (int i = 0; i < botonesPatologias.Length; i++)
         {
@@ -217,7 +267,13 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         }
     }
 
-    private void ValidarSeleccionPatologia(int indice)// validamos la seleccion de la patologia y actualizamos el color del boton seleccionado
+    /// <summary>
+
+    /// Valida la selección de una patología, actualiza su estado visual y comprueba el progreso de la secuencia.
+
+    /// </summary>
+
+    private void ValidarSeleccionPatologia(int indice)
     {
 
         ControladorSonido.Instance?.ReproducirClick(); 
@@ -245,9 +301,15 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         VerificarSecuenciaCompleta();
     }
 
-    private void VerificarSecuenciaCompleta() // verificamos si la secuencia seleccionada es correcta y actualizamos los contadores de aciertos y fallos
+    /// <summary>
+
+    /// Comprueba si la patología seleccionada pertenece al conjunto correcto y actualiza las métricas y el estado del nivel.
+
+    /// </summary>
+
+    private void VerificarSecuenciaCompleta() 
     {
-        //solo tenemos una respuesta correcta 
+        
         bool esCorrecta = false;
 
         if (indicesPatologiasSeleccionadas.Count > 0)
@@ -280,7 +342,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         VerificarProgresoNivel();
     }
 
-    // dibumos lass lineas base  (Lesión -> Familia -> Etiología) 
+    /// <summary>
+
+    /// Actualiza las líneas que representan la secuencia entre lesión, familia, etiología y la patología seleccionada.
+
+    /// </summary>
+
     private void ActualizarLineasConexion()
     {
         if (lineaConectora == null) return;
@@ -289,7 +356,6 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
 
         Color colorBase = lineaConectora.GetColorSeleccion();
 
-        // lineas fijas Lesión -> Familia -> Etiología
         if (botonLesionFijo != null && botonFamiliaFijo != null)
         {
             lineaConectora.CrearLinea(botonLesionFijo, botonFamiliaFijo, colorBase);
@@ -321,6 +387,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         }
     }
 
+    /// <summary>
+
+    /// Pinta las patologías seleccionadas en verde o rojo según correspondan o no a la secuencia correcta.
+
+    /// </summary>
+
     private void PintarBotonesSeleccionados()
     {
         foreach (int idx in indicesPatologiasSeleccionadas)
@@ -329,6 +401,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
             botonesPatologias[idx].GetComponent<Image>().color = esAcertado ? Color.green : Color.red;
         }
     }
+
+    /// <summary>
+
+    /// Muestra la retroalimentación del resultado y configura el botón para continuar con el siguiente nivel.
+
+    /// </summary>
 
     public override void EntregarRetroalimentacion()
     {
@@ -372,6 +450,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         }
     }
 
+    /// <summary>
+
+    /// Comprueba el estado de la selección y entrega la retroalimentación correspondiente.
+
+    /// </summary>
+
     private void VerificarProgresoNivel()
     {
         if (secuenciaCorrectaSeleccionada)
@@ -383,6 +467,12 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
             EntregarRetroalimentacion();
         }
     }
+
+    /// <summary>
+
+    /// Inicializa una nueva pregunta, restablece los estados del nivel, carga una nueva secuencia y configura los botones.
+
+    /// </summary>
 
     public override void InicializarPregunta(int indPatologiaAsignada)
     {
@@ -404,7 +494,6 @@ public class ControladorSecuenciaNV2 : ControladorPreguntas
         ConfigurarDatosAleatoriosSecuencia();
         AsignarPatologiasABotones();
         ConfigurarInteractividadBotones();
-
 
         ActualizarLineasConexion();
     }

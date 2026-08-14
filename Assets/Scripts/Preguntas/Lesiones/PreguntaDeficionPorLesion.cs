@@ -2,15 +2,36 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Gestiona la lógica para preguntas basadas en texto donde el usuario debe identificar cuál de las definiciones mostradas corresponde al nombre de una lesión básica específica.
+/// 
+/// Clases que utiliza y su finalidad:
+/// - ControladorPreguntaBase: Clase base de la que hereda, la cual define la estructura básica y el flujo para el control de preguntas.
+/// - CsvManager: Patrón Singleton (CsvManager.Instance) utilizado para consultar la base de datos de patologías, lesiones y sus descripciones asociadas.
+/// - Patologia: Modelo de datos que representa una patología y permite obtener el ID de la lesión a consultar.
+/// - Lesion: Modelo de datos que contiene los detalles de una lesión básica y sus referencias a IDs de descripción.
+/// - Descripcion: Modelo de datos que representa el texto descriptivo/definición de una lesión.
+/// - UnityEngine: Módulo de Unity utilizado para la generación de índices aleatorios en la selección de opciones.
+/// </summary>
 public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
 {
+    /// <summary>
+    /// Inicializa los parámetros específicos de este tipo de pregunta al iniciar el objeto.
+    /// Define el tipo de materia como "lesion".
+    /// </summary>
     void Start()
     {
         tipoMateria = "lesion";
     }
+
+    /// <summary>
+    /// Configura el enunciado con el nombre de la lesión y genera la lista de alternativas de texto (definición correcta y distractores de otras lesiones) para el ID asignado.
+    /// </summary>
+    /// <param name="idPatologiaAsignada">Identificador único de la patología a consultar.</param>
+    /// <param name="opciones">Parámetro de salida que contendrá la lista de definiciones de texto para las alternativas.</param>
+    /// <param name="spritesOpciones">Parámetro de salida para sprites opcionales (se establece como null en este tipo de pregunta).</param>
     protected override void ConfigurarPreguntaYRespuestas(int idPatologiaAsignada, out List<string> opciones, out List<Sprite> spritesOpciones)
     {
-        //problema corregido: estaba agarrando campos vacios de los csv :p
         spritesOpciones = null;
         opciones = new List<string>();
 
@@ -26,7 +47,7 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
         respuestaCorrecta = descCorrecta.texto;
         opciones.Add(respuestaCorrecta);
 
-        List<Descripcion> restoDescripciones = CsvManager.Instance.descripciones // agregamos un filtro para que no se repitan las descripciones correctas y que no sean vacías
+        List<Descripcion> restoDescripciones = CsvManager.Instance.descripciones
             .Where(d => !lesionCorrecta.descripcionIDs.Contains(d.id)
                         && !string.IsNullOrWhiteSpace(d.texto))
             .ToList();
@@ -42,7 +63,7 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
 
             if (descripcionesMezcladas.Count > 0)
             {
-                string distractor = descripcionesMezcladas[0].texto; // verificamos que no sea nulo o vacío antes de agregarlo a las opciones
+                string distractor = descripcionesMezcladas[0].texto;
                 if (!string.IsNullOrWhiteSpace(distractor))
                 {
                     opciones.Add(distractor);
@@ -56,7 +77,7 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
             }
         }
 
-        while (opciones.Count < botonesAlternativas.Count)// en caso de que no se hayan podido generar suficientes distractores, agregamos opciones falsas
+        while (opciones.Count < botonesAlternativas.Count)
         {
             opciones.Add($"Opcion {opciones.Count + 1}");
         }
@@ -64,439 +85,3 @@ public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
         opciones = opciones.OrderBy(x => Random.value).ToList();
     }
 }
-/*using UnityEngine;
-using UnityEngine.UI;
-using System.Collections.Generic;
-using System.Linq;
-using TMPro;
-
-public class PreguntaDefinicionPorLesion : ControladorPreguntaBase
-{
-    [Header("Configuración Múltiple Selección")]
-    [SerializeField] private TMP_Text textoSeleccionMultiple;
-    [SerializeField] private string segundaRespuestaCorrecta = "";
-
-    [Header("Quinta Alternativa")]
-    [SerializeField] private Button botonQuintaAlternativa;
-    [SerializeField] private GameObject panelQuintaAlternativa;
-
-    private List<string> respuestasCorrectasLista = new List<string>();
-    private List<string> respuestasSeleccionadasLista = new List<string>();
-    private List<Button> botonesSeleccionados = new List<Button>();
-    private bool esRespuestaCorrecta = false;
-
-    void Start()
-    {
-        tipoMateria = "lesion";
-    }
-
-    public override void InicializarPregunta(int idPatologiaAsignada)
-    {
-        yaRespondio = false;
-
-        // Resetear botones normales
-        foreach (Button btn in botonesAlternativas)
-        {
-            btn.interactable = true;
-            btn.GetComponent<Image>().color = Color.white;
-            btn.onClick.RemoveAllListeners();
-
-            Image childImg = GetImageInChild(btn);
-            if (childImg != null) childImg.gameObject.SetActive(false);
-
-            TMP_Text childText = btn.GetComponentInChildren<TMP_Text>();
-            if (childText != null) childText.gameObject.SetActive(true);
-        }
-
-        // Resetear quinta alternativa
-        if (botonQuintaAlternativa != null)
-        {
-            botonQuintaAlternativa.interactable = true;
-            botonQuintaAlternativa.GetComponent<Image>().color = Color.white;
-            botonQuintaAlternativa.onClick.RemoveAllListeners();
-
-            Image childImgQuinta = GetImageInChild(botonQuintaAlternativa);
-            if (childImgQuinta != null) childImgQuinta.gameObject.SetActive(false);
-
-            TMP_Text childTextQuinta = botonQuintaAlternativa.GetComponentInChildren<TMP_Text>();
-            if (childTextQuinta != null) childTextQuinta.gameObject.SetActive(true);
-
-            botonQuintaAlternativa.gameObject.SetActive(false);
-        }
-
-        if (panelQuintaAlternativa != null)
-        {
-            panelQuintaAlternativa.SetActive(false);
-        }
-
-        // Obtener opciones
-        List<string> opcionesTexto;
-        List<Sprite> opcionesSprite;
-        ConfigurarPreguntaYRespuestas(idPatologiaAsignada, out opcionesTexto, out opcionesSprite);
-
-        MezclarOpciones(opcionesTexto, opcionesSprite);
-
-        // Asignar opciones a botones normales
-        for (int i = 0; i < botonesAlternativas.Count; i++)
-        {
-            Button btnActual = botonesAlternativas[i];
-
-            if (opcionesSprite != null && opcionesSprite.Count > i && opcionesSprite[i] != null)
-            {
-                btnActual.gameObject.SetActive(true);
-
-                TMP_Text txt = btnActual.GetComponentInChildren<TMP_Text>(true);
-                if (txt != null) txt.gameObject.SetActive(false);
-
-                Image imgChild = GetImageInChild(btnActual);
-                if (imgChild != null)
-                {
-                    imgChild.gameObject.SetActive(true);
-                    imgChild.sprite = opcionesSprite[i];
-                    imgChild.preserveAspect = true;
-                }
-
-                string valorRespuesta = opcionesTexto[i];
-                btnActual.onClick.AddListener(() => SeleccionarAlternativa(btnActual, valorRespuesta));
-            }
-            else if (opcionesTexto != null && opcionesTexto.Count > i)
-            {
-                btnActual.gameObject.SetActive(true);
-
-                Image imgChild = GetImageInChild(btnActual);
-                if (imgChild != null) imgChild.gameObject.SetActive(false);
-
-                TMP_Text txt = btnActual.GetComponentInChildren<TMP_Text>(true);
-                if (txt != null)
-                {
-                    txt.gameObject.SetActive(true);
-                    txt.text = opcionesTexto[i];
-                }
-
-                string valorRespuesta = opcionesTexto[i];
-                btnActual.onClick.AddListener(() => SeleccionarAlternativa(btnActual, valorRespuesta));
-            }
-            else
-            {
-                btnActual.gameObject.SetActive(false);
-            }
-        }
-
-        // Quinta alternativa (si hay 4 correctas)
-        if (opcionesTexto != null && opcionesTexto.Count > botonesAlternativas.Count && botonQuintaAlternativa != null)
-        {
-            botonQuintaAlternativa.gameObject.SetActive(true);
-            if (panelQuintaAlternativa != null)
-            {
-                panelQuintaAlternativa.SetActive(true);
-            }
-
-            TMP_Text txtQuinta = botonQuintaAlternativa.GetComponentInChildren<TMP_Text>(true);
-            if (txtQuinta != null)
-            {
-                txtQuinta.gameObject.SetActive(true);
-                txtQuinta.text = opcionesTexto[botonesAlternativas.Count];
-            }
-
-            string valorRespuestaQuinta = opcionesTexto[botonesAlternativas.Count];
-            botonQuintaAlternativa.onClick.AddListener(() => SeleccionarAlternativa(botonQuintaAlternativa, valorRespuestaQuinta));
-        }
-    }
-
-    protected override void ConfigurarPreguntaYRespuestas(int idPatologiaAsignada, out List<string> opciones, out List<Sprite> spritesOpciones)
-    {
-        spritesOpciones = null;
-        opciones = new List<string>();
-        respuestasCorrectasLista.Clear();
-        respuestasSeleccionadasLista.Clear();
-        botonesSeleccionados.Clear();
-
-        Patologia p = CsvManager.Instance.ObtenerPatologiaPorId(idPatologiaAsignada);
-        Lesion lesionPrincipal = CsvManager.Instance.ObtenerLesionPorId(p.lesionID);
-
-        // 1. Obtener los nombres limpios de las lesiones (separando por '/')
-        List<string> nombresLesiones = lesionPrincipal.nombre
-            .Split('/')
-            .Select(n => n.Trim())
-            .Where(n => !string.IsNullOrEmpty(n))
-            .ToList();
-
-        // 2. Buscar todos los objetos Lesion correspondientes a los nombres desglosados
-        List<Lesion> lesionesEfectivas = new List<Lesion>();
-        foreach (string nom in nombresLesiones)
-        {
-            Lesion encontrada = CsvManager.Instance.lesiones.FirstOrDefault(l => l.nombre.Trim() == nom);
-            if (encontrada != null)
-            {
-                lesionesEfectivas.Add(encontrada);
-            }
-        }
-
-        // Si no se encontraron coincidencias exactas por nombre, usamos la principal
-        if (lesionesEfectivas.Count == 0)
-        {
-            lesionesEfectivas.Add(lesionPrincipal);
-        }
-
-        // 3. Formatear el enunciado SIN barras '/'
-        if (textoPregunta != null)
-        {
-            if (nombresLesiones.Count > 1)
-            {
-                string nombresFormateados = string.Join(" y ", nombresLesiones);
-                textoPregunta.text = $"¿Cuáles de las siguientes definiciones corresponden a {nombresFormateados}?";
-            }
-            else
-            {
-                textoPregunta.text = $"¿Cuál de las siguientes definiciones corresponde a {nombresLesiones[0]}?";
-            }
-        }
-
-        // 4. Obtener TODAS las descripciones de las lesiones identificadas
-        HashSet<int> idsDescripcionesCorrectas = new HashSet<int>();
-
-        foreach (Lesion l in lesionesEfectivas)
-        {
-            List<Descripcion> descripciones = CsvManager.Instance.ObtenerDescripcionesDeLesion(l);
-            foreach (Descripcion d in descripciones)
-            {
-                if (!respuestasCorrectasLista.Contains(d.texto))
-                {
-                    respuestasCorrectasLista.Add(d.texto);
-                }
-            }
-
-            if (l.descripcionIDs != null)
-            {
-                foreach (int idDesc in l.descripcionIDs)
-                {
-                    idsDescripcionesCorrectas.Add(idDesc);
-                }
-            }
-        }
-
-        if (respuestasCorrectasLista.Count > 0)
-        {
-            respuestaCorrecta = respuestasCorrectasLista[0];
-        }
-
-        if (respuestasCorrectasLista.Count > 1)
-        {
-            segundaRespuestaCorrecta = respuestasCorrectasLista[1];
-        }
-        else
-        {
-            segundaRespuestaCorrecta = "";
-        }
-
-        // 5. Activar indicador visual de Selección Múltiple si hay > 1 descripción correcta
-        if (textoSeleccionMultiple != null)
-        {
-            bool esMultiple = respuestasCorrectasLista.Count > 1;
-            textoSeleccionMultiple.gameObject.SetActive(esMultiple);
-            if (esMultiple)
-            {
-                textoSeleccionMultiple.text = $"Selecciona {respuestasCorrectasLista.Count} opciones correctas.";
-            }
-        }
-
-        // 6. Cargar respuestas correctas en las opciones
-        foreach (string resp in respuestasCorrectasLista)
-        {
-            opciones.Add(resp);
-        }
-
-        // 7. Generar distractores
-        List<Descripcion> restoDescripciones = CsvManager.Instance.descripciones
-            .Where(d => !idsDescripcionesCorrectas.Contains(d.id)
-                        && !respuestasCorrectasLista.Contains(d.texto)
-                        && !string.IsNullOrWhiteSpace(d.texto))
-            .ToList();
-
-        restoDescripciones = restoDescripciones.OrderBy(x => Random.value).ToList();
-
-        //  calculamos la cantidad total de opciones deseadas según la cantidad de respuestas correctas y si hay quinta alternativa
-        int cantidadTotalDeseada = botonesAlternativas.Count;
-        if (respuestasCorrectasLista.Count == 4 && botonQuintaAlternativa != null)
-        {
-            cantidadTotalDeseada = botonesAlternativas.Count + 1;
-        }
-
-        int contadorSeguridad = 0;
-        int maxIntentos = 100;
-
-        while (opciones.Count < cantidadTotalDeseada && contadorSeguridad < maxIntentos)
-        {
-            contadorSeguridad++;
-
-            if (restoDescripciones.Count > 0)
-            {
-                Descripcion dDist = restoDescripciones[0];
-                restoDescripciones.RemoveAt(0);
-
-                if (!string.IsNullOrWhiteSpace(dDist.texto))
-                {
-                    opciones.Add(dDist.texto);
-                }
-            }
-            else
-            {
-                string distractorFalso = $"Definición falsa {opciones.Count + 1}";
-                opciones.Add(distractorFalso);
-            }
-        }
-
-        while (opciones.Count < cantidadTotalDeseada)
-        {
-            opciones.Add($"Definición {opciones.Count + 1}");
-        }
-
-        opciones = opciones.OrderBy(x => Random.value).ToList();
-    }
-
-    protected override void SeleccionarAlternativa(Button boton, string valorSeleccionado)
-    {
-        if (yaRespondio) return;
-
-        ControladorSonido.Instance?.ReproducirClick();
-
-        if (respuestasCorrectasLista.Count <= 1)
-        {
-            base.SeleccionarAlternativa(boton, valorSeleccionado);
-            return;
-        }
-
-        if (botonesSeleccionados.Contains(boton))
-        {
-            botonesSeleccionados.Remove(boton);
-            respuestasSeleccionadasLista.Remove(valorSeleccionado);
-            boton.GetComponent<Image>().color = Color.white;
-        }
-        else
-        {
-            botonesSeleccionados.Add(boton);
-            respuestasSeleccionadasLista.Add(valorSeleccionado);
-            boton.GetComponent<Image>().color = new Color(0.8f, 0.9f, 1f);
-        }
-
-        if (respuestasSeleccionadasLista.Count >= respuestasCorrectasLista.Count)
-        {
-            EvaluarRespuestaMultiple();
-        }
-    }
-
-    private void EvaluarRespuestaMultiple()
-    {
-        yaRespondio = true;
-
-        foreach (Button btn in botonesAlternativas)
-            btn.interactable = false;
-
-        if (botonQuintaAlternativa != null)
-            botonQuintaAlternativa.interactable = false;
-
-        esRespuestaCorrecta = respuestasSeleccionadasLista.Count == respuestasCorrectasLista.Count &&
-                              !respuestasSeleccionadasLista.Except(respuestasCorrectasLista).Any();
-
-        for (int i = 0; i < botonesSeleccionados.Count; i++)
-        {
-            Button btn = botonesSeleccionados[i];
-            string resp = respuestasSeleccionadasLista[i];
-
-            if (respuestasCorrectasLista.Contains(resp))
-            {
-                btn.GetComponent<Image>().color = Color.green;
-            }
-            else
-            {
-                btn.GetComponent<Image>().color = Color.red;
-            }
-        }
-
-        if (GameManager.Instance != null)
-        {
-            if (esRespuestaCorrecta)
-            {
-                GameManager.Instance.Aciertos++;
-                GameManager.Instance.TotalAciertos++;
-            }
-            else
-            {
-                GameManager.Instance.Fallos++;
-                GameManager.Instance.TotalFallos++;
-                if (tipoMateria == "lesion")
-                    GameManager.Instance.FLesiones++;
-                else if (tipoMateria == "familia")
-                    GameManager.Instance.FFamilias++;
-            }
-        }
-
-        if (textoSeleccionMultiple != null)
-            textoSeleccionMultiple.gameObject.SetActive(false);
-
-        StartCoroutine(FinalizarPreguntaRoutineLocal());
-    }
-
-    private System.Collections.IEnumerator FinalizarPreguntaRoutineLocal()
-    {
-        yield return new WaitForSeconds(1.5f);
-        EntregarRetroalimentacion();
-    }
-
-    public override void EntregarRetroalimentacion()
-    {
-        if (canvasJuego != null) canvasJuego.gameObject.SetActive(false);
-
-        if (respuestasCorrectasLista.Count <= 1)
-        {
-            esRespuestaCorrecta = (respuestaSeleccionada == respuestaCorrecta);
-        }
-
-        if (esRespuestaCorrecta)
-        {
-            ControladorSonido.Instance?.ReproducirWin(); 
-            textoResultado.text = "¡Respuesta Correcta!";
-            if (respuestasCorrectasLista.Count > 1)
-            {
-                textoRespuesta.text = "Las descripciones correctas son:\n• " + string.Join("\n• ", respuestasCorrectasLista);
-            }
-            else
-            {
-                textoRespuesta.text = "La descripción correcta es:\n" + respuestaCorrecta;
-            }
-        }
-        else
-        {
-            ControladorSonido.Instance?.ReproducirLoss(); 
-            textoResultado.text = "Respuesta Incorrecta";
-            if (respuestasCorrectasLista.Count > 1)
-            {
-                textoRespuesta.text = "Las descripciones correctas eran:\n• " + string.Join("\n• ", respuestasCorrectasLista);
-            }
-            else
-            {
-                textoRespuesta.text = "";
-            }
-        }
-
-        if (canvasRetroalimentacion != null)
-        {
-            Button btnContinuar = canvasRetroalimentacion.GetComponentInChildren<Button>();
-            btnContinuar.onClick.RemoveAllListeners();
-            btnContinuar.onClick.AddListener(() => {
-                ControladorSonido.Instance?.ReproducirClick(); 
-                finished = true;
-            });
-            canvasRetroalimentacion.gameObject.SetActive(true);
-        }
-    }
-
-    private Image GetImageInChild(Button btn)
-    {
-        foreach (Image img in btn.GetComponentsInChildren<Image>(true))
-        {
-            if (img.gameObject != btn.gameObject) return img;
-        }
-        return null;
-    }
-}*/

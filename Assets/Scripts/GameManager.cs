@@ -5,6 +5,9 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// Define los rangos de clasificación médica que se le pueden otorgar al jugador según su rendimiento.
+/// </summary>
 public enum ClasificacionRango
 {
     SinClasificar,
@@ -15,6 +18,9 @@ public enum ClasificacionRango
     Especialista    // 95% - 100%
 }
 
+/// <summary>
+/// Estructura de datos que almacena el desglose final de rendimiento y clasificación del jugador.
+/// </summary>
 public struct ResultadoClasificacion
 {
     public ClasificacionRango rango;
@@ -23,6 +29,21 @@ public struct ResultadoClasificacion
     public float porcentajeEfectividad;
 }
 
+/// <summary>
+/// Controlador principal del ciclo de vida del juego (Singleton). Coordina los modos de juego (Carrera, QuickPlay, Custom),
+/// gestiona la cola de preguntas, instanciamiento de niveles/tutoriales, métricas globales, guardado de datos y el cálculo de la calificación final.
+/// 
+/// Clases que utiliza y su finalidad:
+/// - MonoBehaviour / SceneManager (UnityEngine): Manejo de estados de Unity, corrutinas y la escena activa ("MainSecene").
+/// - TMP_Text / Canvas / Image / Button (UnityEngine.UI y TMPro): Componentes de UI para renderizar diálogos, tutoriales, conteos y resultados.
+/// - ControladorPreguntas: Clase base abstracta instanciada dinámicamente para inicializar y esperar la resolución de cada pregunta.
+/// - ControladorGuardarDatos: Singleton de persistencia encargado de guardar/cargar partidas, actualizar usuario y almacenar métricas por categoría.
+/// - CsvManager: Central de datos biomédicos de donde se extraen e identifican las patologías y lesiones.
+/// - ConfiguracionPartida: Clase estática/global de configuración desde la que se leen los parámetros del modo Custom y la dificultad.
+/// - Tutorial: Componente asignado al prefab de tutorial para guiar al usuario al inicio de cada nivel en modo Carrera.
+/// - LvPass: Componente de interfaz UI que gestiona los mensajes de pase de nivel o reintento al finalizar un bloque.
+/// - Partida / PreguntaRonda / TipoPregunta: Estructuras y enumeraciones de soporte para empaquetar el estado de juego y las preguntas.
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -33,7 +54,7 @@ public class GameManager : MonoBehaviour
 
     private bool juegoActivo = false;
 
-    [Header("Metricas de control")]
+    [Header("Métricas de Control")]
     [SerializeField] public float TiempoJuego;
     [SerializeField] public int TotalIntentos = 0;
     [SerializeField] public int TotalReinicios = 0;
@@ -44,20 +65,22 @@ public class GameManager : MonoBehaviour
     [SerializeField] public int FFamilias;
     [SerializeField] public int FDiagnosticos;
 
-    public int TotalAciertos; public int TotalFallos;
+    public int TotalAciertos; 
+    public int TotalFallos;
 
     [Header("Prefabs Lesiones")]
     [SerializeField] private GameObject prefabDescripciones;
     [SerializeField] private GameObject prefabLesion;
     [SerializeField] private GameObject prefabManifestaciones;
 
-    [Header("Prefabs familias")]
+    [Header("Prefabs Familias")]
     [SerializeField] private GameObject prefabRelacionCorrecta;
     [SerializeField] private GameObject prefabFamiliaCorrespondiente;
     [SerializeField] private GameObject prefabEtiopatogeniaCorrespondiente;
     [SerializeField] private GameObject prefabEnlazeManifestacion;
     [SerializeField] private GameObject prefabAsociarSecuenciaConManifestacion;
-    [Header("Prefabs diagnosticos")]
+
+    [Header("Prefabs Diagnósticos")]
     [SerializeField] private GameObject prefabAdivina2Preguntas;
     [SerializeField] private GameObject prefabAdivina4Preguntas;
     [SerializeField] private GameObject prefabAdivina6Preguntas;
@@ -67,17 +90,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] public Canvas canvasResultados;
     [SerializeField] private Canvas canvasVictoria;
 
-    [Header("Textos de resultados")]
+    [Header("Textos de Resultados")]
     [SerializeField] public TMP_Text textoAciertos;
     [SerializeField] public TMP_Text textoFallos;
     [SerializeField] public TMP_Text textoTiempo;
     [SerializeField] public TMP_Text textoIntentos;
     [SerializeField] public TMP_Text textoReinicios;
 
-    [Header("Textos victoria")]
+    [Header("Textos Victoria")]
     [SerializeField] private TMP_Text textoTotalAciertos;
     [SerializeField] private TMP_Text textoTotalFallos;
-
     [SerializeField] private TMP_Text rango;
 
     [Header("Tutorial")]
@@ -97,7 +119,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LvPass lvPass;
 
     [Header("Configuración de Calificación")]
-    [SerializeField] private float tiempoEsperadoPorPregunta = 15f; // Segundos razonables por pregunta
+    [SerializeField] private float tiempoEsperadoPorPregunta = 15f;
     [SerializeField] private float puntosPorAcierto = 100f;
     [SerializeField] private float puntosPorFallo = 30f;
     [SerializeField] private float penalizacionPorReinicio = 50f;
@@ -105,6 +127,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] public TMP_Text textoClasificacion;
 
+    /// <summary>
+    /// Configura el patrón Singleton al despertar la instancia.
+    /// </summary>
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -115,6 +140,9 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
+    /// <summary>
+    /// Inicializa las variables de sesión, detecta guardados existentes e inicia el loop correspondiente según el modo activo.
+    /// </summary>
     void Start()
     {
         Debug.Log($"Nivel actual inicial: {nivelActual}");
@@ -161,7 +189,7 @@ public class GameManager : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == "MainSecene")
         {
-            switch(modoActual)
+            switch (modoActual)
             {
                 case ModoJuego.Carrera:
                     if (hayPartida)
@@ -183,22 +211,24 @@ public class GameManager : MonoBehaviour
                     IniciarModoCarrera();
                     break;
             }
-
-            
         }
     }
 
+    /// <summary>
+    /// Actualiza el temporizador general cuando el juego se encuentra en estado activo.
+    /// </summary>
     void Update()
     {
         if (juegoActivo)
             TiempoJuego += Time.deltaTime;
-
-        
     }
 
+    /// <summary>
+    /// Inicia la partida en modo Carrera, opcionalmente reseteando el progreso guardado a nivel 1.
+    /// </summary>
+    /// <param name="reiniciar">Indica si se deben borrar los datos del progreso actual.</param>
     public void IniciarModoCarrera(bool reiniciar = false)
     {
-
         if (reiniciar)
         {
             nivelActual = 1;
@@ -217,7 +247,9 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LoopPrincipalJuego());
     }
 
-    //modo de juego 30 preguntas 
+    /// <summary>
+    /// Inicia una partida rápida compuesta por 30 preguntas variadas.
+    /// </summary>
     public void IniciarModoQuickPlay()
     {
         modoActual = ModoJuego.QuickPlay;
@@ -225,6 +257,9 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LoopPrincipalJuego());
     }
 
+    /// <summary>
+    /// Inicia una partida personalizada con la selección de temas y cantidad de preguntas predefinida en ConfiguracionPartida.
+    /// </summary>
     public void IniciarModoCustom()
     {
         modoActual = ModoJuego.Custom;
@@ -232,15 +267,14 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LoopPrincipalJuego());
     }
 
-
-    
-
-
+    /// <summary>
+    /// Corrutina principal que orquesta la secuencia del juego: inicio de ronda, ejecución de preguntas, finalización y despliegue de resultados.
+    /// </summary>
     private IEnumerator LoopPrincipalJuego()
     {
         while (!ModoFinalizado())
         {
-            yield return StartCoroutine(IniciarRonda()); // se debe usar StartCoroutine para esperar a que IniciarRonda termine antes de continuar
+            yield return StartCoroutine(IniciarRonda());
 
             yield return EjecutarPreguntas();
 
@@ -257,12 +291,15 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                // En QuickPlay y Custom termina la partida después de mostrar resultados.
                 break;
             }
         }
     }
-    private IEnumerator IniciarRonda() //debe ser un enumerator si o si ya que si no se ejecuta de manera asincrona y no se puede esperar a que termine antes de continuar con el resto del loop
+
+    /// <summary>
+    /// Reinicia métricas locales y prepara la cola de preguntas y tutoriales según el modo activo.
+    /// </summary>
+    private IEnumerator IniciarRonda()
     {
         Aciertos = 0;
         Fallos = 0;
@@ -276,7 +313,7 @@ public class GameManager : MonoBehaviour
         {
             case ModoJuego.Carrera:
                 ConfigurarCarrera(nivelActual);
-             yield return StartCoroutine(MostrarTutorialNivel(nivelActual)); // se debe usar StartCoroutine para esperar a que MostrarTutorialNivel termine antes de continuar
+                yield return StartCoroutine(MostrarTutorialNivel(nivelActual));
                 break;
 
             case ModoJuego.QuickPlay:
@@ -288,27 +325,34 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+
+    /// <summary>
+    /// Procesa de manera secuencial cada pregunta de la cola instanciando su prefab y esperando a que finalice la interacción.
+    /// </summary>
     private IEnumerator EjecutarPreguntas()
     {
         while (colaPreguntas.Count > 0)
-            {
-                PreguntaRonda pregunta = colaPreguntas.Dequeue();
-                GameObject prefab = ObtenerPrefab(pregunta.tipo);
+        {
+            PreguntaRonda pregunta = colaPreguntas.Dequeue();
+            GameObject prefab = ObtenerPrefab(pregunta.tipo);
 
-                nivelInstanciado = Instantiate(prefab);
-                ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
-                controlador.InicializarPregunta(pregunta.idPatologia);
+            nivelInstanciado = Instantiate(prefab);
+            ControladorPreguntas controlador = nivelInstanciado.GetComponent<ControladorPreguntas>();
+            controlador.InicializarPregunta(pregunta.idPatologia);
 
-                Debug.Log($"Comienza pregunta. A:{Aciertos} F:{Fallos}");
+            Debug.Log($"Comienza pregunta. A:{Aciertos} F:{Fallos}");
 
-                yield return new WaitUntil(() => controlador.finished);
+            yield return new WaitUntil(() => controlador.finished);
 
-                Debug.Log($"Termina pregunta. A:{Aciertos} F:{Fallos}");
+            Debug.Log($"Termina pregunta. A:{Aciertos} F:{Fallos}");
 
-                Destroy(nivelInstanciado);
-            }
+            Destroy(nivelInstanciado);
+        }
     }
 
+    /// <summary>
+    /// Registra el intento, evalúa si el usuario supera el nivel en modo Carrera y persiste el progreso resultante.
+    /// </summary>
     private void FinalizarRonda()
     {
         TotalIntentos++;
@@ -324,21 +368,20 @@ public class GameManager : MonoBehaviour
                     switch (nivelActual)
                     {
                         case 1:
-                            ActualizarProgreso(true,false,false);
+                            ActualizarProgreso(true, false, false);
                             break;
 
                         case 2:
-                            ActualizarProgreso(true,true,false);
+                            ActualizarProgreso(true, true, false);
                             break;
 
                         case 3:
-                            ActualizarProgreso(true,true,true);
+                            ActualizarProgreso(true, true, true);
                             break;
                     }
 
                     ControladorGuardarDatos.Instance.GuardarPartida(CrearPartidaData(Dificultad, lv1Completado, lv2Completado, lv3Completado));
                     ControladorGuardarDatos.Instance.ActualizarUsuario("XXXX", lv3Completado);
-                        
                 }
 
                 break;
@@ -351,9 +394,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Comprueba si la condición de término del modo de juego actual se ha alcanzado.
+    /// </summary>
+    /// <returns>Verdadero si el modo actual ha finalizado.</returns>
     private bool ModoFinalizado()
     {
-        switch(modoActual)
+        switch (modoActual)
         {
             case ModoJuego.Carrera:
                 return nivelActual >= 4;
@@ -367,30 +414,32 @@ public class GameManager : MonoBehaviour
 
         return true;
     }
+
+    /// <summary>
+    /// Bandera invocado por la UI para desbloquear la espera de continuación en el loop del modo Carrera.
+    /// </summary>
     public void ContinuarCarrera()
     {
         continuarCarrera = true;
     }
 
-
-
+    /// <summary>
+    /// Controla el despliegue del canvas de resultados parciales, pases de nivel o la pantalla final de victoria según el resultado.
+    /// </summary>
     private void MostrarResultados()
     {
         if (modoActual == ModoJuego.Carrera)
         {
-            // 1. Caso Victoria Final (Completó el Nivel 3 y supera el porcentaje)
             if (nivelActual == 4 && PuedePasar())
             {
                 if (lvPass != null)
                 {
-                    // Se asume que el avance a nivel 4 indica victoria global
                     ActualizarProgreso(true, true, true); 
                 }
                 MostrarPantallaVictoria();
-                return; // Salimos para evitar activar el canvasResultados
+                return;
             }
 
-            // 2. Transición o Reintento de Niveles Intermedios (Nivel 1, 2 o Fallo en Nivel 3)
             if (lvPass != null)
             {
                 if (PuedePasar())
@@ -407,7 +456,6 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("La referencia a LvPass es NULL en el GameManager.");
             }
 
-            // 3. Activar Canvas de Resultados Parciales
             if (canvasResultados != null)
             {
                 canvasResultados.gameObject.SetActive(true);
@@ -422,12 +470,10 @@ public class GameManager : MonoBehaviour
                 if (textoReinicios != null) textoReinicios.text = "Reinicios: " + TotalReinicios;
             }
 
-            // Guardar Métricas
             if (ControladorGuardarDatos.Instance != null)
             {
-                //string claveNivel = nivelActual < 4 ? nivelActual.ToString() : "Carrera completada";
                 string claveNivel;
-                switch(nivelActual)
+                switch (nivelActual)
                 {
                     case 1:
                         claveNivel = "Lesiones"; 
@@ -447,11 +493,13 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // Modos QuickPlay o Custom
             MostrarPantallaVictoria();
         }
     }
 
+    /// <summary>
+    /// Despliega la pantalla de victoria final calculando el rango y la efectividad conseguida.
+    /// </summary>
     private void MostrarPantallaVictoria()
     {
         canvasResultados.gameObject.SetActive(false);
@@ -462,9 +510,12 @@ public class GameManager : MonoBehaviour
         ResultadoClasificacion Rc = CalcularClasificacion();
 
         rango.text = $"Rango: {Rc.rango} \nTítulo: {Rc.titulo} \nPuntaje: {Rc.puntajeFinal} \nPorcentaje de efectividad: {Rc.porcentajeEfectividad}";
-
     }
 
+    /// <summary>
+    /// Instancia e instruye la presentación del tutorial interactivo correspondiente al nivel ingresado.
+    /// </summary>
+    /// <param name="nivel">Número de nivel a parametrizar.</param>
     private IEnumerator MostrarTutorialNivel(int nivel)
     {
         if (tutorialInstanciado != null)
@@ -514,7 +565,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Configura y encola las preguntas correspondientes al nivel asignado dentro del modo Carrera.
+    /// </summary>
+    /// <param name="nivel">Identificador del nivel (1 al 3).</param>
     private void ConfigurarCarrera(int nivel)
     {
         PrepararIDs();
@@ -544,15 +598,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Genera una cola de 30 preguntas aleatorias entre todos los tipos disponibles para el modo QuickPlay.
+    /// </summary>
     private void ConfigurarQuickPlay()
     {
         PrepararIDs();
         colaPreguntas.Clear();
 
-        // Obtener todos los tipos disponibles del Enum
         TipoPregunta[] todosLosTipos = (TipoPregunta[])System.Enum.GetValues(typeof(TipoPregunta));
 
-        // Generar 30 preguntas seleccionando tipos aleatorios
         int totalPreguntasQuickPlay = 30;
 
         for (int i = 0; i < totalPreguntasQuickPlay; i++)
@@ -567,6 +622,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Construye una ronda de preguntas personalizada en base a las opciones seleccionadas por el usuario en ConfiguracionPartida.
+    /// </summary>
     private void ConfigurarCustom()
     {
         PrepararIDs();
@@ -588,7 +646,6 @@ public class GameManager : MonoBehaviour
             tiposDisponibles.Add(TipoPregunta.EtiopatogeniaCorrespondiente);
             tiposDisponibles.Add(TipoPregunta.EnlazeManifestacion);
             tiposDisponibles.Add(TipoPregunta.AsociarSecuenciaConManifestacion);
-
         }
 
         if (ConfiguracionPartida.Diagnosticos)
@@ -597,10 +654,8 @@ public class GameManager : MonoBehaviour
             tiposDisponibles.Add(TipoPregunta.Adivina4Preguntas);
             tiposDisponibles.Add(TipoPregunta.Adivina6Preguntas);
             tiposDisponibles.Add(TipoPregunta.CuatroConceptos);
-
         }
 
-        // Seguridad, aunque el botón ya debería impedir llegar aquí.
         if (tiposDisponibles.Count == 0)
         {
             Debug.LogError("No hay tipos de preguntas seleccionados.");
@@ -609,8 +664,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < ConfiguracionPartida.CantidadPreguntas; i++)
         {
-            TipoPregunta tipo =
-                tiposDisponibles[Random.Range(0, tiposDisponibles.Count)];
+            TipoPregunta tipo = tiposDisponibles[Random.Range(0, tiposDisponibles.Count)];
 
             int idPat = ObtenerID();
 
@@ -628,6 +682,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Agrega una cantidad determinada de preguntas de un tipo específico a la cola activa.
+    /// </summary>
+    /// <param name="tipo">Tipo de pregunta a encolar.</param>
+    /// <param name="cantidad">Cantidad de preguntas a instanciar.</param>
     private void AgregarPreguntasACola(TipoPregunta tipo, int cantidad)
     {
         for (int i = 0; i < cantidad; i++)
@@ -639,23 +698,24 @@ public class GameManager : MonoBehaviour
             });
         }
     }
+
+    /// <summary>
+    /// Filtra y desordena aleatoriamente los identificadores de patologías válidas (excluyendo combinaciones con '/') cargadas por CsvManager.
+    /// </summary>
     private void PrepararIDs()
     {
         List<int> ids = new List<int>();
 
-        // 1. Filtrar las patologías para incluir SOLO las que NO tienen '/' en el nombre de su lesión
         foreach (var p in CsvManager.Instance.patologias)
         {
             Lesion lesion = CsvManager.Instance.ObtenerLesionPorId(p.lesionID);
 
-            // Si la lesión existe y NO contiene '/' (es decir, es una sola lesion basica)
             if (lesion != null && !lesion.nombre.Contains("/"))
             {
                 ids.Add(p.id);
             }
         }
 
-        // 2. Mezclar aleatoriamente las IDs válidas (Fisher-Yates)
         for (int i = 0; i < ids.Count; i++)
         {
             int random = Random.Range(i, ids.Count);
@@ -664,7 +724,6 @@ public class GameManager : MonoBehaviour
             ids[random] = temp;
         }
 
-        // 3. Encolar las IDs filtradas
         idsDisponibles.Clear();
         foreach (int id in ids)
         {
@@ -672,29 +731,35 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Desencola el siguiente identificador de patología disponible.
+    /// </summary>
+    /// <returns>El identificador numérico o -1 si la cola está vacía.</returns>
     private int ObtenerID()
     {
         if (idsDisponibles.Count == 0) return -1;
         return idsDisponibles.Dequeue();
     }
 
+    /// <summary>
+    /// Mapea la enumeración TipoPregunta con su respectivo Prefab asignado en el Inspector.
+    /// </summary>
+    /// <param name="tipo">El tipo de pregunta solicitado.</param>
+    /// <returns>El GameObject del prefab correspondiente.</returns>
     private GameObject ObtenerPrefab(TipoPregunta tipo)
     {
         switch (tipo)
         {
-            // Nivel 1
             case TipoPregunta.Descripciones: return prefabDescripciones;
             case TipoPregunta.Lesion: return prefabLesion;
             case TipoPregunta.Manifestaciones: return prefabManifestaciones;
 
-            // Nivel 2
             case TipoPregunta.RelacionCorrecta: return prefabRelacionCorrecta;
             case TipoPregunta.FamiliaCorrespondiente: return prefabFamiliaCorrespondiente;
             case TipoPregunta.EtiopatogeniaCorrespondiente: return prefabEtiopatogeniaCorrespondiente;
             case TipoPregunta.EnlazeManifestacion: return prefabEnlazeManifestacion;
             case TipoPregunta.AsociarSecuenciaConManifestacion: return prefabAsociarSecuenciaConManifestacion;
 
-            // Nivel 3
             case TipoPregunta.Adivina2Preguntas: return prefabAdivina2Preguntas;
             case TipoPregunta.Adivina4Preguntas: return prefabAdivina4Preguntas;
             case TipoPregunta.Adivina6Preguntas: return prefabAdivina6Preguntas;
@@ -706,6 +771,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Valida y actualiza los indicadores booleanos de progreso de niveles y ajusta el puntero nivelActual.
+    /// </summary>
+    /// <param name="lv1">Estado del Nivel 1.</param>
+    /// <param name="lv2">Estado del Nivel 2.</param>
+    /// <param name="lv3">Estado del Nivel 3.</param>
     private void ActualizarProgreso(bool lv1, bool lv2, bool lv3)
     {
         if (!lv1) { lv2 = false; lv3 = false; }
@@ -724,23 +795,35 @@ public class GameManager : MonoBehaviour
         else nivelActual = 4;
     }
 
+    /// <summary>
+    /// Instancia una nueva estructura Partida para su serialización o guardado.
+    /// </summary>
     private Partida CrearPartidaData(string dificulta, bool lv1, bool lv2, bool lv3)
     {
-        return new Partida(dificulta,modoActual.ToString() ,lv1, lv2, lv3);
+        return new Partida(dificulta, modoActual.ToString(), lv1, lv2, lv3);
     }
 
+    /// <summary>
+    /// Detiene la ejecución del tiempo de juego y ajusta Time.timeScale a 0.
+    /// </summary>
     public void PausarJuego()
     {
         juegoActivo = false;
         Time.timeScale = 0f;
     }
 
+    /// <summary>
+    /// Restablece la escala de tiempo a normalidad y reactiva el conteo del temporizador.
+    /// </summary>
     public void ReanudarJuego()
     {
         juegoActivo = true;
         Time.timeScale = 1f;
     }
 
+    /// <summary>
+    /// Limpia el estado de ejecución actual, destruye instancias dinámicas y reinicia la corrutina principal de juego.
+    /// </summary>
     public void ReiniciarPartida()
     {
         Time.timeScale = 1f;
@@ -759,22 +842,29 @@ public class GameManager : MonoBehaviour
         colaPreguntas.Clear();
         idsDisponibles.Clear();
 
-        
         StartCoroutine(LoopPrincipalJuego());
     }
 
+    /// <summary>
+    /// Retorna el umbral decimal de aciertos exigidos según la dificultad seleccionada.
+    /// </summary>
+    /// <returns>Valor porcentual en rango 0.0f a 1.0f.</returns>
     private float ObtenerPorcentajeRequerido()
     {
         string dif = Dificultad != null ? Dificultad.Trim().ToLower() : "";
         switch (dif)
         {
-            case "Fácil": return 0.70f;//70% modo facil
-            case "Medio": return 0.80f;//80% modo medio
-            case "Difícil": return 0.90f;//90% modo dificil
+            case "fácil": return 0.70f;
+            case "medio": return 0.80f;
+            case "difícil": return 0.90f;
             default: return 0.80f;
         }
     }
 
+    /// <summary>
+    /// Evalúa si el porcentaje de aciertos alcanzado en la ronda cumple con la dificultad establecida.
+    /// </summary>
+    /// <returns>Verdadero si el usuario aprueba la ronda.</returns>
     private bool PuedePasar()
     {
         int totalRespuestas = Aciertos + Fallos;
@@ -782,11 +872,10 @@ public class GameManager : MonoBehaviour
         return porcentajeAciertos >= ObtenerPorcentajeRequerido();
     }
 
-    
-
-
-    
-
+    /// <summary>
+    /// Procesa métricas de tiempo, reintentos y aciertos/fallos para dictaminar la clasificación final y rango del jugador.
+    /// </summary>
+    /// <returns>Estructura ResultadoClasificacion con el desglose final.</returns>
     public ResultadoClasificacion CalcularClasificacion()
     {
         int totalPreguntas = Aciertos + Fallos;
@@ -802,17 +891,12 @@ public class GameManager : MonoBehaviour
             };
         }
 
-        // 1. Puntaje Máximo Teórico posible (100% de aciertos sin penalizaciones)
         float puntajeMaximo = totalPreguntas * puntosPorAcierto;
-
-        // 2. Puntaje Base (Aciertos - Fallos)
         float puntajeObtenido = (Aciertos * puntosPorAcierto) - (Fallos * puntosPorFallo);
 
-        // 3. Penalización por Reinicios
         float deduccionReinicios = TotalReinicios * penalizacionPorReinicio;
         puntajeObtenido -= deduccionReinicios;
 
-        // 4. Penalización por Tiempo Excesivo
         float tiempoObjetivo = totalPreguntas * tiempoEsperadoPorPregunta;
         if (TiempoJuego > tiempoObjetivo)
         {
@@ -821,13 +905,10 @@ public class GameManager : MonoBehaviour
             puntajeObtenido -= deduccionTiempo;
         }
 
-        // Aseguramos que el puntaje no sea menor a cero
         puntajeObtenido = Mathf.Max(0f, puntajeObtenido);
 
-        // 5. Calculamos el porcentaje de efectividad respecto al puntaje máximo
         float porcentajeEfectividad = (puntajeObtenido / puntajeMaximo) * 100f;
 
-        // 6. Asignación de Rango según el porcentaje resultante
         ClasificacionRango rangoObtenido;
         string tituloTexto;
 

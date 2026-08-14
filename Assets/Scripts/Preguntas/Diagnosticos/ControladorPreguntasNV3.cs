@@ -5,25 +5,32 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
+/// <summary>
+/// Controlador de preguntas para el Nivel 3. Implementa una mecánica de juego estilo "Ahorcado" o sopa de letras
+/// donde el usuario debe formar el nombre de la patología objetivo mediante un teclado virtual en pantalla.
+/// 
+/// Clases dependientes que utiliza:
+/// - ControladorPreguntas: Clase base heredada que define la estructura general de control de preguntas y estado de finalización.
+/// - CsvManager: Provee la carga de datos de patologías, lesiones, familias, etiologías y sprites de imágenes asociadas.
+/// - GameManager: Registra las estadísticas globales del jugador (aciertos, fallos y fallos de diagnóstico).
+/// - Patologia / Lesion / Familia / Etiologia: Modelos de datos para estructurar la información médica obtenida del CSV.
+/// </summary>
 public class ControladorPreguntasNV3 : ControladorPreguntas
 {
     [Header("Pausa")]
-    [SerializeField]private Button botonPausa;
+    [SerializeField] private Button botonPausa;
 
-    [Header("Configuraci�n del Juego")]
+    [Header("Configuración del Juego")]
+    [SerializeField] private int patologiaIDTarget = 1;
+    [SerializeField] private string palabraCorrecta = "ULCERA";
+    [SerializeField] private int cantidadLetrasTeclado = 12;
 
-    [SerializeField] private int patologiaIDTarget = 1; //ID de la patologia que se quiere mostrar
-    [SerializeField] private string palabraCorrecta = "ULCERA"; //Objetivo a formar
-    [SerializeField] private int cantidadLetrasTeclado = 12;// letras totaless
-
-    [Header("Configuraci�n del Juego")]
-
+    [Header("UI Contenedores")]
     [SerializeField] private Transform containerEspacios;
     [SerializeField] private Transform containerTeclado;
     [SerializeField] private GameObject prefabBotonLetra;
 
-    [Header("Pistas clinicas")]
+    [Header("Pistas clínicas")]
     [SerializeField] private Image uiImagePista;
     [SerializeField] private TextMeshProUGUI uiTextoLesion;
     [SerializeField] private TextMeshProUGUI uiTextoFamilia;
@@ -31,18 +38,17 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
 
     [Header("Datos de la pista")]
     [SerializeField] private Sprite imagenPistaSprite;
-    [SerializeField] private string NombreLesion = "Lesion Primaria";
-    [SerializeField] private string NombreFamilia = "Dermatologica";
-    [SerializeField] private string DescripcionEtiopatogenia = "Perdida continuidad de la piel";
+    [SerializeField] private string NombreLesion = "Lesión Primaria";
+    [SerializeField] private string NombreFamilia = "Dermatológica";
+    [SerializeField] private string DescripcionEtiopatogenia = "Pérdida de continuidad de la piel";
 
-    [Header("Retroalimentacion")]
+    [Header("Retroalimentación")]
     [SerializeField] public TMP_Text textoResultado;
     [SerializeField] public TMP_Text textoRespuesta;
 
     private List<string> letrasTeclado = new List<string>();
-    private string[] progresoUsuario; //variable que guarda las letras que el usuario va ingresando
+    private string[] progresoUsuario;
 
-    //botones para interactuar
     private List<Button> botonesEspaciosUI = new List<Button>();
     private List<Button> botonesTecladoUI = new List<Button>();
 
@@ -51,18 +57,12 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
 
     void Start()
     {
-        // comentar las siguientes dos lineas para funcionamiento con gamemanager ya que si se deje se duplicara el id de los niveles
-        /*
-        ObtenerPatologiaAleatoria();
-        InicializarPregunta(patologiaIDTarget);
-        */
-    }
-    void Update()
-    {
-        
+
     }
 
-    //metodo para obtener una patologia aleatoria del CSV a traves del ID de la patologia
+    /// <summary>
+    /// Selecciona aleatoriamente una patología de la base de datos CSV y actualiza el ID objetivo del nivel.
+    /// </summary>
     private void ObtenerPatologiaAleatoria()
     {
         if (CsvManager.Instance != null && CsvManager.Instance.patologias != null && CsvManager.Instance.patologias.Count > 0)
@@ -73,12 +73,14 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         }
     }
 
-    //metodo para cargar los datos de la patologia desde el CSV
+    /// <summary>
+    /// Consulta al CsvManager para obtener los datos detallados de la patología actual (nombre, lesión, familia, etiología e imagen).
+    /// </summary>
     private void CargarDatosDesdeCSV()
     {
         if (CsvManager.Instance == null) return;
 
-        Patologia patologiaActual = CsvManager.Instance.ObtenerPatologiaPorId(patologiaIDTarget);//
+        Patologia patologiaActual = CsvManager.Instance.ObtenerPatologiaPorId(patologiaIDTarget);
         if (patologiaActual != null)
         {
             palabraCorrecta = patologiaActual.nombre.ToUpper().Trim();
@@ -103,31 +105,34 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
                 }
                 else
                 {
-                    Debug.LogError("No se encontr� la imagen en: Assets/Resources/Imagenes/" + nombreImagenLimpio);
+                    Debug.LogError("No se encontró la imagen en: Assets/Resources/Imagenes/" + nombreImagenLimpio);
                 }
             }
         }
     }
 
-    //metodo para configurar el panel de pistas con los datos obtenidos del CSV
+    /// <summary>
+    /// Asigna los datos médicos cargados a los componentes visuales del panel de pistas clínicas.
+    /// </summary>
     private void ConfigurarPanelPistas()
     {
         if (uiImagePista != null && imagenPistaSprite != null) uiImagePista.sprite = imagenPistaSprite;
-        if (uiTextoLesion != null) uiTextoLesion.text = "Lesi�n: " + NombreLesion;
+        if (uiTextoLesion != null) uiTextoLesion.text = "Lesión: " + NombreLesion;
         if (uiTextoFamilia != null) uiTextoFamilia.text = "Familia: " + NombreFamilia;
         if (uiTextoEtiopatogenia != null) uiTextoEtiopatogenia.text = "Etiopatogenia: " + DescripcionEtiopatogenia;
     }
 
-    //metodo para generarr las teclas en pantalla
+    /// <summary>
+    /// Genera la lista de letras del teclado combinando las letras de la palabra objetivo con letras aleatorias hasta completar la cantidad especificada.
+    /// </summary>
     private void GenerarLetrasTeclado()
     {
-        for (int i = 0; i < palabraCorrecta.Length; i++)//a�ade solamente las letras de la palabra correcta
+        for (int i = 0; i < palabraCorrecta.Length; i++)
         {
             if (palabraCorrecta[i] == ' ') continue;
             letrasTeclado.Add(palabraCorrecta[i].ToString());
         }
 
-        //a�ade con palabras extras hasta formar la cantidad total de palabras
         string abecedario = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (letrasTeclado.Count < cantidadLetrasTeclado)
         {
@@ -135,7 +140,6 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
             letrasTeclado.Add(letraAleatoria);
         }
 
-        //mezcla las letras
         for (int i = 0; i < letrasTeclado.Count; i++)
         {
             string temp = letrasTeclado[i];
@@ -145,7 +149,9 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         }
     }
 
-    //metodo para crear las casillas vacias de las palabras en pantalla 
+    /// <summary>
+    /// Instancia dinámicamente los contenedores y botones de espacio en blanco correspondientes a la palabra objetivo.
+    /// </summary>
     private void CrearEspaciosPalabra()
     {
         string[] palabras = palabraCorrecta.Split(' ');
@@ -200,41 +206,46 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         }
     }
 
-    //crea botones para las letras disponibles
+    /// <summary>
+    /// Instancia los botones correspondientes a las letras disponibles en el contenedor del teclado virtual.
+    /// </summary>
     private void CrearTeclado()
     {
         for (int i = 0; i < letrasTeclado.Count; i++)
         {
-            int index = i; //obtenemos una copia del listener del boton
+            int index = i;
             GameObject nuevoBoton = Instantiate(prefabBotonLetra, containerTeclado);
             Button btn = nuevoBoton.GetComponent<Button>();
 
             string letra = letrasTeclado[index];
             btn.GetComponentInChildren<TextMeshProUGUI>().text = letra;
 
-            //al presionar la tecla se posiciona en su lugar correspondiente
             btn.onClick.AddListener(() => SeleccionarLetraTeclado(index, letra));
 
             botonesTecladoUI.Add(btn);
         }
     }
 
-    //metodo para seleccionar la tecla
+    /// <summary>
+    /// Maneja la pulsación de un botón del teclado virtual, posicionando la letra en la primera casilla vacía disponible.
+    /// </summary>
+    /// <param name="indiceTeclado">Índice del botón presionado en el teclado.</param>
+    /// <param name="letra">Carácter correspondiente a la tecla.</param>
     private void SeleccionarLetraTeclado(int indiceTeclado, string letra)
     {
         if (nivelCompletado) return;
 
-        for (int i = 0; i < progresoUsuario.Length; i++)//busca espacio de izquierda a derecha
+        for (int i = 0; i < progresoUsuario.Length; i++)
         {
             if (string.IsNullOrEmpty(progresoUsuario[i]))
             {
-                progresoUsuario[i] = letra; //guara el progreso del usuario (la letra seleccionada)
+                progresoUsuario[i] = letra;
 
-                botonesEspaciosUI[i].GetComponentInChildren<TextMeshProUGUI>().text = letra; //actualiza la casilla visualmente
+                botonesEspaciosUI[i].GetComponentInChildren<TextMeshProUGUI>().text = letra;
 
-                botonesTecladoUI[indiceTeclado].gameObject.SetActive(false);//se desactiva el boton seleccionado para no repetir la letra 
+                botonesTecladoUI[indiceTeclado].gameObject.SetActive(false);
 
-                botonesEspaciosUI[i].name = indiceTeclado.ToString(); //guarda la referencia del indice del teclado para regresarla en caso de error
+                botonesEspaciosUI[i].name = indiceTeclado.ToString();
 
                 ComprobarResultado();
                 break;
@@ -242,29 +253,31 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         }
     }
 
-
-    //metodo para devolver la tecla a su posicion original
+    /// <summary>
+    /// Quita la letra seleccionada de una casilla objetivo y reactiva la tecla correspondiente en el teclado.
+    /// </summary>
+    /// <param name="indiceEspacio">Índice del espacio de respuesta que se desea limpiar.</param>
     private void RemoverLetraDeEspacio(int indiceEspacio)
     {
-
         if (nivelCompletado) return;
         if (!string.IsNullOrEmpty(progresoUsuario[indiceEspacio]))
         {
-            if (int.TryParse(botonesEspaciosUI[indiceEspacio].name, out int indiceTecladoOriginal)) //obtenemos de que boton provenia la letra seleccionada
+            if (int.TryParse(botonesEspaciosUI[indiceEspacio].name, out int indiceTecladoOriginal))
             {
                 botonesTecladoUI[indiceTecladoOriginal].gameObject.SetActive(true);
             }
-            //limpiamos el progreso 
+
             progresoUsuario[indiceEspacio] = null;
-            
-            //limpiamos visualmente la casilla 
+
             botonesEspaciosUI[indiceEspacio].GetComponentInChildren<TextMeshProUGUI>().text = "";
             botonesEspaciosUI[indiceEspacio].name = "Espacio";
-            botonesEspaciosUI[indiceEspacio].GetComponent<Image>().color = Color.white; //restablece el color del espacio a blanco
+            botonesEspaciosUI[indiceEspacio].GetComponent<Image>().color = Color.white;
         }
     }
 
-    //verifica el resultado correcto con la palabra respuesta
+    /// <summary>
+    /// Valida si el usuario ha completado todas las letras del progreso y verifica si la palabra formada coincide con la correcta.
+    /// </summary>
     private void ComprobarResultado()
     {
         if (nivelCompletado) return;
@@ -272,14 +285,14 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         string palabraFormada = "";
         for (int i = 0; i < progresoUsuario.Length; i++)
         {
-            if (string.IsNullOrEmpty(progresoUsuario[i])) return;//si hay un espacio vacio no se puede comprobar el resultado
+            if (string.IsNullOrEmpty(progresoUsuario[i])) return;
             palabraFormada += progresoUsuario[i];
         }
 
         if (palabraFormada == palabraCorrecta)
         {
             nivelCompletado = true;
-            Debug.Log("<color=green>�Correcto! Has descubierto el diagn�stico cl�nico.</color>");
+            Debug.Log("<color=green>¡Correcto! Has descubierto el diagnóstico clínico.</color>");
             foreach (Button btn in botonesEspaciosUI)
             {
                 btn.GetComponent<Image>().color = Color.green;
@@ -290,7 +303,6 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
                 GameManager.Instance.Aciertos++;
                 GameManager.Instance.TotalAciertos++;
             }
-
 
             EntregarRetroalimentacion();
         }
@@ -314,6 +326,9 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         }
     }
 
+    /// <summary>
+    /// Corrutina que restablece el color original blanco en los casilleros tras un intento incorrecto.
+    /// </summary>
     private IEnumerator RestaurarColoresEspacios()
     {
         yield return new WaitForSeconds(0.5f);
@@ -326,18 +341,21 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         }
     }
 
+    /// <summary>
+    /// Muestra el lienzo de retroalimentación en pantalla con el resultado final (éxito o fracaso) y deshabilita la pausa.
+    /// </summary>
     public override void EntregarRetroalimentacion()
     {
         if (botonPausa != null)
         {
-            botonPausa.gameObject.SetActive(false); // desactivamos el boton de pausa en la pantalal de retroalimentacion para evitar acoplamiento
+            botonPausa.gameObject.SetActive(false);
         }
 
         if (nivelCompletado)
         {
-            textoResultado.text = "Respuesta Correcta!";
+            textoResultado.text = "¡Respuesta Correcta!";
             textoResultado.color = Color.white;
-            textoRespuesta.text = "Has descubierto el diagnostico clinico: " + palabraCorrecta;
+            textoRespuesta.text = "Has descubierto el diagnóstico clínico: " + palabraCorrecta;
         }
         else
         {
@@ -364,13 +382,15 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         }
     }
 
-
+    /// <summary>
+    /// Inicializa y resetea los elementos del Nivel 3 para una nueva pregunta con base en la patología indicada.
+    /// </summary>
+    /// <param name="indPatologiaAsignada">Identificador de la patología a cargar.</param>
     public override void InicializarPregunta(int indPatologiaAsignada)
     {
-
         if (botonPausa != null)
         {
-            botonPausa.gameObject.SetActive(true);//lo activamos de vuelta para cuando se inicialize una pregunta
+            botonPausa.gameObject.SetActive(true);
         }
 
         patologiaIDTarget = indPatologiaAsignada;
@@ -390,6 +410,4 @@ public class ControladorPreguntasNV3 : ControladorPreguntas
         CrearEspaciosPalabra();
         CrearTeclado();
     }
-
-
 }
