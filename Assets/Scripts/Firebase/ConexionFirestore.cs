@@ -6,9 +6,22 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections;
 
+/// <summary>
+/// Gestiona la conexión con Firebase Firestore y la persistencia de datos remotos como partidas, 
+/// estadísticas de usuario, contadores autoincrementables y métricas de juego. 
+/// Implementa el patrón Singleton.
+/// 
+/// Clases dependientes que utiliza:
+/// - FirebaseInit: Utilizada para verificar la inicialización, obtener la instancia activa de Firestore y recuperar el ID del usuario autenticado.
+/// - IFirestoreData: Interfaz requerida por el método de registro de datos para transformar objetos en diccionarios compatibles con Firestore.
+/// </summary>
 public class ConexionFirestore : MonoBehaviour
 {
     private static ConexionFirestore _instance;
+
+    /// <summary>
+    /// Acceso global Singleton a la instancia de ConexionFirestore. Si no existe, crea un GameObject dedicado.
+    /// </summary>
     public static ConexionFirestore Instance
     {
         get
@@ -26,6 +39,9 @@ public class ConexionFirestore : MonoBehaviour
     private FirebaseFirestore db;
     private bool isReady = false;
 
+    /// <summary>
+    /// Garantiza la unicidad del Singleton al despertar el componente.
+    /// </summary>
     void Awake()
     {
         if (_instance != null && _instance != this)
@@ -37,8 +53,14 @@ public class ConexionFirestore : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    /// <summary>
+    /// Inicia el proceso de vinculación con Firebase en el primer frame.
+    /// </summary>
     void Start() => Inicializar();
 
+    /// <summary>
+    /// Comprueba recursivamente si FirebaseInit está listo para asignar la referencia de la base de datos Firestore.
+    /// </summary>
     public void Inicializar()
     {
         if (FirebaseInit.IsReady)
@@ -53,6 +75,19 @@ public class ConexionFirestore : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Guarda el registro detallado de una partida en la subcolección del usuario actual dentro de Firestore.
+    /// </summary>
+    /// <param name="nivel">Nombre o id del nivel jugado.</param>
+    /// <param name="patologiaID">ID de la patología asociada.</param>
+    /// <param name="patologiaOK">Indica si la respuesta de patología fue correcta.</param>
+    /// <param name="etiologiaOK">Indica si la respuesta de etiología fue correcta.</param>
+    /// <param name="familiaOK">Indica si la respuesta de familia fue correcta.</param>
+    /// <param name="lesionOK">Indica si la respuesta de lesión fue correcta.</param>
+    /// <param name="errores">Cantidad total de errores cometidos.</param>
+    /// <param name="tiempo">Tiempo empleado en segundos.</param>
+    /// <param name="erroresDetalle">Estructura con el desglose de los errores.</param>
+    /// <param name="respuestas">Estructura con el detalle de las respuestas seleccionadas.</param>
     public void GuardarPartida(
         string nivel,
         int patologiaID,
@@ -86,7 +121,7 @@ public class ConexionFirestore : MonoBehaviour
 
         string userId = FirebaseInit.GetUserId();
         DocumentReference docRef = db.Collection("usuarios").Document(userId)
-                                      .Collection("partidas").Document();
+                                     .Collection("partidas").Document();
 
         docRef.SetAsync(datos).ContinueWithOnMainThread(task =>
         {
@@ -100,6 +135,9 @@ public class ConexionFirestore : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Recalcula el total de partidas e historia de completado del usuario y actualiza su documento principal en Firestore.
+    /// </summary>
     private void ActualizarEstadisticasUsuario()
     {
         if (!VerificarConexion()) return;
@@ -133,16 +171,28 @@ public class ConexionFirestore : MonoBehaviour
           });
     }
 
+    /// <summary>
+    /// Muestra por consola la información contextual referente a un error cometido durante el juego.
+    /// </summary>
+    /// <param name="nivel">Identificador del nivel.</param>
+    /// <param name="tipo">Tipo de opción fallada.</param>
+    /// <param name="indiceSeleccionado">Índice del elemento marcado.</param>
+    /// <param name="seleccionado">Valor del elemento marcado.</param>
+    /// <param name="correcto">Valor que correspondía a la respuesta correcta.</param>
+    /// <param name="erroresAcumulados">Cantidad acumulada de fallos.</param>
     public void GuardarError(string nivel, string tipo, int indiceSeleccionado, string seleccionado, string correcto, int erroresAcumulados)
     {
         Debug.Log($"Error registrado: {tipo} - {seleccionado} (correcto: {correcto})");
     }
 
-    private bool VerificarConexion() // Verifica si FirebaseInit está listo y si la base de datos está inicializada
+    /// <summary>
+    /// Comprueba la disponibilidad de la conexión a Firebase e inicializa la referencia a la base de datos de ser necesario.
+    /// </summary>
+    /// <returns>True si Firebase y Firestore están listos; de lo contrario, False.</returns>
+    private bool VerificarConexion()
     {
         if (!FirebaseInit.IsReady)
         {
-            // Silenciamos el error rojo intrusivo si es por modo offline intencional
             Debug.Log("Firebase no está listo (Modo Offline o sin conexión).");
             return false;
         }
@@ -157,17 +207,25 @@ public class ConexionFirestore : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Solicita secuencialmente la asignación de un número correlativo global de jugador.
+    /// </summary>
+    /// <param name="callback">Acción a ejecutar retornando el número asignado.</param>
     public void ReservarNumeroJugador(Action<int> callback)
     {
         StartCoroutine(EsperarYReservarNumeroJugador(callback));
     }
 
+    /// <summary>
+    /// Corrutina encargada de esperar la disponibilidad del servicio y ejecutar una transacción atómica 
+    /// en Firestore para incrementar y obtener el contador de jugadores.
+    /// </summary>
+    /// <param name="callback">Acción a invocar tras completar la transacción.</param>
     private IEnumerator EsperarYReservarNumeroJugador(Action<int> callback)
     {
-        float tiempoEspera = 0f;// tiempo minimo que esperamos la conexion
-        float limiteEspera = 4f; // tiempo maximo que esperamos la conexion
+        float tiempoEspera = 0f;
+        float limiteEspera = 4f;
 
-        // esperamos hasta que FirebaseInit esté listo o se alcance el límite de espera
         while (!FirebaseInit.IsReady && tiempoEspera < limiteEspera)
         {
             tiempoEspera += Time.deltaTime;
@@ -219,6 +277,12 @@ public class ConexionFirestore : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Registra un nuevo documento en la colección especificada a partir de un objeto que implemente IFirestoreData.
+    /// </summary>
+    /// <param name="data">Instancia del objeto transformable a datos de Firestore.</param>
+    /// <param name="collection">Nombre de la colección destino.</param>
+    /// <param name="onSuccess">Callback opcional que recibe el ID del nuevo documento generado.</param>
     public void RegistrarData(IFirestoreData data, string collection, Action<string> onSuccess = null)
     {
         if (!VerificarConexion())

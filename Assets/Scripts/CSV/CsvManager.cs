@@ -2,6 +2,17 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Gestiona la carga, almacenamiento y consulta centralizada de datos estructurados desde archivos CSV 
+/// y recursos de imágenes en Unity. Implementa el patrón Singleton para persistir entre escenas.
+/// 
+/// Clases dependientes que utiliza:
+/// - Patologia: Representa datos de afecciones clínicas (relaciona lesión, familia, etiología e imagen).
+/// - Lesion: Define el tipo de lesión asociada y mantiene sus identificadores de descripción.
+/// - Familia: Clasificación taxonómica o agrupador de patologías.
+/// - Etiologia: Origen o causa de la condición médica.
+/// - Descripcion: Textos descriptivos vinculados individualmente a las lesiones.
+/// </summary>
 public class CsvManager : MonoBehaviour
 {
     public static CsvManager Instance { get; private set; } 
@@ -13,6 +24,9 @@ public class CsvManager : MonoBehaviour
 
     private Dictionary<string, Sprite> imagenes;
 
+    /// <summary>
+    /// Configura la instancia Singleton, inicializa las colecciones y desencadena el proceso de carga de datos e imágenes.
+    /// </summary>
     private void Awake()
     {
         if (Instance == null)
@@ -36,15 +50,21 @@ public class CsvManager : MonoBehaviour
         CargarImagenes();
     }
 
+    /// <summary>
+    /// Ejecuta de manera secuencial la lectura de todos los archivos CSV guardados en Resources.
+    /// </summary>
     private void CargarTodos()
     {
-        CargarDescripciones(); // Cargamos primero las descripciones
+        CargarDescripciones();
         CargarPatologias();
         CargarLesiones();
         CargarFamilias();
         CargarEtiologias();
     }
 
+    /// <summary>
+    /// Carga todos los sprites almacenados en la carpeta Resources/Imagenes dentro de un diccionario para acceso rápido.
+    /// </summary>
     private void CargarImagenes()
     {
         Sprite[] sprites = Resources.LoadAll<Sprite>("Imagenes");
@@ -63,6 +83,9 @@ public class CsvManager : MonoBehaviour
         Debug.Log("Se cargaron " + imagenes.Count + " imágenes.");
     }
 
+    /// <summary>
+    /// Lee y procesa el archivo CSV 'descripciones' instanciando la lista de Descripcion.
+    /// </summary>
     private void CargarDescripciones()
     {
         TextAsset csv = Resources.Load<TextAsset>("CSV/descripciones");
@@ -83,6 +106,9 @@ public class CsvManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Lee y procesa el archivo CSV 'lesiones' instanciando objetos Lesion y asociando los IDs de sus descripciones.
+    /// </summary>
     private void CargarLesiones()
     {
         TextAsset csv = Resources.Load<TextAsset>("CSV/lesiones");
@@ -98,7 +124,6 @@ public class CsvManager : MonoBehaviour
             l.id = int.Parse(datos[0].Trim());
             l.nombre = datos[1].Trim();
 
-            // Si la 3ra columna (índice 2) contiene IDs separados por ';' (ej: "1;3;5")
             if (datos.Length > 2 && !string.IsNullOrWhiteSpace(datos[2]))
             {
                 string[] idsDesc = datos[2].Trim().Split(';');
@@ -115,6 +140,9 @@ public class CsvManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Lee y procesa el archivo CSV 'patologias' creando instancias de Patologia vinculadas a sus relaciones.
+    /// </summary>
     private void CargarPatologias()
     {
         TextAsset csv = Resources.Load<TextAsset>("CSV/patologias");
@@ -137,6 +165,9 @@ public class CsvManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Lee y procesa el archivo CSV 'familias' llenando la lista de categorias Familia.
+    /// </summary>
     private void CargarFamilias()
     {
         TextAsset csv = Resources.Load<TextAsset>("CSV/familias");
@@ -155,6 +186,9 @@ public class CsvManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Lee y procesa el archivo CSV 'etiologias' registrando los orígenes de las patologías.
+    /// </summary>
     private void CargarEtiologias()
     {
         TextAsset csv = Resources.Load<TextAsset>("CSV/etiologias");
@@ -173,12 +207,29 @@ public class CsvManager : MonoBehaviour
         }
     }
 
-    // --- Métodos de Búsqueda ---
-
+    /// <summary>
+    /// Busca y retorna un objeto Patologia según su ID identificador.
+    /// </summary>
     public Patologia ObtenerPatologiaPorId(int id) => patologias.Find(p => p.id == id);
+
+    /// <summary>
+    /// Busca y retorna un objeto Lesion según su ID identificador.
+    /// </summary>
     public Lesion ObtenerLesionPorId(int id) => lesiones.Find(l => l.id == id);
+
+    /// <summary>
+    /// Busca y retorna un objeto Familia según su ID identificador.
+    /// </summary>
     public Familia ObtenerFamiliaPorId(int id) => familias.Find(f => f.id == id);
+
+    /// <summary>
+    /// Busca y retorna un objeto Etiologia según su ID identificador.
+    /// </summary>
     public Etiologia ObtenerEtiologiaPorId(int id) => etiologias.Find(e => e.id == id);
+
+    /// <summary>
+    /// Busca y retorna un objeto Descripcion según su ID identificador.
+    /// </summary>
     public Descripcion ObtenerDescripcionPorId(int id) => descripciones.Find(d => d.id == id);
 
     /// <summary>
@@ -201,6 +252,9 @@ public class CsvManager : MonoBehaviour
         return ObtenerDescripcionesDeLesion(l);
     }
 
+    /// <summary>
+    /// Obtiene un Sprite previamente cargado desde el diccionario utilizando su código identificador.
+    /// </summary>
     public Sprite spritePorCodigo(string codigo)
     {
         if(imagenes.TryGetValue(codigo, out Sprite sprite))
@@ -212,23 +266,30 @@ public class CsvManager : MonoBehaviour
         return null;
     }
 
-
-
+    /// <summary>
+    /// Filtra y retorna la lista de patologías vinculadas a una lesión específica por su ID.
+    /// </summary>
     public List<Patologia> ObtenerPatologiasPorLesion(int lesionId)
     {
         return patologias.Where(p => p.lesionID == lesionId).ToList();
     }
 
+    /// <summary>
+    /// Obtiene el Sprite correspondiente a una patología utilizando únicamente su ID.
+    /// </summary>
     public Sprite ObtenerSpritePorPatologiaId(int patologiaId)
     {
         Patologia p = ObtenerPatologiaPorId(patologiaId);
         return p != null ? spritePorCodigo(p.codigoImagen) : null;
     }
+
+    /// <summary>
+    /// Carga de forma directa un Sprite desde Resources según el código de imagen indicado en la patología.
+    /// </summary>
     public Sprite ObtenerSpriteDePatologia(Patologia patologia)
-{
-    if (patologia == null) return null;
-    
-    
-    return Resources.Load<Sprite>($"Imagenes/{patologia.codigoImagen}"); 
-}
+    {
+        if (patologia == null) return null;
+        
+        return Resources.Load<Sprite>($"Imagenes/{patologia.codigoImagen}"); 
+    }
 }

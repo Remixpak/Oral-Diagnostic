@@ -3,12 +3,29 @@ using System.IO;
 using System;
 using System.Collections;
 using System.Reflection;
+
+/// <summary>
+/// Controlador principal encargado de la gestión, persistencia local (JSON) y sincronización remota (Firestore) 
+/// de los datos del juego, incluyendo la información de usuario, partidas guardadas y métricas de rendimiento.
+/// 
+/// Clases dependientes que utiliza:
+/// - FirebaseInit: Utilizada para comprobar la disponibilidad y estado de conexión de Firebase/Firestore.
+/// - ConexionFirestore: Servicio para registrar usuarios, reservar identificadores y enviar métricas a la base de datos remota.
+/// - GameManager: Fuente de datos para extraer tiempos, intentos, aciertos, fallos y el modo de juego actual.
+/// - Usuario: Modelo de datos que almacena la información del jugador (nickname, número asignado y estado de la partida).
+/// - Partida: Modelo de datos que representa el progreso local guardado en disco.
+/// - Metricas: Modelo de datos que empaqueta las estadísticas de desempeño en un nivel para Firestore.
+/// </summary>
 public class ControladorGuardarDatos : MonoBehaviour
 {
     private string rutaPartida;
     private string rutaUsuario;
     public static ControladorGuardarDatos Instance;
-    private bool intentandoSincronizar = false; // booleano para evitar múltiples intentos de sincronización al mismo tiempo
+    private bool intentandoSincronizar = false;
+
+    /// <summary>
+    /// Configura las rutas de almacenamiento persistente en disco e inicializa el patrón Singleton.
+    /// </summary>
     private void Awake()
     {
         rutaPartida = Path.Combine(Application.persistentDataPath, "partida.json");
@@ -18,28 +35,30 @@ public class ControladorGuardarDatos : MonoBehaviour
         if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
         else { Destroy(gameObject); }
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    /// <summary>
+    /// Inicia los procesos de verificación de datos pendientes al comenzar la ejecución del script.
+    /// </summary>
     void Start()
     {
-        StartCoroutine(VerificarYSincronizarUsuarioPendiente()); // inicimos una corrutina para verificar si hay un usuario pendiente de sincronizar con Firebase
+        StartCoroutine(VerificarYSincronizarUsuarioPendiente());
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
 
-    // Corrutina para verificar si hay un usuario pendiente de sincronizar con Firebase
+    /// <summary>
+    /// Evalúa de forma asíncrona la conexión a Firebase para registrar en Firestore a aquellos usuarios creados en modo offline.
+    /// </summary>
     private IEnumerator VerificarYSincronizarUsuarioPendiente()
     {
-        // Esperamos a que Firebase esté listo
         while (!FirebaseInit.IsReady)
         {
             yield return new WaitForSeconds(1f);
         }
 
-        // Si ya tenemos usuario creado y su número es 0 (fue creado offline), procedemos a registrarlo en Firestore
         if (ExisteUsuario() && !intentandoSincronizar)
         {
             Usuario usuarioLocal = CargarUsuario();
@@ -66,7 +85,10 @@ public class ControladorGuardarDatos : MonoBehaviour
         }
     }
 
-    // Corrutina para crear un usuario cuando Firebase esté listo
+    /// <summary>
+    /// Espera de forma asíncrona a que el servicio de Firebase esté disponible para registrar al usuario o guardarlo localmente si expira el tiempo límite.
+    /// </summary>
+    /// <param name="nick">Nombre o apodo del usuario a registrar.</param>
     public IEnumerator CrearUsuarioCuandoFirebaseEsteListo(string nick)
     {
         if (ExisteUsuario())
@@ -99,6 +121,10 @@ public class ControladorGuardarDatos : MonoBehaviour
         CrearUsuario(nick);
     }
 
+    /// <summary>
+    /// Crea un nuevo perfil de usuario, reservando un identificador en Firestore si hay conexión o creándolo en modo offline en disco local.
+    /// </summary>
+    /// <param name="nick">Nombre o apodo asignado al nuevo usuario.</param>
     public void CrearUsuario(string nick)
     {
         if(ExisteUsuario())
@@ -140,12 +166,15 @@ public class ControladorGuardarDatos : MonoBehaviour
                     Debug.Log($"Jugador: {numeroJugador}");
 
                     Debug.Log($"Id Firestore: {idFirestore}");
-
-                    // Aquí puedes guardar el usuario en tu JSON local
                 });
         });
     }
 
+    /// <summary>
+    /// Modifica los campos del usuario en el archivo local y reescribe la información.
+    /// </summary>
+    /// <param name="nick">Nuevo nombre o apodo del usuario.</param>
+    /// <param name="partida">Estado de finalización de la partida.</param>
     public void ActualizarUsuario(string nick, bool partida)
     {
         Usuario u = CargarUsuario();
@@ -153,6 +182,11 @@ public class ControladorGuardarDatos : MonoBehaviour
         u.PartidaTerminada = partida;
         GuardarUsuario(u);
     }
+
+    /// <summary>
+    /// Serializa el objeto Usuario a formato JSON y lo guarda en el disco local.
+    /// </summary>
+    /// <param name="usuario">Instancia de Usuario a guardar.</param>
     public void GuardarUsuario(Usuario usuario)
     {
         string json = JsonUtility.ToJson(usuario, true);
@@ -161,6 +195,11 @@ public class ControladorGuardarDatos : MonoBehaviour
 
         Debug.Log("Usuario guardado en: " + rutaUsuario);
     }
+
+    /// <summary>
+    /// Lee y deserializa la información del archivo JSON local correspondiente al usuario.
+    /// </summary>
+    /// <returns>El objeto Usuario leído o null si el archivo no existe.</returns>
     public Usuario CargarUsuario()
     {
         if (!File.Exists(rutaUsuario))
@@ -177,10 +216,20 @@ public class ControladorGuardarDatos : MonoBehaviour
 
         return usuario;
     }
+
+    /// <summary>
+    /// Comprueba la existencia del archivo del usuario guardado en el almacenamiento local.
+    /// </summary>
+    /// <returns>True si el archivo existe; en caso contrario, False.</returns>
     public bool ExisteUsuario()
     {
         return File.Exists(rutaUsuario);
     }
+
+    /// <summary>
+    /// Serializa el objeto Partida a formato JSON y lo escribe en el almacenamiento local.
+    /// </summary>
+    /// <param name="partida">Instancia de la partida a almacenar.</param>
     public void GuardarPartida(Partida partida)
     {
         string json = JsonUtility.ToJson(partida, true);
@@ -190,6 +239,10 @@ public class ControladorGuardarDatos : MonoBehaviour
         Debug.Log("Partida guardada en: " + rutaPartida);
     }
 
+    /// <summary>
+    /// Lee y deserializa el archivo JSON local de la partida guardada.
+    /// </summary>
+    /// <returns>El objeto Partida deserializado o null si no existe.</returns>
     public Partida CargarPartida()
     {
         if (!File.Exists(rutaPartida))
@@ -207,11 +260,18 @@ public class ControladorGuardarDatos : MonoBehaviour
         return partida;
     }
 
+    /// <summary>
+    /// Comprueba si existe un archivo de partida guardada en el almacenamiento local.
+    /// </summary>
+    /// <returns>True si existe el archivo de partida; de lo contrario, False.</returns>
     public bool ExistePartida()
     {
         return File.Exists(rutaPartida);
     }
 
+    /// <summary>
+    /// Elimina el archivo de partida guardada en la ruta local si este existe.
+    /// </summary>
     public void EliminarPartida()
     {
         if (File.Exists(rutaPartida))
@@ -220,19 +280,27 @@ public class ControladorGuardarDatos : MonoBehaviour
             Debug.Log("Partida eliminada.");
         }
     }
+
+    /// <summary>
+    /// Método reservado para el envío general de datos.
+    /// </summary>
     public void EnviarData()
     {
         
     }
+
+    /// <summary>
+    /// Recopila las estadísticas actuales del GameManager y las envía a la colección de métricas en Firestore.
+    /// </summary>
+    /// <param name="nivel">Nombre o identificador del nivel evaluado.</param>
     public void GuardarMetricas(string nivel)
     {
-        Usuario usuarioActual = CargarUsuario();// Cargamos el usuario actual desde el archivo local
-        if (usuarioActual == null || usuarioActual.NumeroJugador == 0) // Si el usuario no está sincronizado con Firestore (NumeroJugador = 0), no podemos enviar métricas
+        Usuario usuarioActual = CargarUsuario();
+        if (usuarioActual == null || usuarioActual.NumeroJugador == 0)
         {
             Debug.Log("El usuario actual no está sincronizado con Firestore (NumeroJugador = 0)");
             return;
         }
-
 
         Metricas metricas = new Metricas();
 
@@ -253,13 +321,6 @@ public class ControladorGuardarDatos : MonoBehaviour
         metricas.TotalAciertos = GameManager.Instance.Aciertos;
 
         metricas.TotalFallos = GameManager.Instance.Fallos;
-
-        /*metricas.FalloLesiones = GameManager.Instance.FLesiones;
-
-        metricas.FalloFamilias = GameManager.Instance.FFamilias;
-
-        metricas.FalloDiagnosticos = GameManager.Instance.FDiagnosticos;*/
-        //Debug.Log($"Guardando metrica con Lesiones: {metricas.FalloLesiones} del manager: {GameManager.Instance.FLesiones} Familias: {metricas.FalloFamilias} del manager: {GameManager.Instance.FFamilias} diagnosticos: {metricas.FalloDiagnosticos} del manager: {GameManager.Instance.FDiagnosticos}");
 
         if(!FirebaseInit.IsReady)
         {

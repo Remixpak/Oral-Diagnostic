@@ -5,6 +5,20 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// Gestiona la pantalla de inicio del juego, controlando la navegación principal, la apertura y cierre de paneles de ajustes, 
+/// diálogos de confirmación, eliminación y reanudación de partidas guardadas, además de la configuración de opciones de audio y modo zurdo.
+/// 
+/// Clases dependientes que utiliza:
+/// - ControladorSonido: Administra la reproducción de efectos de sonido (clics) y la configuración global de audio y música.
+/// - ControladorModoZurdo: Aplica la preferencia del modo zurdo/diestro en la interfaz.
+/// - ControladorGuardarDatos: Permite validar, cargar, guardar y eliminar partidas o usuarios persistentes.
+/// - ObjetivoIntro: Controla las secuencias introductorias o animaciones de texto al iniciar una partida nueva.
+/// - ToggleSwitch: Componente UI personalizado para alternar los estados de configuración (sonido, música, modo zurdo).
+/// - ConfiguracionPartida: Clase de datos global donde se inyecta la dificultad y el modo de juego al reanudar una partida.
+/// - GameManager: Define las enumeraciones y modos de juego disponibles (ej. ModoJuego.Carrera).
+/// - Partida: Modelo de datos que representa una partida guardada.
+/// </summary>
 public class Inicio : MonoBehaviour
 {
     [Header("Paneles")]
@@ -20,8 +34,8 @@ public class Inicio : MonoBehaviour
     [SerializeField] private Button btnConfirmar;
 
     [Header("Continuar")]
-    [SerializeField] private TMP_Text textoAvisoSinPartida; // Texto del panel 
-    [SerializeField] private GameObject panelAvisoSinPartida; // Panel que se muestra si no hay partida
+    [SerializeField] private TMP_Text textoAvisoSinPartida; 
+    [SerializeField] private GameObject panelAvisoSinPartida; 
 
     private bool pasoCuentaRegresiva = false;
     private Coroutine corrutinaCuentaRegresiva;
@@ -31,6 +45,10 @@ public class Inicio : MonoBehaviour
     [SerializeField] private TMP_Text textoBorrado;
 
     private ObjetivoIntro objetivoIntro;
+
+    /// <summary>
+    /// Inicializa las referencias, sincroniza los controles UI con las preferencias guardadas y valida la existencia del usuario local/remoto.
+    /// </summary>
     void Start()
     {
         objetivoIntro = GetComponent<ObjetivoIntro>();
@@ -72,22 +90,10 @@ public class Inicio : MonoBehaviour
         
     }
 
-    /*private void ConfigurarToggleModoZurdo()
-    {
-        if (toggleModoZurdo == null)
-        {
-            return;
-        }
-
-        bool estadoGuardado = PlayerPrefs.GetInt("ModoZurdo", 0) == 1;
-
-        toggleModoZurdo.SetIsOnWithoutNotify(estadoGuardado);
-
-        toggleModoZurdo.onValueChanged.RemoveAllListeners();
-        toggleModoZurdo.onValueChanged.AddListener(AlternarModoZurdo);
-
-    }*/
-
+    /// <summary>
+    /// Modifica el estado de habilitación de la música de fondo en la aplicación y reproduce el sonido de clic.
+    /// </summary>
+    /// <param name="activado">Indica si la música debe activarse (True) o desactivarse (False).</param>
     public void DesactivarMusica(bool activado)
     {
         if (ControladorSonido.Instance != null)
@@ -97,19 +103,27 @@ public class Inicio : MonoBehaviour
         ControladorSonido.Instance?.ReproducirClick();
     }
 
-
+    /// <summary>
+    /// Despliega el panel de ajustes y reproduce un sonido de interacción.
+    /// </summary>
     public void ActivarAjustes()
     {
         panelAjustes.SetActive(true);
         ControladorSonido.Instance?.ReproducirClick();
     }
 
+    /// <summary>
+    /// Oculta el panel de ajustes y reproduce un sonido de interacción.
+    /// </summary>
     public void DesactivarAjustes()
     {
         panelAjustes.SetActive(false);
         ControladorSonido.Instance?.ReproducirClick();
     }
 
+    /// <summary>
+    /// Inicia el flujo de juego navegando a la pantalla de selección o activando la cinemática de introducción según el estado de la partida del usuario.
+    /// </summary>
     public void IrAJugar()
     {
         ControladorSonido.Instance?.ReproducirClick();
@@ -118,11 +132,8 @@ public class Inicio : MonoBehaviour
         bool usuario = ControladorGuardarDatos.Instance.CargarUsuario() != null;
         bool partidaCompletada = usuario && ControladorGuardarDatos.Instance.CargarUsuario().PartidaTerminada;
         
-
         if (!partidaCompletada)
         {
-            // CASO 1: No hay partida (es nueva/borrada) O existe pero NO la ha completado.
-            // Debe ver la intro/objetivo.
             if (objetivoIntro != null)
             {
                 objetivoIntro.IniciarMensaje();
@@ -133,17 +144,16 @@ public class Inicio : MonoBehaviour
         }
         else
         {
-            // CASO 2: Existe partida Y ademas ya la termino al menos una vez.
-            // Salta la intro y va directo a la seleccion de nivel/modo.
             SceneManager.LoadScene("PantallaSeleccion");
             Debug.Log("Partida existente y completada: Pasando a PantallaSeleccion");
         }
     }
 
-
+    /// <summary>
+    /// Corrutina que aguarda la finalización de la secuencia textual introductoria antes de realizar el cambio de escena a "PantallaSeleccion".
+    /// </summary>
     private IEnumerator CargarEscenaSecuencia()
     {
-
         while (objetivoIntro != null && objetivoIntro.Escribiendo)
         {
             yield return null; 
@@ -154,6 +164,10 @@ public class Inicio : MonoBehaviour
         SceneManager.LoadScene("PantallaSeleccion");
     }
 
+    /// <summary>
+    /// Alterna la preferencia del modo zurdo, guardando la configuración en PlayerPrefs y notificando al controlador correspondiente.
+    /// </summary>
+    /// <param name="activado">Indica si el modo zurdo debe activarse (True) o desactivarse (False).</param>
     public void AlternarModoZurdo(bool activado)
     {
         PlayerPrefs.SetInt("ModoZurdo", activado ? 1 : 0);
@@ -163,13 +177,14 @@ public class Inicio : MonoBehaviour
         {
             ControladorModoZurdo.Instance.ActivarModoZurdo(activado);
         }
-        else
-        {
-        }
 
         ControladorSonido.Instance?.ReproducirClick();
     }
 
+    /// <summary>
+    /// Modifica el estado global de activación de los efectos de sonido.
+    /// </summary>
+    /// <param name="activado">Indica si los efectos de sonido deben activarse (True) o desactivarse (False).</param>
     public void DesactivarSonido(bool activado)
     {
         Debug.Log($"Inicio recibió: {activado}");
@@ -177,9 +192,11 @@ public class Inicio : MonoBehaviour
         {
             ControladorSonido.Instance.SetSonidoActivado(activado);
         }
-        
     }
 
+    /// <summary>
+    /// Muestra el panel emergente de confirmación e inicia un temporizador de cuenta regresiva en el botón de confirmación si no ha finalizado previamente.
+    /// </summary>
     public void AbrirConfirmacion()
     {
         ControladorSonido.Instance?.ReproducirClick();
@@ -198,6 +215,10 @@ public class Inicio : MonoBehaviour
             btnConfirmar.GetComponentInChildren<TMP_Text>().text = "Confirmar";
         }
     }
+
+    /// <summary>
+    /// Oculta el panel emergente de confirmación y detiene la cuenta regresiva en curso si correspondiese.
+    /// </summary>
     public void CerrarConfirmacion()
     {
         if (!pasoCuentaRegresiva && corrutinaCuentaRegresiva != null)
@@ -208,9 +229,11 @@ public class Inicio : MonoBehaviour
 
         panelConfirmacion.SetActive(false);
         ControladorSonido.Instance?.ReproducirClick();
-
     }
 
+    /// <summary>
+    /// Elimina los datos de la partida guardada actual, cierra paneles abiertos y muestra temporalmente la notificación de borrado.
+    /// </summary>
     public void BorrarPartida()
     {
         if (ControladorGuardarDatos.Instance.ExistePartida())
@@ -219,15 +242,17 @@ public class Inicio : MonoBehaviour
             textoBorrado.text = "No existe partida";
         ControladorGuardarDatos.Instance.EliminarPartida();
 
-        if (panelAjustes != null) panelAjustes.SetActive(false);//cerramos el panel de ajustes
-        if (panelConfirmacion != null) panelConfirmacion.SetActive(false); // cerramos el panel de confirmacion
-        if (panelAvisoSinPartida != null) panelAvisoSinPartida.SetActive(false); // cerramos el panel de aviso de que no hay partida guardada
+        if (panelAjustes != null) panelAjustes.SetActive(false);
+        if (panelConfirmacion != null) panelConfirmacion.SetActive(false); 
+        if (panelAvisoSinPartida != null) panelAvisoSinPartida.SetActive(false); 
 
         StartCoroutine(PanelBorrado());
         ControladorSonido.Instance?.ReproducirClick();
     }
 
-    //metodo para continuar partida, si no hay partida guardada se muestra un panel con un texto personalizado
+    /// <summary>
+    /// Reanuda la partida guardada si existe, inyectando su configuración en la clase global y cargando la escena principal; de lo contrario despliega un aviso.
+    /// </summary>
     public void ContinuarPartida() 
     {
         ControladorSonido.Instance?.ReproducirClick();
@@ -269,6 +294,9 @@ public class Inicio : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Corrutina que oculta automáticamente el panel de aviso de ausencia de partida tras 1 segundo.
+    /// </summary>
     private IEnumerator OcultarPanelAviso()
     {
         yield return new WaitForSeconds(1f);
@@ -278,6 +306,9 @@ public class Inicio : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Corrutina que deshabilita el botón de confirmación durante 5 segundos como medida de seguridad antes de permitir una acción crítica.
+    /// </summary>
     private IEnumerator CuentaRegresivaConfirmacion()
     {
         btnConfirmar.interactable = false;
@@ -294,10 +325,11 @@ public class Inicio : MonoBehaviour
         pasoCuentaRegresiva = true;
     }
 
-
+    /// <summary>
+    /// Corrutina que despliega el panel con la notificación de borrado durante medio segundo.
+    /// </summary>
     private IEnumerator PanelBorrado()
     {
-        
         panelBorrado.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         panelBorrado.gameObject.SetActive(false);

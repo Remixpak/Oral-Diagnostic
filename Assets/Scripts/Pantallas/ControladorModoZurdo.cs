@@ -2,17 +2,36 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+/// <summary>
+/// Gestiona la preferencia global del modo zurdo/diestro en la interfaz de usuario, alternando
+/// la visibilidad entre pares de GameObjects de botones asignados y guardando la preferencia localmente.
+/// Implementa el patrón Singleton.
+/// 
+/// Clases dependientes que utiliza:
+/// - PlayerPrefs: Utilizada para guardar y recuperar la preferencia del usuario ("ModoZurdo") de forma local e intradominio.
+/// - ParBotones: Estructura serializable interna que asocia un objeto de botón para diestro con su alternativa para zurdo.
+/// </summary>
 public class ControladorModoZurdo : MonoBehaviour
 {
-
-    //basicamente al script le pasas dos botones, uno que quede visible al estar desactivado el modo zurdo y otro que se quiera ver si se activa el modo zurdo, diviertete y asegurate que otro boton
-    //no este isntanciando el mismo o pasaran cosas feas
+    /// <summary>
+    /// Acceso global Singleton a la instancia activa del ControladorModoZurdo.
+    /// </summary>
     public static ControladorModoZurdo Instance { get; private set; }
 
+    /// <summary>
+    /// Estructura contenedora que vincula la versión diestra y zurda de un elemento de interfaz.
+    /// </summary>
     [System.Serializable]
     public class ParBotones
     {
+        /// <summary>
+        /// Objeto del botón orientado a la disposición predeterminada (diestra).
+        /// </summary>
         public GameObject botonDiestro;
+
+        /// <summary>
+        /// Objeto del botón orientado a la disposición adaptada (zurda).
+        /// </summary>
         public GameObject botonZurdo;
     }
 
@@ -21,6 +40,9 @@ public class ControladorModoZurdo : MonoBehaviour
 
     private bool modoZurdo = false;
 
+    /// <summary>
+    /// Configura la instancia Singleton, carga el estado persistente del modo zurdo y aplica la visibilidad inicial.
+    /// </summary>
     void Awake()
     {
         if (Instance == null)
@@ -37,6 +59,10 @@ public class ControladorModoZurdo : MonoBehaviour
         AplicarModoZurdo(modoZurdo);
     }
 
+    /// <summary>
+    /// Establece explícitamente el estado del modo zurdo, persiste la elección en PlayerPrefs y actualiza la interfaz.
+    /// </summary>
+    /// <param name="activado">True para activar el modo zurdo, False para el modo diestro.</param>
     public void ActivarModoZurdo(bool activado)
     {
         if (modoZurdo == activado) return;
@@ -47,10 +73,21 @@ public class ControladorModoZurdo : MonoBehaviour
         AplicarModoZurdo(activado);
     }
 
+    /// <summary>
+    /// Consulta si el modo zurdo está actualmente activo.
+    /// </summary>
+    /// <returns>True si el modo zurdo está habilitado; de lo contrario, False.</returns>
     public bool EsModoZurdo() => modoZurdo;
 
+    /// <summary>
+    /// Invierte el estado actual del modo zurdo (de activo a inactivo o viceversa).
+    /// </summary>
     public void AlternarModoZurdo() => ActivarModoZurdo(!modoZurdo);
 
+    /// <summary>
+    /// Alterna el estado de activación en la jerarquía de Unity para los botones diestros y zurdos registrados.
+    /// </summary>
+    /// <param name="activado">Indica si se deben mostrar los elementos para zurdos (True) o diestros (False).</param>
     private void AplicarModoZurdo(bool activado)
     {
         if (pares == null || pares.Count == 0)
