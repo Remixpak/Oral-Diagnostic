@@ -312,7 +312,7 @@ public class ControladorGuardarDatos : MonoBehaviour
 
         metricas.NumeroJugador = CargarUsuario().NumeroJugador;
 
-        metricas.TiempoJuego = GameManager.Instance.TiempoJuego;
+        metricas.TiempoJuego = FormatearTiempo(GameManager.Instance.TiempoJuego);
 
         metricas.TotalIntentos = GameManager.Instance.TotalIntentos;
 
@@ -332,4 +332,18 @@ public class ControladorGuardarDatos : MonoBehaviour
             metricas,
             "metricas");
     }
+
+    //hacemos un metodo para formatear el tiempo en segundos a un string con minutos y segundos
+    private string FormatearTiempo(float tiempoEnSegundos)
+    {
+        //aproximamos el tiempo a minutos y segundos
+        int minutos = Mathf.FloorToInt(tiempoEnSegundos / 60f);
+        int segundos = Mathf.FloorToInt(tiempoEnSegundos % 60f);
+
+        if (minutos > 0)
+            return $"{minutos}m {segundos}s";
+        else
+            return $"{segundos}s";
+    }
+
 }

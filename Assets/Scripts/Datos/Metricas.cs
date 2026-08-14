@@ -8,7 +8,7 @@ public class Metricas : IFirestoreData
     public string TipoNivel;
     public GameManager.ModoJuego ModoJuego;
     public int NumeroJugador;
-    public float TiempoJuego;
+    public string TiempoJuego; //cambiamos el tiempo de flaot a string para poder formatearlo en minutos y segundos
     public int TotalIntentos;
     public int TotalReinicios;
     public int TotalAciertos;
